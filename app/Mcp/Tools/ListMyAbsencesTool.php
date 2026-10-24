@@ -12,9 +12,11 @@ use Illuminate\JsonSchema\Types\Type;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
+use Laravel\Mcp\Server\Attributes\Name;
 use Laravel\Mcp\Server\Tool;
 use Laravel\Mcp\Server\Tools\Annotations\IsReadOnly;
 
+#[Name('list_my_absences')]
 #[Description('Lists the signed-in person\'s own absences (vacations and leaves) with their status, and the reason when rejected.')]
 #[IsReadOnly]
 class ListMyAbsencesTool extends Tool

@@ -11,9 +11,11 @@ use Illuminate\JsonSchema\Types\Type;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
+use Laravel\Mcp\Server\Attributes\Name;
 use Laravel\Mcp\Server\Tool;
 use Laravel\Mcp\Server\Tools\Annotations\IsIdempotent;
 
+#[Name('mark_notifications_read')]
 #[Description('Marks all of the signed-in person\'s unread notifications as read.')]
 #[IsIdempotent]
 class MarkNotificationsReadTool extends Tool

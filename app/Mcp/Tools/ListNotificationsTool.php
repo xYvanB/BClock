@@ -13,9 +13,11 @@ use Illuminate\Notifications\DatabaseNotification;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
+use Laravel\Mcp\Server\Attributes\Name;
 use Laravel\Mcp\Server\Tool;
 use Laravel\Mcp\Server\Tools\Annotations\IsReadOnly;
 
+#[Name('list_notifications')]
 #[Description('Lists the signed-in person\'s latest notifications (20), unread ones first if asked.')]
 #[IsReadOnly]
 class ListNotificationsTool extends Tool

@@ -14,9 +14,11 @@ use Illuminate\JsonSchema\Types\Type;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
+use Laravel\Mcp\Server\Attributes\Name;
 use Laravel\Mcp\Server\Tool;
 use Laravel\Mcp\Server\Tools\Annotations\IsReadOnly;
 
+#[Name('list_projects')]
 #[Description('Lists the projects with customer, dates and hours (planned and logged). Only for the Boss, area heads and HR; employees see their own tasks with list_my_activities instead.')]
 #[IsReadOnly]
 class ListProjectsTool extends Tool

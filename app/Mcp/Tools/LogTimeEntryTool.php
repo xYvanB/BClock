@@ -13,9 +13,11 @@ use Illuminate\JsonSchema\Types\Type;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
+use Laravel\Mcp\Server\Attributes\Name;
 use Laravel\Mcp\Server\Tool;
 use Throwable;
 
+#[Name('log_time_entry')]
 #[Description('Logs hours worked by the signed-in person on a task: day, start and end time. Overlaps with other entries are allowed; going over the planned hours is only a warning. Archived tasks are refused.')]
 class LogTimeEntryTool extends Tool
 {

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Settings\CompanyCalendarController;
+use App\Http\Controllers\Settings\ConnectedAppController;
 use App\Http\Controllers\Settings\NotificationPreferencesController;
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\PreferencesController;
@@ -25,6 +26,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('settings/notifications', [NotificationPreferencesController::class, 'edit'])->name('notification-preferences.edit');
     Route::put('settings/notifications', [NotificationPreferencesController::class, 'update'])->name('notification-preferences.update');
+
+    Route::get('settings/connected-apps', [ConnectedAppController::class, 'index'])->name('connected-apps.index');
+    Route::delete('settings/connected-apps/{client}', [ConnectedAppController::class, 'destroy'])->name('connected-apps.destroy');
 
     Route::get('settings/company-calendar', [CompanyCalendarController::class, 'edit'])->name('company-calendar.edit');
     Route::put('settings/company-calendar', [CompanyCalendarController::class, 'update'])->name('company-calendar.update');

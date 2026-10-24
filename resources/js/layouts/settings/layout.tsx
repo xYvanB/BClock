@@ -27,6 +27,11 @@ const sidebarNavItems: NavItem[] = [
         url: '/settings/notifications',
         icon: null,
     },
+    {
+        title: 'App collegate',
+        url: '/settings/connected-apps',
+        icon: null,
+    },
 ];
 
 /** Application settings: seen only by the Boss and HR. */

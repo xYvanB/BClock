@@ -21,6 +21,7 @@ use App\Models\Project;
 use App\Models\TimeEntry;
 use App\Models\Timer;
 use App\Models\User;
+use Laravel\Mcp\Server\Attributes\Description;
 
 function mcpActivity(User $person, array $attributes = []): Activity
 {
@@ -161,6 +162,6 @@ it('answers in the language of the person', function (): void {
 
 it('has the tools declared with a description for the AI', function (): void {
     foreach ([ListMyActivitiesTool::class, LogTimeEntryTool::class, RequestAbsenceTool::class] as $tool) {
-        BClockServer::tool($tool)->assertDescription((new ReflectionClass($tool))->getAttributes()[0]->getArguments()[0]);
+        BClockServer::tool($tool)->assertDescription((new ReflectionClass($tool))->getAttributes(Description::class)[0]->getArguments()[0]);
     }
 });

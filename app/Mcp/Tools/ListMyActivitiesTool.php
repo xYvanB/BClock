@@ -13,9 +13,11 @@ use Illuminate\JsonSchema\Types\Type;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
+use Laravel\Mcp\Server\Attributes\Name;
 use Laravel\Mcp\Server\Tool;
 use Laravel\Mcp\Server\Tools\Annotations\IsReadOnly;
 
+#[Name('list_my_activities')]
 #[Description('Lists the tasks (activities) assigned to the signed-in person, with project, dates, planned and logged hours. Use it to find the activity id needed to log time or start a timer.')]
 #[IsReadOnly]
 class ListMyActivitiesTool extends Tool

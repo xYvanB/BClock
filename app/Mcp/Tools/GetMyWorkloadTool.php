@@ -13,9 +13,11 @@ use Illuminate\JsonSchema\Types\Type;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
+use Laravel\Mcp\Server\Attributes\Name;
 use Laravel\Mcp\Server\Tool;
 use Laravel\Mcp\Server\Tools\Annotations\IsReadOnly;
 
+#[Name('get_my_workload')]
 #[Description('Shows the signed-in person\'s workload day by day: capacity (hours available after holidays and absences), assigned hours and the level (under capacity, full, overloaded).')]
 #[IsReadOnly]
 class GetMyWorkloadTool extends Tool

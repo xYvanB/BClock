@@ -13,9 +13,11 @@ use Illuminate\JsonSchema\Types\Type;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
+use Laravel\Mcp\Server\Attributes\Name;
 use Laravel\Mcp\Server\Tool;
 use Throwable;
 
+#[Name('start_timer')]
 #[Description('Starts a timer on a task for the signed-in person. One timer per task; stopping it turns it into time entries.')]
 class StartTimerTool extends Tool
 {

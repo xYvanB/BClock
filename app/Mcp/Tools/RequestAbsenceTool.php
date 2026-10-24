@@ -14,9 +14,11 @@ use Illuminate\JsonSchema\Types\Type;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
+use Laravel\Mcp\Server\Attributes\Name;
 use Laravel\Mcp\Server\Tool;
 use Throwable;
 
+#[Name('request_absence')]
 #[Description('Requests a vacation (one or more whole days) or a leave (a few hours within one day) for the signed-in person. The request starts pending and is approved by the area head and/or HR as usual; the Boss\'s own absences are confirmed at once. Non-working days and overlaps are refused.')]
 class RequestAbsenceTool extends Tool
 {

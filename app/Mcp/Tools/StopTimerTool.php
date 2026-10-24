@@ -14,9 +14,11 @@ use Illuminate\JsonSchema\Types\Type;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
+use Laravel\Mcp\Server\Attributes\Name;
 use Laravel\Mcp\Server\Tool;
 use Throwable;
 
+#[Name('stop_timer')]
 #[Description('Stops one of the signed-in person\'s running timers and turns it into time entries (one per day if it crossed midnight). Without a timer id it stops the only running timer, and asks which one if there are several.')]
 class StopTimerTool extends Tool
 {
