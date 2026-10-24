@@ -1,7 +1,7 @@
 import InputError from '@/components/input-error';
 import { dateOfWorkingDay } from '@/lib/template-days';
 import { formatDay } from '@/lib/time';
-import { type AssigneeOption, type TemplateOption } from '@/types';
+import { type AssigneeOption, type TemplateOption, type WorkCalendar } from '@/types';
 
 interface TemplatePreviewProps {
     template: TemplateOption;
@@ -12,19 +12,21 @@ interface TemplatePreviewProps {
     onChange: (selected: Record<string, number[]>) => void;
     /** Messaggio di errore per una chiave del server, es. `template_assignees.12`. */
     errorFor: (key: string) => string | undefined;
+    /** Calendario aziendale per contare i giorni lavorativi (di norma quello condiviso dal server). */
+    calendar?: WorkCalendar | null;
 }
 
 /** Data di fine dell'ultima attività del template, o null se non c'è una data di inizio valida. */
-export function templateEndDate(template: TemplateOption, startsOn: string): string | null {
+export function templateEndDate(template: TemplateOption, startsOn: string, calendar?: WorkCalendar | null): string | null {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(startsOn) || template.activities.length === 0) {
         return null;
     }
 
-    return dateOfWorkingDay(startsOn, Math.max(...template.activities.map((activity) => activity.end_day)));
+    return dateOfWorkingDay(startsOn, Math.max(...template.activities.map((activity) => activity.end_day)), calendar ?? undefined);
 }
 
 /** Anteprima delle attività che il template creerà, con le date calcolate e gli assegnatari obbligatori. */
-export function TemplatePreview({ template, startsOn, dueOn, assignees, selected, onChange, errorFor }: TemplatePreviewProps) {
+export function TemplatePreview({ template, startsOn, dueOn, assignees, selected, onChange, errorFor, calendar }: TemplatePreviewProps) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(startsOn)) {
         return <p className="text-muted-foreground text-sm">Imposta la data di inizio per vedere l'anteprima delle attività.</p>;
     }
@@ -61,8 +63,8 @@ export function TemplatePreview({ template, startsOn, dueOn, assignees, selected
                     <fieldset key={activity.id} className="border-sidebar-border/70 grid gap-2 rounded-lg border p-3">
                         <legend className="px-1 text-sm font-medium">{activity.name}</legend>
                         <p className="text-muted-foreground text-sm">
-                            {formatDay(dateOfWorkingDay(startsOn, activity.start_day))} → {formatDay(dateOfWorkingDay(startsOn, activity.end_day))} ·{' '}
-                            {activity.planned_hours} h
+                            {formatDay(dateOfWorkingDay(startsOn, activity.start_day, calendar ?? undefined))} →{' '}
+                            {formatDay(dateOfWorkingDay(startsOn, activity.end_day, calendar ?? undefined))} · {activity.planned_hours} h
                         </p>
                         <div className="grid gap-1">
                             <span className="text-sm">Assegnatari (almeno uno)</span>

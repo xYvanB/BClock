@@ -13,8 +13,10 @@ import {
     type GanttProject,
     type GanttShiftMode,
     type PersonOption,
+    type SharedData,
+    type WorkCalendar,
 } from '@/types';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { PointerEvent, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Gantt', href: '/gantt' }];
@@ -62,7 +64,12 @@ const diffDays = (from: string, to: string) => Math.round((toUtc(to) - toUtc(fro
 const addDays = (iso: string, days: number) => new Date(toUtc(iso) + days * DAY_MS).toISOString().slice(0, 10);
 const formatDate = (iso: string) => iso.split('-').reverse().join('/');
 const monthName = (iso: string) => new Date(toUtc(iso)).toLocaleDateString('it-IT', { month: 'long', year: 'numeric', timeZone: 'UTC' });
-const isWeekend = (iso: string) => [0, 6].includes(new Date(toUtc(iso)).getUTCDay());
+/** Giorno non lavorativo: un giorno della settimana in cui non si lavora (impostazioni) oppure una festività o chiusura. */
+const isOffDay = (iso: string, calendar: WorkCalendar | null) => {
+    const weekday = new Date(toUtc(iso)).getUTCDay() === 0 ? 7 : new Date(toUtc(iso)).getUTCDay();
+
+    return calendar ? !calendar.working_weekdays.includes(weekday) || calendar.closures.includes(iso) : weekday > 5;
+};
 
 /** Segmenti dei mesi per l'intestazione: etichetta, posizione e larghezza in pixel. */
 function buildMonths(from: string, totalDays: number, px: number): { label: string; left: number; width: number }[] {
@@ -84,6 +91,7 @@ function buildMonths(from: string, totalDays: number, px: number): { label: stri
 
 /** Gantt (F10): attività per progetto con dipendenze; le barre si spostano e si ridimensionano, con anteprima della catena. */
 export default function GanttIndex({ zoom, filters, from, to, today, projects, filter_options, preview }: GanttProps) {
+    const { calendar } = usePage<SharedData>().props;
     const px = PX_PER_DAY[zoom];
     const totalDays = diffDays(from, to) + 1;
     const timelineWidth = totalDays * px;
@@ -337,7 +345,7 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
                                             key={date}
                                             className={cn(
                                                 'text-muted-foreground absolute border-l text-center text-xs',
-                                                isWeekend(date) && 'bg-muted-foreground/10',
+                                                isOffDay(date, calendar) && 'bg-muted-foreground/10',
                                             )}
                                             style={{
                                                 left: diffDays(from, date) * px,

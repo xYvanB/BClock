@@ -40,7 +40,14 @@ export interface SharedData {
     timer_warning_minutes: number;
     /** Ora del server (ISO 8601): corregge l'orologio del browser nel tempo trascorso. */
     server_now: string;
+    /** Calendario aziendale: giorni lavorativi della settimana (1 = lunedì … 7 = domenica) e date di festività o chiusura. */
+    calendar: WorkCalendar | null;
     [key: string]: unknown;
+}
+
+export interface WorkCalendar {
+    working_weekdays: number[];
+    closures: string[];
 }
 
 export type Role = 'capo' | 'capo_area' | 'hr' | 'dipendente';
@@ -286,6 +293,7 @@ export interface Holiday {
     id: number;
     date: string;
     name: string;
+    kind: 'festivo' | 'chiusura';
 }
 
 export interface AppNotification {
@@ -297,7 +305,8 @@ export type LoadLevel = 'sotto_capacita' | 'pieno' | 'sovraccarico';
 
 export interface CalendarDay {
     date: string;
-    is_weekend: boolean;
+    /** Giorno della settimana in cui non si lavora (impostazioni del calendario aziendale). */
+    is_off: boolean;
     holiday: string | null;
     is_today: boolean;
 }

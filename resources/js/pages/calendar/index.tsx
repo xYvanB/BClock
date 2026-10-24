@@ -227,7 +227,7 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
                                             title={day.holiday ?? undefined}
                                             className={cn(
                                                 'min-w-14 px-2 py-2 text-center font-medium',
-                                                (day.is_weekend || day.holiday) && 'text-muted-foreground',
+                                                (day.is_off || day.holiday) && 'text-muted-foreground',
                                                 day.is_today && 'text-primary underline',
                                             )}
                                         >
@@ -251,7 +251,7 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
                                         {days.map((day) => {
                                             const cell = person.days[day.date];
                                             const isSelected = selected?.personId === person.id && selected.date === day.date;
-                                            const dropAllowed = dragged !== null && dragged.personId === person.id && !day.is_weekend && !day.holiday;
+                                            const dropAllowed = dragged !== null && dragged.personId === person.id && !day.is_off && !day.holiday;
 
                                             return (
                                                 <td

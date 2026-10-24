@@ -12,6 +12,7 @@ use App\Models\Absence;
 use App\Models\ActivityAllocation;
 use App\Models\Area;
 use App\Models\Holiday;
+use App\Models\Setting;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
@@ -54,9 +55,10 @@ class CalendarController extends Controller
             ->mapWithKeys(fn (Holiday $holiday): array => [$holiday->date->toDateString() => $holiday->name]);
 
         $today = $this->today()->toDateString();
+        $weekdays = Setting::workingWeekdays();
         $days = collect(CarbonPeriod::create($start, $end))->map(fn ($day): array => [
             'date' => $day->toDateString(),
-            'is_weekend' => $day->isWeekend(),
+            'is_off' => ! in_array($day->dayOfWeekIso, $weekdays, true),
             'holiday' => $holidays->get($day->toDateString()),
             'is_today' => $day->toDateString() === $today,
         ])->values();

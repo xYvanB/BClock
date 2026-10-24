@@ -20,7 +20,7 @@ class HolidayController extends Controller
     {
         $action->handle($request->toDto());
 
-        return to_route('absences.index')->with('success', 'Festivo aggiunto.');
+        return back()->with('success', 'Giorno non lavorativo aggiunto.');
     }
 
     /**
@@ -30,7 +30,7 @@ class HolidayController extends Controller
     {
         $action->handle($request->toDto(), $holiday);
 
-        return to_route('absences.index')->with('success', 'Festivo aggiornato.');
+        return back()->with('success', 'Giorno non lavorativo aggiornato.');
     }
 
     /**
@@ -42,6 +42,6 @@ class HolidayController extends Controller
 
         $action->handle($holiday);
 
-        return to_route('absences.index')->with('success', 'Festivo eliminato.');
+        return back()->with('success', 'Giorno non lavorativo eliminato.');
     }
 }

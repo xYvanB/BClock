@@ -8,6 +8,7 @@ use App\Enum\AbsenceStatus;
 use App\Enum\AbsenceType;
 use App\Models\Absence;
 use App\Models\Holiday;
+use App\Models\Setting;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonPeriod;
@@ -17,7 +18,7 @@ final class CalculateAvailability
     /**
      * Ore disponibili di ogni persona in ogni giorno dell'intervallo (estremi inclusi).
      *
-     * Un giorno lavorativo non è né weekend né festivo. La disponibilità è la capacità giornaliera della persona,
+     * Un giorno lavorativo cade in un giorno della settimana lavorativo (impostazioni) e non è festivo né di chiusura. La disponibilità è la capacità giornaliera della persona,
      * ridotta delle ore dei permessi confermati e azzerata da ferie confermate; fuori dai giorni lavorativi è 0.
      * Contano solo le assenze confermate (con tutte le approvazioni richieste).
      *
@@ -33,8 +34,10 @@ final class CalculateAvailability
             ->get()
             ->map(fn (Holiday $holiday): string => $holiday->date->toDateString());
 
+        $weekdays = Setting::workingWeekdays();
+
         $workingDays = $days
-            ->reject(fn (string $day): bool => CarbonImmutable::parse($day)->isWeekend() || $holidays->contains($day))
+            ->reject(fn (string $day): bool => ! in_array(CarbonImmutable::parse($day)->dayOfWeekIso, $weekdays, true) || $holidays->contains($day))
             ->values();
 
         $capacities = User::whereIn('id', $userIds)->pluck('daily_capacity', 'id')

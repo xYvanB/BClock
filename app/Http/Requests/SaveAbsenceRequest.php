@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Actions\Allocations\CalculateAvailability;
 use App\DTO\AbsenceData;
 use App\Enum\AbsenceStatus;
 use App\Enum\AbsenceType;
 use App\Models\Absence;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
@@ -71,6 +73,23 @@ class SaveAbsenceRequest extends FormRequest
                 }
 
                 $isLeave = $this->input('type') === AbsenceType::Leave->value;
+
+                // un permesso non può cadere in un giorno non lavorativo, le ferie devono avere almeno un giorno lavorativo
+                $workingDays = app(CalculateAvailability::class)
+                    ->handle([$this->user()->id], $this->string('starts_on')->toString(), $this->string('ends_on')->toString())['working_days'];
+
+                if ($isLeave && $workingDays === []) {
+                    $validator->errors()->add('starts_on', 'Il '.CarbonImmutable::parse($this->string('starts_on')->toString())->format('d/m/Y').' non è un giorno lavorativo (weekend, festività o chiusura aziendale).');
+
+                    return;
+                }
+
+                if (! $isLeave && $workingDays === []) {
+                    $validator->errors()->add('starts_on', 'Il periodo scelto non contiene giorni lavorativi (weekend, festività o chiusure aziendali).');
+
+                    return;
+                }
+
                 $startsTime = $isLeave ? $this->string('starts_time')->toString() : null;
                 $endsTime = $isLeave ? $this->string('ends_time')->toString() : null;
 

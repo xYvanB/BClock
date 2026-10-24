@@ -7,6 +7,7 @@ namespace App\Actions\Gantt;
 use App\Enum\WorkStatus;
 use App\Models\Activity;
 use App\Models\Holiday;
+use App\Models\Setting;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
@@ -21,6 +22,9 @@ final class PlanActivityShift
 
     /** @var array<string, true>|null */
     private ?array $holidays = null;
+
+    /** @var list<int>|null */
+    private ?array $weekdays = null;
 
     /**
      * Calcola, senza modificare nulla, cosa succede se si sposta o si ridimensiona un'attività nel Gantt.
@@ -208,7 +212,9 @@ final class PlanActivityShift
             ->mapWithKeys(fn (Holiday $holiday): array => [$holiday->date->toDateString() => true])
             ->all();
 
-        return ! $day->isWeekend() && ! isset($this->holidays[$day->toDateString()]);
+        $this->weekdays ??= Setting::workingWeekdays();
+
+        return in_array($day->dayOfWeekIso, $this->weekdays, true) && ! isset($this->holidays[$day->toDateString()]);
     }
 
     private function statusLabel(WorkStatus $status): string

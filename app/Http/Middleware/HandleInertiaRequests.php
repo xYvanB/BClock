@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Models\Holiday;
+use App\Models\Setting;
 use App\Models\Timer;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
@@ -47,6 +49,11 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user(),
+            ],
+            // Calendario aziendale: serve al browser per calcolare le date dei template e per attenuare i giorni non lavorativi.
+            'calendar' => fn () => $request->user() === null ? null : [
+                'working_weekdays' => Setting::workingWeekdays(),
+                'closures' => Holiday::closedDates(),
             ],
             // Timer attivi della persona (sempre visibili nella topbar); `server_now` corregge l'orologio del browser.
             'timers' => fn () => $request->user() === null ? [] : Timer::query()

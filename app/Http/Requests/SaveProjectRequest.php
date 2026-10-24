@@ -8,8 +8,10 @@ use App\DTO\ProjectData;
 use App\Enum\Role;
 use App\Enum\WorkStatus;
 use App\Models\Activity;
+use App\Models\Holiday;
 use App\Models\Project;
 use App\Models\ProjectTemplate;
+use App\Models\Setting;
 use App\Models\TemplateActivity;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Http\FormRequest;
@@ -76,7 +78,7 @@ class SaveProjectRequest extends FormRequest
                 }
 
                 $lastDay = (int) $template->activities->max('end_day');
-                $end = TemplateActivity::dateOfWorkingDay(CarbonImmutable::parse($this->input('starts_on')), $lastDay);
+                $end = TemplateActivity::dateOfWorkingDay(CarbonImmutable::parse($this->input('starts_on')), $lastDay, Setting::workingWeekdays(), Holiday::closedDates());
 
                 if ($end->toDateString() > $this->input('due_on')) {
                     $validator->errors()->add('template_id', "Le attività del template finiscono il {$end->format('d/m/Y')}, oltre la scadenza del progetto: allunga la scadenza o scegli un altro template.");

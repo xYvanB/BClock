@@ -6,7 +6,7 @@ use App\Models\Holiday;
 use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 
-it('shows the holidays to everyone, with management only for hr', function (User $user, bool $canManage): void {
+it('shows the holidays to everyone, with management only for boss and hr', function (User $user, bool $canManage): void {
     Holiday::factory()->count(2)->create();
 
     $this->actingAs($user)
@@ -18,17 +18,18 @@ it('shows the holidays to everyone, with management only for hr', function (User
             ->where('can_manage_holidays', $canManage));
 })->with([
     'hr' => [fn () => User::factory()->hr()->create(), true],
-    'boss' => [fn () => User::factory()->boss()->create(), false],
+    'boss' => [fn () => User::factory()->boss()->create(), true],
     'area head' => [fn () => User::factory()->areaHead()->create(), false],
     'employee' => [fn () => User::factory()->employee()->create(), false],
 ]);
 
-it('lets hr create, update and delete a holiday', function (): void {
-    $hr = User::factory()->hr()->create();
+it('lets hr and the boss create, update and delete a holiday', function (User $manager): void {
+    $hr = $manager;
 
     $this->actingAs($hr)
+        ->from(route('company-calendar.edit'))
         ->post(route('holidays.store'), ['date' => '2026-12-25', 'name' => 'Natale'])
-        ->assertRedirect(route('absences.index'))
+        ->assertRedirect(route('company-calendar.edit'))
         ->assertSessionHasNoErrors();
 
     $holiday = Holiday::firstOrFail();
@@ -39,11 +40,14 @@ it('lets hr create, update and delete a holiday', function (): void {
         ->assertSessionHasNoErrors();
     expect($holiday->refresh()->name)->toBe('Natale di Cristo');
 
-    $this->actingAs($hr)->delete(route('holidays.destroy', $holiday))->assertRedirect(route('absences.index'));
+    $this->actingAs($hr)->delete(route('holidays.destroy', $holiday))->assertSessionHasNoErrors();
     $this->assertDatabaseCount('holidays', 0);
-});
+})->with([
+    'hr' => fn () => User::factory()->hr()->create(),
+    'boss' => fn () => User::factory()->boss()->create(),
+]);
 
-it('forbids everyone but hr from managing holidays', function (User $user): void {
+it('forbids everyone but boss and hr from managing holidays', function (User $user): void {
     $holiday = Holiday::factory()->create(['date' => '2026-12-25']);
 
     $this->actingAs($user)->post(route('holidays.store'), ['date' => '2026-12-26', 'name' => 'Santo Stefano'])->assertForbidden();
@@ -52,7 +56,6 @@ it('forbids everyone but hr from managing holidays', function (User $user): void
 
     $this->assertDatabaseCount('holidays', 1);
 })->with([
-    'boss' => fn () => User::factory()->boss()->create(),
     'area head' => fn () => User::factory()->areaHead()->create(),
     'employee' => fn () => User::factory()->employee()->create(),
 ]);

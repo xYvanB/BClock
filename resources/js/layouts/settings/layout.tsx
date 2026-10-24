@@ -24,12 +24,15 @@ const sidebarNavItems: NavItem[] = [
 ];
 
 /** Impostazioni dell'applicazione: le vedono solo Capo e HR. */
-const workloadNavItem: NavItem = { title: 'Carico di lavoro', url: '/settings/workload', icon: null };
+const adminNavItems: NavItem[] = [
+    { title: 'Calendario aziendale', url: '/settings/company-calendar', icon: null },
+    { title: 'Carico di lavoro', url: '/settings/workload', icon: null },
+];
 
 export default function SettingsLayout({ children }: { children: React.ReactNode }) {
     const currentPath = window.location.pathname;
     const { auth } = usePage<SharedData>().props;
-    const navItems = ['capo', 'hr'].includes(auth.user.role) ? [...sidebarNavItems, workloadNavItem] : sidebarNavItems;
+    const navItems = ['capo', 'hr'].includes(auth.user.role) ? [...sidebarNavItems, ...adminNavItems] : sidebarNavItems;
 
     return (
         <div className="px-4 py-6">

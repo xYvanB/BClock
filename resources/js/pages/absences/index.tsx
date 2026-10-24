@@ -1,15 +1,15 @@
 import { AbsenceFormSheet } from '@/components/absence-form-sheet';
 import { FlashMessage } from '@/components/flash-message';
-import { HolidayFormSheet } from '@/components/holiday-form-sheet';
 import InputError from '@/components/input-error';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { absenceTypeLabel } from '@/lib/schemas/absence';
+import { holidayKindLabels } from '@/lib/schemas/holiday';
 import { type Absence, type AppNotification, type BreadcrumbItem, type Holiday, type SharedData } from '@/types';
-import { Head, router, usePage } from '@inertiajs/react';
-import { Check, Pencil, Plus, Trash2, X } from 'lucide-react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Check, Pencil, Plus, Settings, Trash2, X } from 'lucide-react';
 import { useState } from 'react';
 
 interface AbsencesIndexProps {
@@ -54,10 +54,9 @@ const statusLabel = { in_attesa: 'In attesa', confermata: 'Confermata', rifiutat
 
 const statusVariant = { in_attesa: 'secondary', confermata: 'default', rifiutata: 'destructive' } as const;
 
-/** Festivi (gestiti dall'HR) e assenze: ognuno vede le proprie (il Capo area anche quelle della sua area), l'HR vede tutte. */
+/** Assenze (ognuno le proprie; il Capo area anche quelle della sua area, il Capo quelle dell'HR, l'HR tutte) e giorni non lavorativi. */
 export default function AbsencesIndex({ absences, holidays, can_manage_holidays, notifications }: AbsencesIndexProps) {
     const { auth } = usePage<SharedData>().props;
-    const isHr = auth.user.role === 'hr';
     const showPerson = auth.user.role !== 'dipendente';
     const title = 'Assenze';
     const breadcrumbs: BreadcrumbItem[] = [{ title, href: '/absences' }];
@@ -65,8 +64,6 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays,
     const [tab, setTab] = useState<Tab>('absences');
     const [absenceSheetOpen, setAbsenceSheetOpen] = useState(false);
     const [editingAbsence, setEditingAbsence] = useState<Absence | null>(null);
-    const [holidaySheetOpen, setHolidaySheetOpen] = useState(false);
-    const [editingHoliday, setEditingHoliday] = useState<Holiday | null>(null);
     const [confirmingDelete, setConfirmingDelete] = useState<string | null>(null);
     const [reasonAction, setReasonAction] = useState<ReasonAction | null>(null);
     const [reason, setReason] = useState('');
@@ -75,11 +72,6 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays,
     const openAbsence = (absence: Absence | null) => {
         setEditingAbsence(absence);
         setAbsenceSheetOpen(true);
-    };
-
-    const openHoliday = (holiday: Holiday | null) => {
-        setEditingHoliday(holiday);
-        setHolidaySheetOpen(true);
     };
 
     const startReasonAction = (kind: ReasonAction['kind'], absence: Absence) => {
@@ -170,8 +162,10 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays,
                         </Button>
                     ) : (
                         can_manage_holidays && (
-                            <Button onClick={() => openHoliday(null)}>
-                                <Plus /> Nuovo festivo
+                            <Button variant="outline" asChild>
+                                <Link href={route('company-calendar.edit')}>
+                                    <Settings /> Gestisci nelle impostazioni
+                                </Link>
                             </Button>
                         )
                     )}
@@ -194,7 +188,7 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays,
                         size="sm"
                         onClick={() => setTab('holidays')}
                     >
-                        Festivi
+                        Giorni non lavorativi
                     </Button>
                 </div>
 
@@ -328,8 +322,7 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays,
                 {tab === 'holidays' &&
                     (holidays.length === 0 ? (
                         <div className="border-sidebar-border/70 flex flex-col items-center gap-3 rounded-xl border border-dashed p-12 text-center">
-                            <p className="text-muted-foreground">Nessun festivo inserito</p>
-                            {can_manage_holidays && <Button onClick={() => openHoliday(null)}>Aggiungi un festivo</Button>}
+                            <p className="text-muted-foreground">Nessuna festività o chiusura inserita</p>
                         </div>
                     ) : (
                         <div className="border-sidebar-border/70 overflow-x-auto rounded-xl border">
@@ -338,7 +331,7 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays,
                                     <tr>
                                         <th className="px-4 py-3 font-medium">Data</th>
                                         <th className="px-4 py-3 font-medium">Nome</th>
-                                        {can_manage_holidays && <th className="px-4 py-3" />}
+                                        <th className="px-4 py-3 font-medium">Tipo</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -346,19 +339,11 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays,
                                         <tr key={holiday.id} className="border-sidebar-border/70 border-t">
                                             <td className="px-4 py-3 whitespace-nowrap">{formatDate(holiday.date)}</td>
                                             <td className="px-4 py-3 font-medium">{holiday.name}</td>
-                                            {can_manage_holidays && (
-                                                <td className="px-4 py-3 text-right whitespace-nowrap">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => openHoliday(holiday)}
-                                                        aria-label={`Modifica ${holiday.name}`}
-                                                    >
-                                                        <Pencil /> Modifica
-                                                    </Button>
-                                                    {deleteControls(`holiday-${holiday.id}`, route('holidays.destroy', holiday.id), holiday.name)}
-                                                </td>
-                                            )}
+                                            <td className="px-4 py-3">
+                                                <Badge variant={holiday.kind === 'chiusura' ? 'secondary' : 'outline'}>
+                                                    {holidayKindLabels[holiday.kind]}
+                                                </Badge>
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -368,7 +353,6 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays,
             </div>
 
             <AbsenceFormSheet open={absenceSheetOpen} absence={editingAbsence} onClose={() => setAbsenceSheetOpen(false)} />
-            <HolidayFormSheet open={holidaySheetOpen} holiday={editingHoliday} onClose={() => setHolidaySheetOpen(false)} />
         </AppLayout>
     );
 }

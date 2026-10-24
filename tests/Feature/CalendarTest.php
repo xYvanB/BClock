@@ -38,8 +38,8 @@ it('shows the week of the given date, Monday to Sunday, with weekends and holida
             ->where('next', '2026-11-19')
             ->has('days', 7)
             ->where('days.2.holiday', 'San Martino')
-            ->where('days.5.is_weekend', true)
-            ->where('days.0.is_weekend', false));
+            ->where('days.5.is_off', true)
+            ->where('days.0.is_off', false));
 });
 
 it('shows the whole month in month view', function (): void {

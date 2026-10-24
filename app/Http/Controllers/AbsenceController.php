@@ -80,6 +80,7 @@ class AbsenceController extends Controller
                     'id' => $holiday->id,
                     'date' => $holiday->date->toDateString(),
                     'name' => $holiday->name,
+                    'kind' => $holiday->kind->value,
                 ]),
             'can_manage_holidays' => $user->can('create', Holiday::class),
             'notifications' => $user->unreadNotifications

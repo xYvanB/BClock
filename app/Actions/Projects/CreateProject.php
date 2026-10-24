@@ -7,8 +7,10 @@ namespace App\Actions\Projects;
 use App\Actions\Allocations\GenerateActivityAllocations;
 use App\DTO\ProjectData;
 use App\Enum\WorkStatus;
+use App\Models\Holiday;
 use App\Models\Project;
 use App\Models\ProjectTemplate;
+use App\Models\Setting;
 use App\Models\TemplateActivity;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
@@ -55,13 +57,15 @@ final class CreateProject
     private function createActivitiesFromTemplate(Project $project, ProjectTemplate $template, array $assigneesByTemplateActivity): void
     {
         $start = CarbonImmutable::parse($project->starts_on);
+        $weekdays = Setting::workingWeekdays();
+        $closedDates = Holiday::closedDates();
 
         foreach ($template->activities as $templateActivity) {
             $activity = $project->activities()->create([
                 'name' => $templateActivity->name,
                 'description' => $templateActivity->description,
-                'starts_on' => TemplateActivity::dateOfWorkingDay($start, $templateActivity->start_day),
-                'due_on' => TemplateActivity::dateOfWorkingDay($start, $templateActivity->end_day),
+                'starts_on' => TemplateActivity::dateOfWorkingDay($start, $templateActivity->start_day, $weekdays, $closedDates),
+                'due_on' => TemplateActivity::dateOfWorkingDay($start, $templateActivity->end_day, $weekdays, $closedDates),
                 'planned_hours' => $templateActivity->planned_hours,
                 'status' => WorkStatus::Todo,
             ]);

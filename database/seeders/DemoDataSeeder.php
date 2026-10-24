@@ -7,6 +7,7 @@ namespace Database\Seeders;
 use App\Actions\Allocations\RegenerateAllocations;
 use App\Enum\AbsenceStatus;
 use App\Enum\AbsenceType;
+use App\Enum\HolidayKind;
 use App\Enum\Role;
 use App\Enum\TimeEntrySource;
 use App\Enum\WorkStatus;
@@ -103,12 +104,13 @@ class DemoDataSeeder extends Seeder
         foreach ([
             ['2026-11-01', 'Ognissanti'],
             ['2026-12-08', 'Immacolata Concezione'],
+            ['2026-12-07', 'Ponte di dicembre', HolidayKind::Closure],
             ['2026-12-25', 'Natale'],
             ['2026-12-26', 'Santo Stefano'],
             ['2027-01-01', 'Capodanno'],
             ['2027-01-06', 'Epifania'],
-        ] as [$date, $name]) {
-            Holiday::firstOrCreate(['date' => $date], ['name' => $name]);
+        ] as $row) {
+            Holiday::firstOrCreate(['date' => $row[0]], ['name' => $row[1], 'kind' => $row[2] ?? HolidayKind::Holiday]);
         }
     }
 

@@ -62,22 +62,28 @@ class TemplateActivity extends Model
     }
 
     /**
-     * Data del giorno lavorativo N: il giorno 1 è la data di inizio del progetto (se cade
-     * di sabato o domenica, il primo lunedì successivo); si contano solo lunedì–venerdì.
+     * Data del giorno lavorativo N: il giorno 1 è la data di inizio del progetto (se non è un giorno lavorativo,
+     * il primo successivo). Si contano solo i giorni della settimana lavorativi (`$weekdays`, 1 = lunedì … 7 = domenica,
+     * di norma lunedì–venerdì) che non siano festività o chiusure (`$closedDates`, date `Y-m-d`).
      * La stessa formula è replicata in `resources/js/lib/template-days.ts`.
+     *
+     * @param  list<int>  $weekdays
+     * @param  list<string>  $closedDates
      */
-    public static function dateOfWorkingDay(CarbonImmutable $projectStart, int $day): CarbonImmutable
+    public static function dateOfWorkingDay(CarbonImmutable $projectStart, int $day, array $weekdays = [1, 2, 3, 4, 5], array $closedDates = []): CarbonImmutable
     {
+        $isOff = fn (CarbonImmutable $date): bool => ! in_array($date->dayOfWeekIso, $weekdays, true) || in_array($date->toDateString(), $closedDates, true);
+
         $date = $projectStart;
 
-        while ($date->isWeekend()) {
+        while ($isOff($date)) {
             $date = $date->addDay();
         }
 
         for ($remaining = $day - 1; $remaining > 0; $remaining--) {
             $date = $date->addDay();
 
-            while ($date->isWeekend()) {
+            while ($isOff($date)) {
                 $date = $date->addDay();
             }
         }
