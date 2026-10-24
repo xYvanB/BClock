@@ -4,15 +4,21 @@ declare(strict_types=1);
 
 namespace App\Actions\Allocations;
 
+use App\Actions\Notifications\NotifyUsers;
+use App\Enum\NotificationKind;
 use App\Enum\WorkStatus;
 use App\Models\ActivityAllocation;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
 final class MoveAllocation
 {
-    public function __construct(private readonly CalculateAvailability $availability) {}
+    public function __construct(
+        private readonly CalculateAvailability $availability,
+        private readonly NotifyUsers $notify,
+    ) {}
 
     /**
      * Sposta la quota di un giorno su un altro giorno lavorativo, per la stessa persona e la stessa attività.
@@ -20,16 +26,16 @@ final class MoveAllocation
      * Si sposta solo quella quota, non l'attività. Oltre la scadenza dell'attività serve la conferma ($extendActivity)
      * e la scadenza dell'attività si allunga fino al nuovo giorno; oltre la scadenza del progetto serve anche
      * $extendProject e si allunga pure quella del progetto. Prima dell'inizio dell'attività non si può.
-     * Si possono spostare solo alcune ore (`$hours`, al massimo quelle della quota): il resto resta dov'è.
+     * Chi non è il proprietario della quota lo avvisa con una notifica. Si possono spostare solo alcune ore (`$hours`, al massimo quelle della quota): il resto resta dov'è.
      * Se nel giorno di arrivo c'è già una quota della stessa attività, le ore si sommano. Un giorno di partenza
      * svuotato resta come quota manuale a 0 ore, così una rigenerazione non lo riempie di nuovo.
      *
      * @throws Throwable
      * @throws ValidationException
      */
-    public function handle(ActivityAllocation $allocation, string $toDate, bool $extendActivity, bool $extendProject, ?float $hours = null): ActivityAllocation
+    public function handle(User $actor, ActivityAllocation $allocation, string $toDate, bool $extendActivity, bool $extendProject, ?float $hours = null): ActivityAllocation
     {
-        return DB::transaction(function () use ($allocation, $toDate, $extendActivity, $extendProject, $hours): ActivityAllocation {
+        return DB::transaction(function () use ($actor, $allocation, $toDate, $extendActivity, $extendProject, $hours): ActivityAllocation {
             $activity = $allocation->activity()->with('project')->firstOrFail();
             $project = $activity->project;
 
@@ -88,7 +94,16 @@ final class MoveAllocation
             $target->is_manual = true;
             $target->save();
 
+            $from = $allocation->date->format('d/m/Y');
             $allocation->update(['hours' => round($available - $moved, 2), 'is_manual' => true]);
+
+            $this->notify->handle(
+                [$allocation->user],
+                NotificationKind::QuotaMoved,
+                "{$actor->fullName()} ha spostato le tue ore di «{$activity->name}» dal {$from} al ".$target->date->format('d/m/Y').'.',
+                route('calendar.index'),
+                $actor,
+            );
 
             return $target;
         });

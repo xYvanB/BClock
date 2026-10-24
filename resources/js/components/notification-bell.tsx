@@ -1,16 +1,35 @@
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { getEcho } from '@/lib/echo';
 import { formatNotificationDate } from '@/lib/notifications';
 import { type SharedData } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { Bell } from 'lucide-react';
+import { useEffect } from 'react';
 
 /**
  * Campanello nella topbar: pallino col numero delle notifiche non lette e pannello con le ultime.
  * Un clic su una notifica la segna come letta e apre la pagina collegata.
  */
 export function NotificationBell() {
-    const { notifications } = usePage<SharedData>().props;
+    const { notifications, auth } = usePage<SharedData>().props;
+    const userId = auth.user?.id;
+
+    // Tempo reale: quando il server annuncia notifiche nuove, il campanello si ricarica subito.
+    useEffect(() => {
+        const echo = userId === undefined ? null : getEcho();
+
+        if (echo === null || userId === undefined) {
+            return;
+        }
+
+        const channel = echo.private(`App.Models.User.${userId}`).listen('.notifications.changed', () => router.reload({ only: ['notifications'] }));
+
+        return () => {
+            channel.stopListening('.notifications.changed');
+            echo.leave(`App.Models.User.${userId}`);
+        };
+    }, [userId]);
 
     if (notifications === null) {
         return null;

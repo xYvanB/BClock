@@ -2,16 +2,21 @@
 
 declare(strict_types=1);
 
+use App\Actions\Allocations\GenerateActivityAllocations;
 use App\Console\Commands\PruneNotificationsCommand;
 use App\Enum\NotificationKind;
 use App\Enum\WorkStatus;
+use App\Events\NotificationsChanged;
 use App\Mail\AppNotificationMail;
 use App\Models\Absence;
 use App\Models\Activity;
 use App\Models\Area;
 use App\Models\Project;
+use App\Models\TimeEntry;
+use App\Models\Timer;
 use App\Models\User;
 use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -204,4 +209,63 @@ it('prunes the notifications older than 90 days', function (): void {
     $this->artisan('notifications:prune')->assertSuccessful();
 
     expect(DatabaseNotification::count())->toBe(1);
+});
+
+it('tells the owner of a quota when someone else moves it, and nobody when they move it themselves', function (): void {
+    $boss = User::factory()->boss()->create();
+    $person = User::factory()->employee()->create();
+    $project = notificationProject();
+    $activity = Activity::factory()->for($project)->create(['name' => 'Sviluppo login', 'starts_on' => '2026-11-09', 'due_on' => '2026-11-13', 'planned_hours' => '10.00']);
+    $activity->assignees()->attach($person);
+    app(GenerateActivityAllocations::class)->handle($activity);
+    $allocation = $activity->allocations()->where('date', '2026-11-09')->firstOrFail();
+
+    $this->actingAs($boss)->post(route('allocations.move', $allocation), ['date' => '2026-11-10'])->assertSessionHasNoErrors();
+
+    expect($person->unreadNotifications()->get()->pluck('data.kind')->all())->toBe(['quota_spostata']);
+
+    $mine = $activity->allocations()->where('date', '2026-11-11')->firstOrFail();
+    $this->actingAs($person)->post(route('allocations.move', $mine), ['date' => '2026-11-12'])->assertSessionHasNoErrors();
+    expect($person->unreadNotifications()->count())->toBe(1);
+});
+
+it('tells the approvers again when a pending request is edited', function (): void {
+    $hr = User::factory()->hr()->create();
+    $employee = User::factory()->employee()->create();
+    $this->actingAs($employee)->post(route('absences.store'), ['type' => 'ferie', 'starts_on' => '2026-11-09', 'ends_on' => '2026-11-11', 'note' => '']);
+    $absence = Absence::firstOrFail();
+
+    $this->actingAs($employee)->put(route('absences.update', $absence), ['type' => 'ferie', 'starts_on' => '2026-11-09', 'ends_on' => '2026-11-12', 'note' => ''])->assertSessionHasNoErrors();
+
+    expect($hr->unreadNotifications()->get()->pluck('data.message')->implode(' | '))->toContain('ha modificato la richiesta di');
+});
+
+it('sends the scheduled reminders once: due soon, forgotten timer, project over its hours', function (): void {
+    $this->travelTo('2026-11-10 10:00:00');
+    $boss = User::factory()->boss()->create();
+    $person = User::factory()->employee()->create();
+    $project = Project::factory()->create(['starts_on' => '2026-11-01', 'due_on' => '2026-12-31', 'planned_hours' => '1.00']);
+    $soon = Activity::factory()->for($project)->create(['name' => 'In scadenza', 'starts_on' => '2026-11-02', 'due_on' => '2026-11-11', 'planned_hours' => '5.00']);
+    $soon->assignees()->attach($person);
+    Activity::factory()->for($project)->create(['name' => 'Lontana', 'starts_on' => '2026-11-02', 'due_on' => '2026-11-30'])->assignees()->attach($person);
+    Timer::factory()->create(['user_id' => $person->id, 'activity_id' => $soon->id, 'started_at' => now()->subHours(9)]);
+    TimeEntry::factory()->create(['user_id' => $person->id, 'activity_id' => $soon->id, 'duration_minutes' => 120]);
+
+    $this->artisan('notifications:remind')->assertSuccessful();
+
+    $kinds = $person->unreadNotifications()->get()->pluck('data.kind')->sort()->values()->all();
+    expect($kinds)->toBe(['scadenza_vicina', 'timer_dimenticato'])
+        ->and($boss->unreadNotifications()->get()->pluck('data.kind')->all())->toBe(['sforamento_ore']);
+
+    $this->artisan('notifications:remind')->assertSuccessful();
+    expect($person->unreadNotifications()->count())->toBe(2)->and($boss->unreadNotifications()->count())->toBe(1);
+});
+
+it('announces new notifications to the browser of the person, after the action', function (): void {
+    Event::fake([NotificationsChanged::class]);
+    $person = User::factory()->employee()->create();
+
+    $this->actingAs(User::factory()->boss()->create())->post(route('activities.store'), notificationActivityPayload(notificationProject(), [$person->id]));
+
+    Event::assertDispatched(NotificationsChanged::class, fn ($event): bool => $event->userId === $person->id);
 });

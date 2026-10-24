@@ -57,6 +57,10 @@ final class SaveAbsence
                     $this->allocations->handle(min($previous[0], $data->startsOn), max($previous[1], $data->endsOn), [$user->id]);
                 }
 
+                if (! $user->hasRole(Role::Boss)) {
+                    $this->notifyApprovers($user, $absence, 'ha modificato la richiesta di');
+                }
+
                 return $absence;
             }
 
@@ -69,22 +73,29 @@ final class SaveAbsence
 
             $absence = Absence::create($attributes + ['user_id' => $user->id, 'status' => AbsenceStatus::Pending]);
 
-            // chi deve approvare viene avvisato: il Capo area del dipendente e chi dà la conferma finale (HR, o il Capo per l'HR)
-            $approvers = User::where('role', $absence->finalApproverRole())->get();
-
-            if ($absence->requiresAreaHead()) {
-                $approvers = $approvers->merge(User::where('role', Role::AreaHead)->where('area_id', $user->area_id)->get());
-            }
-
-            $this->notify->handle(
-                $approvers,
-                NotificationKind::AbsenceRequested,
-                "{$user->fullName()} ha chiesto {$absence->type->value} ({$absence->periodLabel()}): serve la tua approvazione.",
-                route('absences.index'),
-                $user,
-            );
+            $this->notifyApprovers($user, $absence, 'ha chiesto');
 
             return $absence;
         });
+    }
+
+    /**
+     * Avvisa chi deve approvare: il Capo area del dipendente e chi dà la conferma finale (HR, o il Capo per l'HR).
+     */
+    private function notifyApprovers(User $user, Absence $absence, string $verb): void
+    {
+        $approvers = User::where('role', $absence->finalApproverRole())->get();
+
+        if ($absence->requiresAreaHead()) {
+            $approvers = $approvers->merge(User::where('role', Role::AreaHead)->where('area_id', $user->area_id)->get());
+        }
+
+        $this->notify->handle(
+            $approvers,
+            NotificationKind::AbsenceRequested,
+            "{$user->fullName()} {$verb} {$absence->type->value} ({$absence->periodLabel()}): serve la tua approvazione.",
+            route('absences.index'),
+            $user,
+        );
     }
 }

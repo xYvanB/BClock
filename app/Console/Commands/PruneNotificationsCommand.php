@@ -6,6 +6,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Support\Facades\DB;
 
 class PruneNotificationsCommand extends Command
 {
@@ -19,6 +20,9 @@ class PruneNotificationsCommand extends Command
     public function handle(): int
     {
         $deleted = DatabaseNotification::where('created_at', '<', now()->subDays(self::KEEP_DAYS))->delete();
+
+        // i promemoria già inviati servono solo finché l'evento è attuale
+        DB::table('sent_reminders')->where('sent_at', '<', now()->subDays(self::KEEP_DAYS * 2))->delete();
 
         $this->info("Notifiche cancellate: {$deleted}.");
 

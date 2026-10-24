@@ -13,6 +13,10 @@ enum NotificationKind: string
     case ActivityMoved = 'attivita_spostata';
     case AbsenceDecision = 'assenza_esito';
     case AbsenceRequested = 'assenza_richiesta';
+    case QuotaMoved = 'quota_spostata';
+    case DueSoon = 'scadenza_vicina';
+    case TimerForgotten = 'timer_dimenticato';
+    case HoursOverrun = 'sforamento_ore';
 
     public function label(): string
     {
@@ -20,7 +24,11 @@ enum NotificationKind: string
             self::TaskAssigned => 'Task assegnato a me',
             self::ActivityMoved => 'Date di un\'attività mia spostate',
             self::AbsenceDecision => 'Permesso approvato, rifiutato o eliminato',
-            self::AbsenceRequested => 'Nuova richiesta da approvare',
+            self::AbsenceRequested => 'Nuova richiesta da approvare (o modificata)',
+            self::QuotaMoved => 'Una mia quota è stata spostata da altri',
+            self::DueSoon => 'Scadenza vicina',
+            self::TimerForgotten => 'Timer attivo da oltre 8 ore',
+            self::HoursOverrun => 'Sforamento ore del progetto',
         };
     }
 

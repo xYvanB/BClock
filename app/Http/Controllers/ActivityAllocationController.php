@@ -20,6 +20,7 @@ class ActivityAllocationController extends Controller
     public function move(MoveAllocationRequest $request, ActivityAllocation $allocation, MoveAllocation $action): RedirectResponse
     {
         $action->handle(
+            $request->user(),
             $allocation,
             $request->toDate(),
             $request->boolean('extend_activity'),

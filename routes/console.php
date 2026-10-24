@@ -11,3 +11,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('notifications:prune')->daily();
+Schedule::command('notifications:remind')->hourly();
