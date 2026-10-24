@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Quota di ore di un'attività su un giorno, per una persona.
+ * `is_manual` indica una quota spostata a mano nel calendario: la rigenerazione la rispetta.
  */
 class ActivityAllocation extends Model
 {
@@ -20,6 +21,7 @@ class ActivityAllocation extends Model
         'user_id',
         'date',
         'hours',
+        'is_manual',
     ];
 
     /**
@@ -30,6 +32,7 @@ class ActivityAllocation extends Model
         return [
             'date' => 'date',
             'hours' => 'decimal:2',
+            'is_manual' => 'boolean',
         ];
     }
 

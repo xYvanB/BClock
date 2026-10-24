@@ -1,7 +1,18 @@
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
-import { type AreaOption, type BreadcrumbItem, type CalendarCell, type CalendarDay, type CalendarPerson, type LoadLevel } from '@/types';
+import {
+    type AreaOption,
+    type BreadcrumbItem,
+    type CalendarCell,
+    type CalendarDay,
+    type CalendarItem,
+    type CalendarPerson,
+    type LoadLevel,
+} from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
@@ -19,6 +30,12 @@ interface CalendarProps {
     areas: AreaOption[];
     days: CalendarDay[];
     people: CalendarPerson[];
+}
+
+/** Spostamento di una quota in attesa di conferma (oltre la scadenza dell'attività o del progetto). */
+interface PendingMove {
+    item: CalendarItem;
+    toDate: string;
 }
 
 const levelStyles: Record<LoadLevel, string> = {
@@ -49,9 +66,13 @@ const rangeTitle = (view: 'week' | 'month', from: string, to: string, date: stri
         ? new Date(`${date}T00:00:00`).toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })
         : `${formatDate(from)} – ${formatDate(to)}`;
 
-/** Calendario del carico (F9): per persona e giorno le ore assegnate rispetto a quelle disponibili. Sola lettura. */
+/** Calendario del carico (F9): per persona e giorno le ore assegnate rispetto a quelle disponibili; le quote si spostano. */
 export default function CalendarIndex({ view, date, from, to, previous, next, area_id, areas, days, people }: CalendarProps) {
-    const [selected, setSelected] = useState<{ person: CalendarPerson; day: CalendarDay } | null>(null);
+    const [selected, setSelected] = useState<{ personId: number; date: string } | null>(null);
+    const [dragged, setDragged] = useState<{ item: CalendarItem; personId: number; fromDate: string } | null>(null);
+    const [pending, setPending] = useState<PendingMove | null>(null);
+    const [moveError, setMoveError] = useState<string | null>(null);
+    const [targets, setTargets] = useState<Record<number, string>>({});
 
     const go = (params: { view?: string; date?: string; area_id?: number | null }) => {
         setSelected(null);
@@ -66,8 +87,47 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
         );
     };
 
+    const submitMove = (item: CalendarItem, toDate: string, extendActivity: boolean, extendProject: boolean) =>
+        router.post(
+            route('allocations.move', item.allocation_id),
+            { date: toDate, extend_activity: extendActivity, extend_project: extendProject },
+            {
+                preserveScroll: true,
+                preserveState: true,
+                onSuccess: () => {
+                    setPending(null);
+                    setMoveError(null);
+                    setSelected(null);
+                },
+                onError: (errors) => {
+                    setPending(null);
+                    setMoveError(Object.values(errors)[0] ?? 'Spostamento non riuscito.');
+                },
+            },
+        );
+
+    /** Chiede conferma se il giorno scelto è oltre la scadenza dell'attività o del progetto, altrimenti sposta subito. */
+    const requestMove = (item: CalendarItem, fromDate: string, toDate: string) => {
+        setMoveError(null);
+
+        if (!item.can_move || toDate === '' || toDate === fromDate) {
+            return;
+        }
+
+        if (toDate > item.activity_due_on || toDate > item.project_due_on) {
+            setPending({ item, toDate });
+
+            return;
+        }
+
+        submitMove(item, toDate, false, false);
+    };
+
     const today = days.find((day) => day.is_today)?.date;
-    const selectedCell: CalendarCell | undefined = selected?.person.days[selected.day.date];
+    const selectedPerson = selected ? people.find((person) => person.id === selected.personId) : undefined;
+    const selectedDay = selected ? days.find((day) => day.date === selected.date) : undefined;
+    const selectedCell: CalendarCell | undefined = selectedPerson && selectedDay ? selectedPerson.days[selectedDay.date] : undefined;
+    const beyondProject = pending !== null && pending.toDate > pending.item.project_due_on;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -133,6 +193,12 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
                     </li>
                 </ul>
 
+                {moveError && (
+                    <div role="alert" className="border-destructive/50 bg-destructive/10 rounded-md border p-3 text-sm">
+                        {moveError}
+                    </div>
+                )}
+
                 {people.length === 0 ? (
                     <div className="border-sidebar-border/70 rounded-xl border border-dashed p-12 text-center">
                         <p className="text-muted-foreground">Nessuna persona da mostrare</p>
@@ -172,39 +238,66 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
                                         </th>
                                         {days.map((day) => {
                                             const cell = person.days[day.date];
-                                            const isSelected = selected?.person.id === person.id && selected.day.date === day.date;
-                                            const off = cell.level === null;
+                                            const isSelected = selected?.personId === person.id && selected.date === day.date;
+                                            const dropAllowed = dragged !== null && dragged.personId === person.id && !day.is_weekend && !day.holiday;
 
                                             return (
-                                                <td key={day.date} className="p-0.5 align-top">
+                                                <td
+                                                    key={day.date}
+                                                    className="p-0.5 align-top"
+                                                    onDragOver={(event) => {
+                                                        if (dropAllowed) {
+                                                            event.preventDefault();
+                                                            event.dataTransfer.dropEffect = 'move';
+                                                        }
+                                                    }}
+                                                    onDrop={(event) => {
+                                                        event.preventDefault();
+                                                        if (dropAllowed) {
+                                                            requestMove(dragged.item, dragged.fromDate, day.date);
+                                                        }
+                                                        setDragged(null);
+                                                    }}
+                                                >
                                                     <button
                                                         type="button"
-                                                        onClick={() => setSelected(isSelected ? null : { person, day })}
+                                                        onClick={() => setSelected(isSelected ? null : { personId: person.id, date: day.date })}
                                                         aria-pressed={isSelected}
                                                         aria-label={`${person.name}, ${formatDate(day.date)}: ${formatHours(cell.load)} ore su ${formatHours(cell.capacity)}${cell.level ? `, ${levelLabels[cell.level]}` : ''}`}
                                                         className={cn(
                                                             'focus-visible:ring-ring flex min-h-12 w-full flex-col items-center justify-center rounded-md px-1 py-1 text-xs focus-visible:ring-2 focus-visible:outline-none',
                                                             cell.level ? levelStyles[cell.level] : 'bg-muted text-muted-foreground',
                                                             isSelected && 'ring-primary ring-2',
+                                                            dropAllowed && 'outline-primary outline-dashed',
                                                         )}
                                                     >
                                                         {cell.absence && <span className="font-medium">{absenceLabels[cell.absence]}</span>}
-                                                        {!(off && cell.load === 0) && (
+                                                        {!(cell.level === null && cell.load === 0) && (
                                                             <span>
                                                                 {formatHours(cell.load)} / {formatHours(cell.capacity)}
                                                             </span>
                                                         )}
-                                                        {view === 'week' &&
-                                                            cell.items.map((item) => (
-                                                                <span
-                                                                    key={item.activity_id}
-                                                                    className="mt-0.5 max-w-24 truncate opacity-80"
-                                                                    title={`${item.activity} – ${item.project}`}
-                                                                >
-                                                                    {item.activity}
-                                                                </span>
-                                                            ))}
                                                     </button>
+                                                    {view === 'week' &&
+                                                        cell.items.map((item) => (
+                                                            <div
+                                                                key={item.allocation_id}
+                                                                draggable={item.can_move}
+                                                                onDragStart={(event) => {
+                                                                    event.dataTransfer.setData('text/plain', String(item.allocation_id));
+                                                                    event.dataTransfer.effectAllowed = 'move';
+                                                                    setDragged({ item, personId: person.id, fromDate: day.date });
+                                                                }}
+                                                                onDragEnd={() => setDragged(null)}
+                                                                title={`${item.activity} – ${item.project}${item.can_move ? ' (trascina per spostare)' : ''}`}
+                                                                className={cn(
+                                                                    'bg-background border-sidebar-border/70 mt-1 max-w-28 truncate rounded border px-1 py-0.5 text-xs',
+                                                                    item.can_move && 'cursor-grab',
+                                                                )}
+                                                            >
+                                                                {item.activity} · {formatHours(item.hours)} h
+                                                            </div>
+                                                        ))}
                                                 </td>
                                             );
                                         })}
@@ -215,15 +308,15 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
                     </div>
                 )}
 
-                {selected && selectedCell && (
+                {selectedPerson && selectedDay && selectedCell && (
                     <section aria-live="polite" className="border-sidebar-border/70 rounded-xl border p-4">
                         <h2 className="font-semibold">
-                            {selected.person.name} – {formatDate(selected.day.date)}
+                            {selectedPerson.name} – {formatDate(selectedDay.date)}
                         </h2>
                         <p className="text-muted-foreground text-sm">
                             {selectedCell.level ? `${levelLabels[selectedCell.level]}: ` : ''}
                             {formatHours(selectedCell.load)} ore assegnate su {formatHours(selectedCell.capacity)} disponibili
-                            {selected.day.holiday ? ` · ${selected.day.holiday}` : ''}
+                            {selectedDay.holiday ? ` · ${selectedDay.holiday}` : ''}
                             {selectedCell.absence ? ` · ${absenceLabels[selectedCell.absence]}` : ''}
                         </p>
                         {selectedCell.items.length === 0 ? (
@@ -231,18 +324,66 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
                         ) : (
                             <ul className="mt-2 divide-y text-sm">
                                 {selectedCell.items.map((item) => (
-                                    <li key={item.activity_id} className="flex items-center justify-between gap-4 py-1.5">
+                                    <li key={item.allocation_id} className="flex flex-wrap items-center justify-between gap-3 py-2">
                                         <span>
                                             {item.activity} <span className="text-muted-foreground">– {item.project}</span>
                                         </span>
-                                        <span className="font-medium">{formatHours(item.hours)} h</span>
+                                        <span className="flex flex-wrap items-center gap-2">
+                                            <span className="font-medium">{formatHours(item.hours)} h</span>
+                                            {item.can_move && (
+                                                <>
+                                                    <label className="sr-only" htmlFor={`move-${item.allocation_id}`}>
+                                                        Sposta {item.activity} al giorno
+                                                    </label>
+                                                    <Input
+                                                        id={`move-${item.allocation_id}`}
+                                                        type="date"
+                                                        className="h-8 w-40"
+                                                        value={targets[item.allocation_id] ?? ''}
+                                                        onChange={(event) => setTargets({ ...targets, [item.allocation_id]: event.target.value })}
+                                                    />
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        disabled={!targets[item.allocation_id]}
+                                                        onClick={() => requestMove(item, selectedDay.date, targets[item.allocation_id])}
+                                                    >
+                                                        Sposta
+                                                    </Button>
+                                                </>
+                                            )}
+                                        </span>
                                     </li>
                                 ))}
                             </ul>
                         )}
+                        <InputError message={moveError ?? undefined} />
                     </section>
                 )}
             </div>
+
+            <Dialog open={pending !== null} onOpenChange={(open) => !open && setPending(null)}>
+                <DialogContent>
+                    {pending && (
+                        <>
+                            <DialogHeader>
+                                <DialogTitle>{beyondProject ? 'Sei sicuro?' : "Estendere la data di fine dell'attività?"}</DialogTitle>
+                                <DialogDescription>
+                                    {beyondProject
+                                        ? `Il ${formatDate(pending.toDate)} è oltre la scadenza del progetto (${formatDate(pending.item.project_due_on)}). Confermando si estendono a quella data sia la scadenza del progetto sia quella dell'attività «${pending.item.activity}».`
+                                        : `L'attività «${pending.item.activity}» finisce il ${formatDate(pending.item.activity_due_on)}. Confermando, la sua data di fine diventa il ${formatDate(pending.toDate)}.`}
+                                </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                                <Button variant="outline" onClick={() => setPending(null)}>
+                                    Annulla
+                                </Button>
+                                <Button onClick={() => submitMove(pending.item, pending.toDate, true, beyondProject)}>Estendi e sposta</Button>
+                            </DialogFooter>
+                        </>
+                    )}
+                </DialogContent>
+            </Dialog>
         </AppLayout>
     );
 }

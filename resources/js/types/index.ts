@@ -292,6 +292,11 @@ export interface CalendarDay {
 }
 
 export interface CalendarItem {
+    allocation_id: number;
+    can_move: boolean;
+    activity_starts_on: string;
+    activity_due_on: string;
+    project_due_on: string;
     activity_id: number;
     activity: string;
     project: string;

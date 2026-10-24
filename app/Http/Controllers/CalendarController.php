@@ -45,7 +45,7 @@ class CalendarController extends Controller
         $userIds = $people->pluck('id')->all();
 
         $load = $userIds === [] ? [] : $dailyLoad->handle($userIds, $from, $to);
-        $items = $this->itemsByUserAndDay($userIds, $from, $to);
+        $items = $this->itemsByUserAndDay($user, $userIds, $from, $to);
         $absences = $this->absencesByUserAndDay($userIds, $from, $to);
 
         $holidays = Holiday::query()
@@ -102,25 +102,35 @@ class CalendarController extends Controller
     }
 
     /**
-     * Quote delle attività aperte, per persona e giorno.
+     * Quote delle attività aperte, per persona e giorno (quelle a 0 ore, lasciate da uno spostamento, non si mostrano).
+     * `can_move` dice se chi guarda può spostarle, cioè se può modificare l'attività.
      *
      * @param  list<int>  $userIds
-     * @return array<int, array<string, list<array{activity_id: int, activity: string, project: string, hours: float}>>>
+     * @return array<int, array<string, list<array<string, mixed>>>>
      */
-    private function itemsByUserAndDay(array $userIds, string $from, string $to): array
+    private function itemsByUserAndDay(User $viewer, array $userIds, string $from, string $to): array
     {
         $items = [];
+        $canMove = [];
 
         ActivityAllocation::query()
-            ->with('activity.project:id,name')
+            ->with(['activity.project:id,name,due_on', 'activity.assignees:id,area_id'])
+            ->where('hours', '>', 0)
             ->whereIn('user_id', $userIds)
             ->whereDate('date', '>=', $from)
             ->whereDate('date', '<=', $to)
             ->whereHas('activity', fn ($query) => $query->whereNotIn('status', [WorkStatus::Done, WorkStatus::Archived]))
             ->orderBy('date')
             ->get()
-            ->each(function (ActivityAllocation $allocation) use (&$items): void {
+            ->each(function (ActivityAllocation $allocation) use (&$items, $viewer, &$canMove): void {
+                $canMove[$allocation->activity_id] ??= $viewer->can('update', $allocation->activity);
+
                 $items[$allocation->user_id][$allocation->date->toDateString()][] = [
+                    'allocation_id' => $allocation->id,
+                    'can_move' => $canMove[$allocation->activity_id],
+                    'activity_starts_on' => $allocation->activity->starts_on->toDateString(),
+                    'activity_due_on' => $allocation->activity->due_on->toDateString(),
+                    'project_due_on' => $allocation->activity->project->due_on->toDateString(),
                     'activity_id' => $allocation->activity_id,
                     'activity' => $allocation->activity->name,
                     'project' => $allocation->activity->project->name,

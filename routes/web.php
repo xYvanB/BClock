@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\AbsenceController;
+use App\Http\Controllers\ActivityAllocationController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\CalendarController;
@@ -63,6 +64,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('timers/{timer}/stop', [TimerController::class, 'stop'])->name('timers.stop');
 
     Route::get('calendar', [CalendarController::class, 'index'])->name('calendar.index');
+    Route::post('allocations/{allocation}/move', [ActivityAllocationController::class, 'move'])->name('allocations.move');
 
     Route::get('absences', [AbsenceController::class, 'index'])->name('absences.index');
     Route::post('absences', [AbsenceController::class, 'store'])->name('absences.store');
