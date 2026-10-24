@@ -375,16 +375,31 @@ export default function Dashboard({ filters, project_hours, day_hours, worked_ho
                                 </tfoot>
                             </table>
                             {maxMinutes > 0 && worked_hours.buckets.length > 1 && (
-                                <div className="mt-4 flex h-24 items-end gap-1" role="img" aria-label="Ore lavorate per periodo">
-                                    {worked_hours.column_totals.map((minutes, index) => (
-                                        <div
-                                            key={worked_hours.buckets[index].from}
-                                            className="bg-primary/70 min-w-1 flex-1 rounded-t"
-                                            style={{ height: `${(minutes / maxMinutes) * 100}%` }}
-                                            title={`${worked_hours.buckets[index].label}: ${formatMinutes(minutes)}`}
-                                        />
-                                    ))}
-                                </div>
+                                <figure className="mt-6">
+                                    <figcaption className="mb-2 text-sm font-medium">Ore totali per periodo</figcaption>
+                                    <div className="flex items-end gap-1" role="img" aria-label="Ore totali per periodo">
+                                        {worked_hours.column_totals.map((minutes, index) => (
+                                            <div
+                                                key={worked_hours.buckets[index].from}
+                                                className="flex min-w-0 flex-1 flex-col items-center justify-end gap-1"
+                                                title={`${worked_hours.buckets[index].label}: ${formatMinutes(minutes)}`}
+                                            >
+                                                {worked_hours.buckets.length <= 14 && (
+                                                    <span className="text-xs">{minutes === 0 ? '–' : formatMinutes(minutes)}</span>
+                                                )}
+                                                <div
+                                                    className="bg-primary/70 w-full rounded-t"
+                                                    style={{ height: `${Math.max(2, (minutes / maxMinutes) * 80)}px` }}
+                                                />
+                                                {worked_hours.buckets.length <= 14 && (
+                                                    <span className="text-muted-foreground w-full truncate text-center text-xs">
+                                                        {worked_hours.buckets[index].label}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </figure>
                             )}
                         </div>
                     )}

@@ -107,5 +107,8 @@ class DatabaseSeeder extends Seeder
                 'source' => TimeEntrySource::Manual,
             ]);
         }
+
+        // più persone, progetti, ore e assenze per provare calendario, Gantt e dashboard
+        $this->call(DemoDataSeeder::class);
     }
 }

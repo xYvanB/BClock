@@ -314,7 +314,7 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
                     </div>
                 ) : (
                     <div className="border-sidebar-border/70 max-h-[70vh] overflow-auto rounded-xl border">
-                        <div className="relative" style={{ width: LABEL_WIDTH + timelineWidth }}>
+                        <div className="relative w-full" style={{ minWidth: LABEL_WIDTH + timelineWidth }}>
                             <div className="bg-muted sticky top-0 z-30 flex" style={{ height: HEADER_HEIGHT }}>
                                 <div
                                     className="bg-muted sticky left-0 z-40 flex shrink-0 items-center border-r px-3 text-sm font-medium"
@@ -322,7 +322,7 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
                                 >
                                     Progetto / attività
                                 </div>
-                                <div className="relative" style={{ width: timelineWidth }}>
+                                <div className="relative flex-1" style={{ minWidth: timelineWidth }}>
                                     {months.map((month) => (
                                         <div
                                             key={month.left}
@@ -365,7 +365,7 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
                                                     {row.project.name}
                                                 </span>
                                             </div>
-                                            <div className="relative" style={{ width: timelineWidth }}>
+                                            <div className="relative flex-1" style={{ minWidth: timelineWidth }}>
                                                 <div
                                                     className="bg-foreground/30 absolute top-4 h-1.5 rounded"
                                                     style={{
@@ -386,7 +386,7 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
                                                 </span>
                                                 <span className="text-muted-foreground truncate text-xs">{row.activity.assignees.join(', ')}</span>
                                             </div>
-                                            <div className="relative" style={{ width: timelineWidth }}>
+                                            <div className="relative flex-1" style={{ minWidth: timelineWidth }}>
                                                 {(() => {
                                                     const base = barOf(row.activity);
                                                     const dx = drag?.id === row.activity.id ? drag.dx : 0;
