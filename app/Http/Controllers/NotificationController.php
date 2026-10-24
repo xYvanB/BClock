@@ -26,7 +26,7 @@ class NotificationController extends Controller
             ->through(fn (DatabaseNotification $notification): array => self::present($notification));
 
         return Inertia::render('notifications/index', [
-            'notifications' => $notifications,
+            'list' => $notifications,
             'filter' => $unreadOnly ? 'unread' : 'all',
         ]);
     }

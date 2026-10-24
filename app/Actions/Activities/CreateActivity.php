@@ -50,7 +50,7 @@ final class CreateActivity
                 User::whereIn('id', $data->assigneeIds)->get(),
                 NotificationKind::TaskAssigned,
                 "Ti è stato assegnato «{$activity->name}».",
-                route('activities.index'),
+                route('calendar.index'),
                 $actor,
             );
 

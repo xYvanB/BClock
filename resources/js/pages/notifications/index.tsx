@@ -7,12 +7,12 @@ import { Head, Link, router } from '@inertiajs/react';
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Notifiche', href: '/notifications' }];
 
 interface Props {
-    notifications: Paginated<AppNotification>;
+    list: Paginated<AppNotification>;
     filter: 'all' | 'unread';
 }
 
 /** Elenco completo delle notifiche della persona, con filtro "non lette" e paginazione. */
-export default function NotificationsIndex({ notifications, filter }: Props) {
+export default function NotificationsIndex({ list, filter }: Props) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Notifiche" />
@@ -37,11 +37,11 @@ export default function NotificationsIndex({ notifications, filter }: Props) {
                     </div>
                 </div>
 
-                {notifications.data.length === 0 ? (
+                {list.data.length === 0 ? (
                     <p className="text-muted-foreground text-sm">{filter === 'unread' ? 'Nessuna notifica da leggere.' : 'Nessuna notifica.'}</p>
                 ) : (
                     <ul className="grid gap-2">
-                        {notifications.data.map((notification) => (
+                        {list.data.map((notification) => (
                             <li key={notification.id}>
                                 <button
                                     type="button"
@@ -62,20 +62,20 @@ export default function NotificationsIndex({ notifications, filter }: Props) {
                     </ul>
                 )}
 
-                {notifications.last_page > 1 && (
+                {list.last_page > 1 && (
                     <nav className="flex items-center justify-between text-sm" aria-label="Pagine">
-                        {notifications.prev_page_url ? (
-                            <Link href={notifications.prev_page_url} className="underline">
+                        {list.prev_page_url ? (
+                            <Link href={list.prev_page_url} className="underline">
                                 ← Più recenti
                             </Link>
                         ) : (
                             <span />
                         )}
                         <span className="text-muted-foreground">
-                            Pagina {notifications.current_page} di {notifications.last_page}
+                            Pagina {list.current_page} di {list.last_page}
                         </span>
-                        {notifications.next_page_url ? (
-                            <Link href={notifications.next_page_url} className="underline">
+                        {list.next_page_url ? (
+                            <Link href={list.next_page_url} className="underline">
                                 Meno recenti →
                             </Link>
                         ) : (

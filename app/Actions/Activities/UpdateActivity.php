@@ -53,7 +53,15 @@ final class UpdateActivity
                 User::whereIn('id', $changes['attached'])->get(),
                 NotificationKind::TaskAssigned,
                 "Ti è stato assegnato «{$activity->name}».",
-                route('activities.index'),
+                route('calendar.index'),
+                $actor,
+            );
+
+            $this->notify->handle(
+                User::whereIn('id', $changes['detached'])->get(),
+                NotificationKind::TaskAssigned,
+                "Non sei più assegnato a «{$activity->name}».",
+                route('calendar.index'),
                 $actor,
             );
 
@@ -64,7 +72,7 @@ final class UpdateActivity
                     User::whereIn('id', $data->assigneeIds)->whereNotIn('id', $changes['attached'])->get(),
                     NotificationKind::ActivityMoved,
                     "Date cambiate: «{$activity->name}» ora va dal {$activity->starts_on->format('d/m/Y')} al {$activity->due_on->format('d/m/Y')} (era dal {$this->format($before[0])} al {$this->format($before[1])}).",
-                    route('activities.index'),
+                    route('calendar.index'),
                     $actor,
                 );
             }

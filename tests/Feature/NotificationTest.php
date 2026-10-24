@@ -66,6 +66,28 @@ it('tells only who is added when an assignee changes, and who stays when the dat
     expect($stays->unreadNotifications()->count())->toBe(1);
 });
 
+it('tells who is taken off an activity', function (): void {
+    $boss = User::factory()->boss()->create();
+    [$stays, $removed] = User::factory()->employee()->count(2)->create();
+    $project = notificationProject();
+    $activity = Activity::factory()->for($project)->create(['name' => 'Sviluppo login', 'starts_on' => '2026-11-09', 'due_on' => '2026-11-13', 'planned_hours' => '10.00']);
+    $activity->assignees()->attach([$stays->id, $removed->id]);
+    $payload = notificationActivityPayload($project, [$stays->id]);
+    unset($payload['project_id']);
+
+    $this->actingAs($boss)->put(route('activities.update', $activity), $payload)->assertSessionHasNoErrors();
+
+    expect($removed->unreadNotifications()->get()->pluck('data.message')->all())->toBe(['Non sei più assegnato a «Sviluppo login».'])
+        ->and($stays->unreadNotifications()->count())->toBe(0);
+});
+
+it('sends a real e-mail with the link, once the queue runs', function (): void {
+    $mail = new AppNotificationMail('Ti è stato assegnato «Sviluppo login».', 'http://localhost/calendar');
+
+    $mail->assertSeeInHtml('Ti è stato assegnato');
+    $mail->assertSeeInHtml('http://localhost/calendar');
+});
+
 it('tells the assignees once for every activity moved from the Gantt', function (): void {
     $boss = User::factory()->boss()->create();
     $person = User::factory()->employee()->create();
@@ -118,7 +140,8 @@ it('opens the linked page, marks only the own notification as read, and refuses 
     $this->actingAs($person)->post(route('notifications.read', $theirs->id))->assertNotFound();
     expect($theirs->fresh()->read_at)->toBeNull();
 
-    $this->actingAs($person)->post(route('notifications.read', $mine->id))->assertRedirect('/activities');
+    $this->actingAs($person)->post(route('notifications.read', $mine->id))->assertRedirect('/calendar');
+    $this->actingAs($person)->followingRedirects()->post(route('notifications.read', $mine->id))->assertOk();
     expect($mine->fresh()->read_at)->not->toBeNull();
 });
 
@@ -132,9 +155,9 @@ it('shares the unread count and the latest notifications, and lists them all wit
         ->assertInertia(fn (Assert $page) => $page->where('notifications.unread_count', 1)->has('notifications.items', 2));
 
     $this->actingAs($person)->get(route('notifications.index'))
-        ->assertInertia(fn (Assert $page) => $page->component('notifications/index')->has('notifications.data', 2));
+        ->assertInertia(fn (Assert $page) => $page->component('notifications/index')->has('list.data', 2)->where('notifications.unread_count', 1));
     $this->actingAs($person)->get(route('notifications.index', ['filter' => 'unread']))
-        ->assertInertia(fn (Assert $page) => $page->has('notifications.data', 1)->where('filter', 'unread'));
+        ->assertInertia(fn (Assert $page) => $page->has('list.data', 1)->where('filter', 'unread'));
 });
 
 it('sends the e-mail only to who wants it, after the action', function (): void {
