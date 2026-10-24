@@ -4,30 +4,25 @@ declare(strict_types=1);
 
 namespace App\Actions\Allocations;
 
-use App\Enum\AbsenceStatus;
-use App\Enum\AbsenceType;
 use App\Enum\WorkStatus;
-use App\Models\Absence;
 use App\Models\Activity;
 use App\Models\ActivityAllocation;
-use App\Models\Holiday;
-use App\Models\User;
-use Carbon\CarbonImmutable;
-use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
 final class GenerateActivityAllocations
 {
+    public function __construct(private readonly CalculateAvailability $availability) {}
+
     /**
      * Ricalcola le quote giornaliere di un'attività (le sostituisce tutte).
      *
-     * Le ore previste si dividono sulle coppie persona–giorno lavorativo, ciascuna col suo peso:
-     * 1 per un giorno libero, 0 in weekend, festivi e giorni di ferie confermate, e ridotto in proporzione
-     * alle ore di permesso confermate (un permesso di 2 ore su 8 dà peso 0,75). Con pesi uguali la divisione
-     * è in parti uguali. Il totale delle quote è sempre uguale alle ore previste. Se non resta nessun giorno
-     * lavorativo (solo weekend/festivi) o nessun peso, si ripiega su tutti i giorni o su pesi uguali, così le
-     * ore non si perdono. Le attività archiviate non cambiano.
+     * Le ore previste si dividono sulle coppie persona–giorno lavorativo, ciascuna col suo peso: la
+     * disponibilità del giorno (vedi CalculateAvailability) rispetto alla capacità giornaliera della persona.
+     * Pesi uguali dividono in parti uguali; un permesso di 2 ore su 8 dà peso 0,75, le ferie 0. Il totale delle
+     * quote è sempre uguale alle ore previste. Se non resta nessun giorno lavorativo (solo weekend/festivi) o
+     * nessun peso, si ripiega su tutti i giorni o su pesi uguali, così le ore non si perdono.
+     * Le attività archiviate non cambiano.
      *
      * @throws Throwable
      */
@@ -79,37 +74,15 @@ final class GenerateActivityAllocations
      */
     private function weightedUnits(Activity $activity, array $userIds): array
     {
-        $start = CarbonImmutable::parse($activity->starts_on)->startOfDay();
-        $end = CarbonImmutable::parse($activity->due_on)->startOfDay();
+        $availability = $this->availability->handle($userIds, $activity->starts_on->toDateString(), $activity->due_on->toDateString());
 
-        $allDays = collect(CarbonPeriod::create($start, $end))->map(fn ($day): string => $day->toDateString());
-
-        $holidays = Holiday::query()
-            ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
-            ->get()
-            ->map(fn (Holiday $holiday): string => $holiday->date->toDateString());
-
-        $workingDays = $allDays
-            ->reject(fn (string $day): bool => CarbonImmutable::parse($day)->isWeekend() || $holidays->contains($day))
-            ->values();
-
-        if ($workingDays->isEmpty()) {
-            $workingDays = $allDays->values();
-        }
-
-        $capacities = User::whereIn('id', $userIds)->pluck('daily_capacity', 'id');
-
-        $absences = Absence::query()
-            ->whereIn('user_id', $userIds)
-            ->where('status', AbsenceStatus::Confirmed)
-            ->whereDate('starts_on', '<=', $end->toDateString())
-            ->whereDate('ends_on', '>=', $start->toDateString())
-            ->get();
+        $days = $availability['working_days'] !== [] ? $availability['working_days'] : $availability['days'];
 
         $units = [];
-        foreach ($workingDays as $day) {
+        foreach ($days as $day) {
             foreach ($userIds as $userId) {
-                $units[] = [$userId, $day, $this->weightOf($absences->where('user_id', $userId), $day, (float) ($capacities[$userId] ?? 8))];
+                $capacity = $availability['capacities'][$userId] ?? 0.0;
+                $units[] = [$userId, $day, $capacity > 0 ? $availability['hours'][$userId][$day] / $capacity : 0.0];
             }
         }
 
@@ -118,30 +91,6 @@ final class GenerateActivityAllocations
         }
 
         return $units;
-    }
-
-    /**
-     * Quota di giornata disponibile (da 0 a 1) di una persona, date le sue assenze confermate.
-     *
-     * @param  iterable<Absence>  $absences
-     */
-    private function weightOf(iterable $absences, string $day, float $capacity): float
-    {
-        $leaveHours = 0.0;
-
-        foreach ($absences as $absence) {
-            if ($absence->starts_on->toDateString() > $day || $absence->ends_on->toDateString() < $day) {
-                continue;
-            }
-
-            if ($absence->type === AbsenceType::Vacation) {
-                return 0.0;
-            }
-
-            $leaveHours += $absence->leaveHours() ?? 0.0;
-        }
-
-        return $capacity > 0 ? max(0.0, 1 - $leaveHours / $capacity) : 0.0;
     }
 
     /**
