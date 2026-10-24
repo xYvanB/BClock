@@ -21,11 +21,11 @@ BClock is a web app for logging and planning a company's working hours: customer
 
 ## Tech stack
 
-Laravel 12 (PHP 8.3), Inertia 2 with React 19 and TypeScript, Tailwind CSS 4, Laravel Reverb for real time, Laravel Passport and Laravel MCP for connected AI apps, and Pest for tests.
+Laravel 13 (PHP 8.4), Inertia 2 with React 19 and TypeScript, Tailwind CSS 4, Laravel Reverb for real time, Laravel Passport and Laravel MCP for connected AI apps, and Pest for tests.
 
 ## Installation
 
-You need PHP 8.3, Composer, Node.js and a MySQL database.
+You need PHP 8.4, Composer, Node.js and a MySQL database.
 
 ```bash
 composer install
