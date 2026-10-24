@@ -16,16 +16,16 @@ final class GenerateActivityAllocations
     public function __construct(private readonly CalculateAvailability $availability) {}
 
     /**
-     * Ricalcola le quote giornaliere di un'attività.
+     * Recalculates the daily allocations of an activity.
      *
-     * Le quote spostate a mano nel calendario (`is_manual`) restano, purché la persona sia ancora assegnata e il
-     * giorno cada ancora nel periodo dell'attività; le altre si sostituiscono. Le ore previste che non sono
-     * coperte dalle quote manuali si dividono sulle coppie persona–giorno lavorativo rimaste, ciascuna col suo
-     * peso: la disponibilità del giorno (vedi CalculateAvailability) rispetto alla capacità giornaliera della
-     * persona. Pesi uguali dividono in parti uguali; un permesso di 2 ore su 8 dà peso 0,75, le ferie 0. Il
-     * totale delle quote è sempre uguale alle ore previste. Se non resta nessun giorno lavorativo (solo
-     * weekend/festivi) o nessun peso, si ripiega su tutti i giorni o su pesi uguali, così le ore non si perdono.
-     * Le attività archiviate non cambiano.
+     * Allocations moved by hand in the calendar (`is_manual`) stay, as long as the person is still assigned and the
+     * day still falls within the activity period; the others are replaced. The planned hours not
+     * covered by manual allocations are split over the remaining person–working day pairs, each with its
+     * weight: the day's availability (see CalculateAvailability) relative to the person's daily
+     * capacity. Equal weights split evenly; a 2-hour leave out of 8 gives weight 0.75, a vacation 0. The
+     * total of the allocations always equals the planned hours. If no working day is left (only
+     * weekends/holidays) or no weight, it falls back to all days or to equal weights, so hours are not lost.
+     * Archived activities do not change.
      *
      * @throws Throwable
      */
@@ -59,7 +59,7 @@ final class GenerateActivityAllocations
             $units = $this->weightedUnits($activity, $userIds, $kept);
 
             if ($units === [] && $kept->isNotEmpty()) {
-                // le quote manuali occupano ogni giorno rimasto: si scartano, così le ore previste non si perdono
+                // manual allocations fill every remaining day: discard them, so the planned hours are not lost
                 $activity->allocations()->delete();
                 $remainingCents += $keptCents;
                 $units = $this->weightedUnits($activity, $userIds, collect());
@@ -94,7 +94,7 @@ final class GenerateActivityAllocations
     }
 
     /**
-     * Coppie [persona, data, peso] su cui dividere le ore, escluse quelle che hanno già una quota manuale.
+     * [person, date, weight] pairs to split the hours over, excluding those that already have a manual allocation.
      *
      * @param  list<int>  $userIds
      * @param  Collection<int, ActivityAllocation>  $manual
@@ -129,8 +129,8 @@ final class GenerateActivityAllocations
     }
 
     /**
-     * Divide i centesimi in proporzione ai pesi; il resto va a chi ha la parte frazionaria maggiore
-     * (a parità, ai primi), così la somma è sempre esatta.
+     * Splits the cents in proportion to the weights; the remainder goes to whoever has the largest fractional part
+     * (ties go to the first ones), so the sum is always exact.
      *
      * @param  list<float>  $weights
      * @return list<int>

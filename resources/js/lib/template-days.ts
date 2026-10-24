@@ -1,13 +1,13 @@
 import { type WorkCalendar } from '@/types';
 
-/** Lunedì–venerdì, senza chiusure: il calendario di partenza. */
+/** Monday–Friday, no closures: the starting calendar. */
 const defaultCalendar: WorkCalendar = { working_weekdays: [1, 2, 3, 4, 5], closures: [] };
 
 /**
- * Data del giorno lavorativo N dall'inizio del progetto: il giorno 1 è la data di inizio (se non è un giorno
- * lavorativo, il primo successivo). Si contano solo i giorni della settimana lavorativi (1 = lunedì … 7 = domenica)
- * che non siano festività o chiusure. Replica `TemplateActivity::dateOfWorkingDay()` lato server: vanno tenute uguali.
- * Le date sono stringhe `YYYY-MM-DD` e il calcolo è in UTC per non dipendere dal fuso orario.
+ * Date of working day N from the project start: day 1 is the start date (if it is not a working day,
+ * the first one after it). Only working weekdays (1 = Monday … 7 = Sunday) that are not holidays or closures
+ * are counted. Mirrors `TemplateActivity::dateOfWorkingDay()` on the server: they must stay equal.
+ * Dates are `YYYY-MM-DD` strings and the computation is in UTC so it does not depend on the timezone.
  */
 export function dateOfWorkingDay(projectStart: string, day: number, calendar: WorkCalendar = defaultCalendar): string {
     const [year, month, dayOfMonth] = projectStart.split('-').map(Number);

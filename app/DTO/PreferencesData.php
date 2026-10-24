@@ -17,7 +17,7 @@ final readonly class PreferencesData
         public AppLocale $locale,
         public TimeFormat $timeFormat,
         public Palette $palette,
-        /** @var array<string, string>|null Colori della palette personalizzata (chiave → #rrggbb) */
+        /** @var array<string, string>|null Colors of the custom palette (key → #rrggbb) */
         public ?array $customColors = null,
     ) {}
 }

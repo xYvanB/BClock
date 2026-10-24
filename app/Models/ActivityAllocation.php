@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Quota di ore di un'attività su un giorno, per una persona.
- * `is_manual` indica una quota spostata a mano nel calendario: la rigenerazione la rispetta.
+ * Share of an activity's hours on one day, for one person.
+ * `is_manual` marks an allocation moved by hand in the calendar: regeneration respects it.
  */
 class ActivityAllocation extends Model
 {

@@ -8,7 +8,7 @@ use App\Enum\AppLocale;
 use App\Enum\TimeFormat;
 
 /**
- * Dati del primo accesso da invito: password e preferenze.
+ * First-access data from an invitation: password and preferences.
  */
 final readonly class AcceptInvitationData
 {

@@ -11,7 +11,7 @@ use Illuminate\Foundation\Http\FormRequest;
 class WorkloadSettingsRequest extends FormRequest
 {
     /**
-     * Autorizza prima della validazione (SettingPolicy).
+     * Authorizes before validation (SettingPolicy).
      */
     public function authorize(): bool
     {

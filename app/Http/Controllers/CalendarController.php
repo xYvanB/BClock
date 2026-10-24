@@ -25,8 +25,8 @@ use Inertia\Response;
 class CalendarController extends Controller
 {
     /**
-     * Calendario del carico, per persona e per giorno, in vista settimanale o mensile.
-     * Il Capo e l'HR vedono tutti (l'HR in sola lettura), il Capo area la sua area, il Dipendente solo sé stesso.
+     * Workload calendar, per person and per day, in weekly or monthly view.
+     * The Boss and HR see everyone (HR read-only), the area head their area, the Employee only themselves.
      */
     public function index(Request $request, CalculateDailyLoad $dailyLoad): Response
     {
@@ -104,8 +104,8 @@ class CalendarController extends Controller
     }
 
     /**
-     * Quote delle attività aperte, per persona e giorno (quelle a 0 ore, lasciate da uno spostamento, non si mostrano).
-     * `can_move` dice se chi guarda può spostarle, cioè se può modificare l'attività.
+     * Allocations of open activities, per person and day (those at 0 hours, left by a move, are not shown).
+     * `can_move` says whether the viewer can move them, that is whether they can edit the activity.
      *
      * @param  list<int>  $userIds
      * @return array<int, array<string, list<array<string, mixed>>>>
@@ -144,7 +144,7 @@ class CalendarController extends Controller
     }
 
     /**
-     * Assenze confermate, per persona e giorno: "ferie" o "permesso".
+     * Confirmed absences, per person and day: "vacation" or "leave".
      *
      * @param  list<int>  $userIds
      * @return array<int, array<string, string>>
@@ -176,7 +176,7 @@ class CalendarController extends Controller
         if (is_string($value) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) === 1) {
             $date = CarbonImmutable::createFromFormat('!Y-m-d', $value);
 
-            // una data inesistente (es. 2026-02-31) viene riportata al mese dopo: in quel caso si ripiega su oggi
+            // a nonexistent date (e.g. 2026-02-31) rolls over to the next month: in that case fall back to today
             if ($date !== false && $date->toDateString() === $value) {
                 return $date;
             }
@@ -186,7 +186,7 @@ class CalendarController extends Controller
     }
 
     /**
-     * Oggi nel fuso orario locale dell'azienda (l'applicazione lavora in UTC).
+     * Today in the company's local timezone (the application works in UTC).
      */
     private function today(): CarbonImmutable
     {

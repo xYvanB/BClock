@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Timer attivi: più d'uno per persona, ma uno solo per attività. `started_at` è un istante (UTC).
+        // Active timers: more than one per person, but only one per activity. `started_at` is an instant (UTC).
         Schema::create('timers', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();

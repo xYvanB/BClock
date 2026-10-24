@@ -7,8 +7,8 @@ namespace App\DTO;
 use Carbon\CarbonImmutable;
 
 /**
- * Dati validati per creare o modificare una registrazione ore.
- * Gli orari sono nel formato H:i, la durata viene calcolata dall'Action.
+ * Validated data to create or edit a time entry.
+ * Times are in H:i format, the duration is computed by the Action.
  */
 final readonly class TimeEntryData
 {
@@ -21,8 +21,8 @@ final readonly class TimeEntryData
     ) {}
 
     /**
-     * Minuti tra inizio e fine, nello stesso giorno. Calcolo diretto su ore e minuti,
-     * senza passare dall'orologio corrente (che riempirebbe secondi e data).
+     * Minutes between start and end, on the same day. Computed directly on hours and minutes,
+     * without going through the current clock (which would fill in seconds and date).
      */
     public function durationMinutes(): int
     {

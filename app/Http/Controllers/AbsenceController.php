@@ -24,8 +24,8 @@ use Throwable;
 class AbsenceController extends Controller
 {
     /**
-     * L'HR vede le assenze di tutti (per confermarle); il Capo le proprie e quelle dell'HR (che deve confermare);
-     * il Capo area le proprie e quelle della sua area; il Dipendente le proprie. I festivi li vedono tutti.
+     * HR sees everyone's absences (to confirm them); the Boss their own and HR's (which they must confirm);
+     * the area head their own and their area's; the Employee their own. Everyone sees the holidays.
      */
     public function index(Request $request): Response
     {
@@ -129,7 +129,7 @@ class AbsenceController extends Controller
     }
 
     /**
-     * Approvazione del Capo area per un'assenza di un dipendente della sua area.
+     * Area head approval for the absence of an employee of their area.
      *
      * @throws Throwable
      */

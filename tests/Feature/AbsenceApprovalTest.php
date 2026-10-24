@@ -90,7 +90,7 @@ it('tells the area head when an employee of their area requests an absence, and 
         ->and($head->unreadNotifications()->first()->data['message'])->toContain($employee->fullName())
         ->and($otherHead->unreadNotifications()->count())->toBe(0);
 
-    // un HR non passa dal Capo area
+    // an HR does not go through the area head
     $this->actingAs(User::factory()->hr()->create())->post(route('absences.store'), vacationRequest());
     expect($head->unreadNotifications()->count())->toBe(1);
 });

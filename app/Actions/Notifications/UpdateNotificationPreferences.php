@@ -11,7 +11,7 @@ use Throwable;
 final class UpdateNotificationPreferences
 {
     /**
-     * Salva le scelte della persona in transazione.
+     * Saves the person's choices in a transaction.
      *
      * @param  array<string, array{app: bool, mail: bool}>  $preferences
      *

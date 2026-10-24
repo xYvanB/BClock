@@ -1,4 +1,4 @@
-/** Tempo trascorso come `HH:MM:SS` (le ore possono superare 24). */
+/** Elapsed time as `HH:MM:SS` (hours can exceed 24). */
 export function formatElapsed(milliseconds: number): string {
     const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
     const hours = Math.floor(totalSeconds / 3600);

@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Festivi gestiti dall'HR: giorni non lavorativi per tutti.
+        // Holidays managed by HR: non-working days for everyone.
         Schema::create('holidays', function (Blueprint $table): void {
             $table->id();
             $table->date('date')->unique();

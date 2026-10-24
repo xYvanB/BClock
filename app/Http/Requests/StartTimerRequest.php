@@ -12,7 +12,7 @@ use Illuminate\Validation\Rule;
 class StartTimerRequest extends FormRequest
 {
     /**
-     * Ognuno può avviare timer (come registrare ore).
+     * Anyone can start timers (like logging hours).
      */
     public function authorize(): bool
     {

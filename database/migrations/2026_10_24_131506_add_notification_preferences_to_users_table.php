@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Scelte della persona per tipo di notifica: tipo → {app: bool, mail: bool}; i tipi mancanti usano i valori di default.
+        // The person's choices per notification type: type → {app: bool, mail: bool}; missing types use the default values.
         Schema::table('users', function (Blueprint $table): void {
             $table->json('notification_preferences')->nullable()->after('custom_colors');
         });

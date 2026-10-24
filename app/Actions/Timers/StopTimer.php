@@ -17,16 +17,16 @@ final class StopTimer
     public function __construct(private readonly CreateTimeEntry $createTimeEntry) {}
 
     /**
-     * Ferma il timer e lo trasforma in registrazioni ore modificabili (sorgente "timer"), in transazione.
+     * Stops the timer and turns it into editable time entries (source "timer"), in a transaction.
      *
-     * - Gli orari sono nel fuso locale (`app.local_timezone`), come le ore manuali.
-     * - Una registrazione sta in un solo giorno: se il timer attraversa la mezzanotte viene diviso per giorno
-     *   (il primo giorno finisce alle 23:59, i successivi iniziano alle 00:00).
-     * - Sotto il minuto (a inizio e fine troncati al minuto) non si crea nulla.
-     * - Il timer si elimina per primo: con due richieste insieme (doppio click) solo una lo trova.
-     * - Si registra anche se l'attività è stata archiviata nel frattempo: il lavoro è stato fatto.
+     * - Times are in the local timezone (`app.local_timezone`), like manual hours.
+     * - An entry lies within a single day: if the timer crosses midnight it is split by day
+     *   (the first day ends at 23:59, the following ones start at 00:00).
+     * - Under a minute (start and end truncated to the minute) nothing is created.
+     * - The timer is deleted first: with two simultaneous requests (double click) only one finds it.
+     * - It is logged even if the activity was archived in the meantime: the work was done.
      *
-     * @return int|null numero di registrazioni create, o null se il timer era già stato fermato
+     * @return int|null number of entries created, or null if the timer had already been stopped
      *
      * @throws Throwable
      */

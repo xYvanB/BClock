@@ -1,9 +1,9 @@
 import { type Palette } from '@/types';
 
-/** Palette con sfondo scuro: attivano anche la classe `dark` di Tailwind. */
+/** Palettes with a dark background: they also enable Tailwind's `dark` class. */
 const darkPalettes: Palette[] = ['scuro', 'personalizzata'];
 
-/** Colori che si possono scegliere nella palette personalizzata, con la loro etichetta (le chiavi sono quelle del server). */
+/** Colors that can be chosen in the custom palette, with their label (the keys are the server's). */
 export const customColorFields: { key: string; label: string; hint: string }[] = [
     { key: 'bg', label: 'Sfondo', hint: 'Fondo delle pagine' },
     { key: 'surface', label: 'Superfici', hint: 'Schede, menu e pannelli' },
@@ -27,14 +27,14 @@ const relativeLuminance = (hex: string): number => {
     return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
 };
 
-/** Rapporto di contrasto WCAG fra due colori (da 1 a 21); sotto 4,5 il testo si legge male. */
+/** WCAG contrast ratio between two colors (1 to 21); below 4.5 the text is hard to read. */
 export const contrastRatio = (first: string, second: string): number => {
     const [light, dark] = [relativeLuminance(first), relativeLuminance(second)].sort((a, b) => b - a);
 
     return (light + 0.05) / (dark + 0.05);
 };
 
-/** Testo sul colore primario: scuro se il primario è chiaro, chiaro altrimenti (come fa il server). */
+/** Text on the primary color: dark if the primary is light, light otherwise (as the server does). */
 const onPrimary = (primary: string): string => {
     const [red, green, blue] = [1, 3, 5].map((start) => parseInt(primary.slice(start, start + 2), 16));
 
@@ -42,8 +42,8 @@ const onPrimary = (primary: string): string => {
 };
 
 /**
- * Applica subito una palette al documento (anteprima o salvataggio). I colori sono in resources/css/tema.css;
- * per la personalizzata si passano i colori scelti, che diventano stile inline di <html>.
+ * Applies a palette to the document right away (preview or save). The colors are in resources/css/tema.css;
+ * for the custom one the chosen colors are passed, which become the inline style of <html>.
  */
 export function applyPalette(palette: Palette, customColors?: CustomColors | null): void {
     const root = document.documentElement;

@@ -23,7 +23,7 @@ class ProjectTemplate extends Model
     ];
 
     /**
-     * Attività del template nell'ordine scelto.
+     * The template's activities in the chosen order.
      *
      * @return HasMany<TemplateActivity, $this>
      */
@@ -33,7 +33,7 @@ class ProjectTemplate extends Model
     }
 
     /**
-     * Sostituisce tutte le attività con quelle date, nell'ordine ricevuto (nessun'altra tabella le richiama).
+     * Replaces all the activities with the given ones, in the received order (no other table references them).
      *
      * @param  list<TemplateActivityData>  $activities
      */

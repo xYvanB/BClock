@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Ferie e permessi: li inserisce la persona, li conferma l'HR; la capacità cala solo da confermati.
+        // Vacations and leaves: entered by the person, confirmed by HR; capacity decreases only from confirmed ones.
         Schema::create('absences', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();

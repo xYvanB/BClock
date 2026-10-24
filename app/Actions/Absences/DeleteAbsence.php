@@ -21,7 +21,7 @@ final class DeleteAbsence
     ) {}
 
     /**
-     * Elimina l'assenza. Se è confermata ed è l'HR a toglierla a un'altra persona, la persona riceve il motivo.
+     * Deletes the absence. If it is confirmed and HR removes it from someone else, that person receives the reason.
      *
      * @throws Throwable
      */

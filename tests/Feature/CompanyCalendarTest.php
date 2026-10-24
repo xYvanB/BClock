@@ -13,7 +13,7 @@ use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 
 /**
- * Lunedì 2026-11-09 … venerdì 13, sabato 14, domenica 15.
+ * Monday 2026-11-09 … Friday 13, Saturday 14, Sunday 15.
  *
  * @return array<string, string>
  */
@@ -62,7 +62,7 @@ it('counts only the chosen weekdays as working days', function (): void {
 
     $availability = app(CalculateAvailability::class)->handle([$user->id], '2026-11-09', '2026-11-15');
 
-    // venerdì a casa, sabato al lavoro
+    // Friday at home, Saturday at work
     expect($availability['working_days'])->toBe(['2026-11-09', '2026-11-10', '2026-11-11', '2026-11-12', '2026-11-14'])
         ->and($availability['hours'][$user->id]['2026-11-13'])->toBe(0.0)
         ->and($availability['hours'][$user->id]['2026-11-14'])->toBe(8.0);

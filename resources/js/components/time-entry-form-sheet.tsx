@@ -20,7 +20,7 @@ interface TimeEntryFormSheetProps {
 const fieldClass =
     'border-input bg-background focus-visible:ring-ring h-9 w-full rounded-md border px-3 text-sm focus-visible:ring-1 focus-visible:outline-none';
 
-/** Drawer laterale per registrare, modificare o eliminare ore (F3, F5). */
+/** Side drawer to log, edit or delete hours (F3, F5). */
 export function TimeEntryFormSheet({ open, entry, activities, onClose }: TimeEntryFormSheetProps) {
     const { data, setData, post, put, processing, errors, setError, clearErrors, reset } = useForm<TimeEntryFormData>({
         activity_id: '',

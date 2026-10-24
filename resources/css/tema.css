@@ -1,8 +1,8 @@
 /*
- * Palette dell'interfaccia: collezione di variabili `Tema` di FigCraft (file BClock-wireframe.figcraft),
- * esportata con variable.export (formato css). Per aggiornarla: cambiare i valori in FigCraft,
- * riesportare e riportare qui i valori (i selettori usano gli stessi nomi di App\Enum\Palette).
- * Il valore predefinito (:root) è la modalità Wireframe.
+ * Interface palette: `Tema` variable collection of FigCraft (file BClock-wireframe.figcraft),
+ * exported with variable.export (css format). To update it: change the values in FigCraft,
+ * re-export and bring the values here (the selectors use the same names as App\Enum\Palette).
+ * The default value (:root) is the Wireframe mode.
  */
 
 /* Tema · Wireframe */
@@ -67,8 +67,8 @@
 }
 
 /*
- * Tema · Personalizzata: parte uguale allo scuro. La persona sceglie otto colori (Preferenze), applicati come stile
- * inline su <html>; gli altri si ricavano da quelli.
+ * Theme · Custom: starts equal to the dark one. The person chooses eight colors (Preferences), applied as inline style
+ * on <html>; the others are derived from them.
  */
 [data-tema='personalizzata'] {
     --t-bg: #0a0a0f;

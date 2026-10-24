@@ -21,7 +21,7 @@ interface UserFormSheetProps {
     user: ManagedUser | null;
     areas: AreaOption[];
     assignableRoles: Role[];
-    /** Per il Capo area: l'area è fissa e non modificabile. */
+    /** For the area head: the area is fixed and cannot be changed. */
     fixedAreaId: number | null;
     onClose: () => void;
 }
@@ -29,7 +29,7 @@ interface UserFormSheetProps {
 const fieldClass =
     'border-input bg-background focus-visible:ring-ring h-9 w-full rounded-md border px-3 text-sm focus-visible:ring-1 focus-visible:outline-none disabled:opacity-60';
 
-/** Drawer laterale per invitare un utente (F2) o modificarne i dati. */
+/** Side drawer to invite a user (F2) or edit their data. */
 export function UserFormSheet({ open, user, areas, assignableRoles, fixedAreaId, onClose }: UserFormSheetProps) {
     const { data, setData, post, put, processing, errors, setError, clearErrors, reset } = useForm<UserFormData>({
         name: '',

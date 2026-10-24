@@ -14,8 +14,8 @@ final class UpdateWorkingWeekdays
     public function __construct(private readonly RegenerateAllocations $allocations) {}
 
     /**
-     * Salva i giorni della settimana lavorativi (1 = lunedì … 7 = domenica) e ricalcola le quote delle attività aperte,
-     * che dipendono da quali giorni si lavora.
+     * Saves the working weekdays (1 = Monday … 7 = Sunday) and recalculates the allocations of open activities,
+     * which depend on which days are worked.
      *
      * @param  list<int>  $weekdays
      *

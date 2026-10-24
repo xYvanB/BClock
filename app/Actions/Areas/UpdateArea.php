@@ -12,7 +12,7 @@ use Throwable;
 final class UpdateArea
 {
     /**
-     * Aggiorna un'area in transazione.
+     * Updates an area in a transaction.
      *
      * @throws Throwable
      */

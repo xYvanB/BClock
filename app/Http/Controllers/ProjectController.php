@@ -32,12 +32,12 @@ use Throwable;
 class ProjectController extends Controller
 {
     /**
-     * Righe di "Ore" mostrate nel dettaglio.
+     * "Hours" rows shown in the detail.
      */
     private const int TIME_ENTRIES_LIMIT = 100;
 
     /**
-     * Lista progetti. Gli archiviati sono nascosti, salvo filtro per stato "archiviato" o `archived=1`.
+     * Project list. Archived ones are hidden, unless filtering by "archived" status or `archived=1`.
      */
     public function index(Request $request): Response
     {
@@ -228,7 +228,7 @@ class ProjectController extends Controller
     }
 
     /**
-     * Template con le attività, per la scelta nel drawer del progetto; vuoti per chi non può creare attività (HR).
+     * Templates with their activities, to choose from in the project drawer; empty for who cannot create activities (HR).
      *
      * @return Collection<int, array<string, mixed>>
      */
@@ -258,7 +258,7 @@ class ProjectController extends Controller
     }
 
     /**
-     * Persone assegnabili alle attività: il Capo area solo quelle della propria area.
+     * People assignable to activities: the area head only those of their own area.
      *
      * @return Collection<int, array{id: int, name: string, area_id: int|null}>
      */

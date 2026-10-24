@@ -12,7 +12,7 @@ use Throwable;
 final class UpdateUser
 {
     /**
-     * Aggiorna i dati di un utente in transazione.
+     * Updates a user's data in a transaction.
      *
      * @throws Throwable
      */

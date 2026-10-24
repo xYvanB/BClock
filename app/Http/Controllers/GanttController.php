@@ -24,9 +24,9 @@ use Throwable;
 class GanttController extends Controller
 {
     /**
-     * Gantt (F10): le attività raggruppate per progetto, con dipendenze, linea di oggi e scadenza del progetto.
-     * Il Capo e l'HR vedono tutto (l'HR in sola lettura), il Capo area le attività con persone della sua area,
-     * il Dipendente le proprie. Si può spostare solo ciò che si può modificare (ActivityPolicy).
+     * Gantt (F10): activities grouped by project, with dependencies, today line and project due date.
+     * The Boss and HR see everything (HR read-only), the area head the activities with people of their area,
+     * the Employee their own. Only what can be edited can be moved (ActivityPolicy).
      */
     public function index(Request $request, PlanActivityShift $planner): Response
     {
@@ -98,7 +98,7 @@ class GanttController extends Controller
     }
 
     /**
-     * Applica uno spostamento o ridimensionamento (con la sua catena di dipendenze).
+     * Applies a move or resize (with its chain of dependencies).
      *
      * @throws Throwable
      */
@@ -117,7 +117,7 @@ class GanttController extends Controller
     }
 
     /**
-     * Anteprima di uno spostamento (richiesta parziale `only: ['preview']`): cosa cambia e cosa lo blocca.
+     * Preview of a move (partial request `only: ['preview']`): what changes and what blocks it.
      *
      * @return array<string, mixed>|null
      */

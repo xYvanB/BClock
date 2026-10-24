@@ -12,7 +12,7 @@ interface AppShellProps {
 export function AppShell({ children, variant = 'header' }: AppShellProps) {
     const { auth } = usePage<SharedData>().props;
 
-    // Il tag <html> è scritto dal server solo al caricamento completo: con login e navigazione Inertia va riallineato.
+    // The <html> tag is written by the server only on a full load: with login and Inertia navigation it must be realigned.
     useEffect(() => applyPalette(auth.user.palette), [auth.user.palette]);
 
     const [isOpen, setIsOpen] = useState(() => (typeof window !== 'undefined' ? localStorage.getItem('sidebar') !== 'false' : true));

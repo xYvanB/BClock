@@ -23,7 +23,7 @@ function dependencyPayload(Activity $activity, array $overrides = []): array
 }
 
 /**
- * Tre attività dello stesso progetto, tutte dentro le sue date.
+ * Three activities of the same project, all within its dates.
  *
  * @return array{Project, Activity, Activity, Activity}
  */
@@ -102,7 +102,7 @@ it('refuses dependencies that would form a cycle, direct or not', function (): v
 
     expect($a->dependencies()->count())->toBe(0);
 
-    // dipendere da un'attività non collegata va bene
+    // depending on an unrelated activity is fine
     $this->actingAs($boss)->put(route('activities.update', $c), dependencyPayload($c, ['dependency_ids' => [$a->id, $b->id]]))
         ->assertSessionHasNoErrors();
 });

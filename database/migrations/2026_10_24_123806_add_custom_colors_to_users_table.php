@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Colori scelti dalla persona per la palette personalizzata (chiave → #rrggbb, vedi Palette::CUSTOM_KEYS).
+        // Colors chosen by the person for the custom palette (key → #rrggbb, see Palette::CUSTOM_KEYS).
         Schema::table('users', function (Blueprint $table): void {
             $table->json('custom_colors')->nullable()->after('palette');
         });

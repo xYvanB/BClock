@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\DTO;
 
 /**
- * Impostazioni del carico di lavoro: tolleranza del livello "pieno".
+ * Workload settings: tolerance of the "full" level.
  */
 final readonly class WorkloadSettingsData
 {

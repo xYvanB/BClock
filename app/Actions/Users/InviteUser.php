@@ -14,8 +14,8 @@ use Throwable;
 final class InviteUser
 {
     /**
-     * Crea l'utente in attesa di invito (con una password casuale che nessuno conosce)
-     * e, a transazione conclusa, gli manda l'email con il link per scegliere la password.
+     * Creates the user awaiting an invitation (with a random password nobody knows)
+     * and, once the transaction is done, sends them the e-mail with the link to choose the password.
      *
      * @throws Throwable
      */

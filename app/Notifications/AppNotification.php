@@ -8,7 +8,7 @@ use App\Enum\NotificationKind;
 use Illuminate\Notifications\Notification;
 
 /**
- * Notifica nell'app (campanello). L'e-mail la manda NotifyUsers, fuori dalle transazioni, solo se la persona la vuole.
+ * In-app notification (bell). The e-mail is sent by NotifyUsers, outside transactions, only if the person wants it.
  */
 class AppNotification extends Notification
 {

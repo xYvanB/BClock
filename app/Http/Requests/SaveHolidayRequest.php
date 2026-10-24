@@ -15,7 +15,7 @@ use Illuminate\Validation\Validator;
 class SaveHolidayRequest extends FormRequest
 {
     /**
-     * Autorizza prima della validazione (HolidayPolicy), così chi non può riceve 403 e non errori di campo.
+     * Authorizes before validation (HolidayPolicy), so whoever cannot gets 403 and not field errors.
      */
     public function authorize(): bool
     {
@@ -55,7 +55,7 @@ class SaveHolidayRequest extends FormRequest
     }
 
     /**
-     * Un periodo di chiusura dura al massimo tre mesi.
+     * A closure period lasts at most three months.
      */
     public function after(): array
     {

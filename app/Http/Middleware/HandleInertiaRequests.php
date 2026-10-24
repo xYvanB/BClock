@@ -52,12 +52,12 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
-            // Calendario aziendale: serve al browser per calcolare le date dei template e per attenuare i giorni non lavorativi.
+            // Company calendar: the browser needs it to compute template dates and to dim non-working days.
             'calendar' => fn () => $request->user() === null ? null : [
                 'working_weekdays' => Setting::workingWeekdays(),
                 'closures' => Holiday::closedDates(),
             ],
-            // Timer attivi della persona (sempre visibili nella topbar); `server_now` corregge l'orologio del browser.
+            // The person's active timers (always visible in the topbar); `server_now` corrects the browser clock.
             'timers' => fn () => $request->user() === null ? [] : Timer::query()
                 ->where('user_id', $request->user()->id)
                 ->with('activity.project:id,name')
@@ -72,7 +72,7 @@ class HandleInertiaRequests extends Middleware
                     'started_at' => $timer->started_at->toIso8601String(),
                 ])
                 ->values(),
-            // Campanello: non lette e ultime notifiche della persona.
+            // Bell: unread count and latest notifications of the person.
             'notifications' => fn () => $request->user() === null ? null : [
                 'unread_count' => $request->user()->unreadNotifications()->count(),
                 'items' => $request->user()->notifications()->limit(10)->get()

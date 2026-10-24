@@ -11,7 +11,7 @@ use Illuminate\Foundation\Http\FormRequest;
 class DeleteAbsenceRequest extends FormRequest
 {
     /**
-     * Autorizza prima della validazione (AbsencePolicy::delete).
+     * Authorizes before validation (AbsencePolicy::delete).
      */
     public function authorize(): bool
     {
@@ -21,7 +21,7 @@ class DeleteAbsenceRequest extends FormRequest
     }
 
     /**
-     * Per eliminare un'assenza già confermata di un altro serve un motivo (chi toglie la propria non deve spiegare niente).
+     * Deleting an already confirmed absence of someone else requires a reason (whoever removes their own need not explain anything).
      *
      * @return array<string, array<int, mixed>>
      */

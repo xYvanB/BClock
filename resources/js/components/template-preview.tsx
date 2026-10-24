@@ -10,13 +10,13 @@ interface TemplatePreviewProps {
     assignees: AssigneeOption[];
     selected: Record<string, number[]>;
     onChange: (selected: Record<string, number[]>) => void;
-    /** Messaggio di errore per una chiave del server, es. `template_assignees.12`. */
+    /** Error message for a server key, e.g. `template_assignees.12`. */
     errorFor: (key: string) => string | undefined;
-    /** Calendario aziendale per contare i giorni lavorativi (di norma quello condiviso dal server). */
+    /** Company calendar to count working days (normally the one shared by the server). */
     calendar?: WorkCalendar | null;
 }
 
-/** Data di fine dell'ultima attività del template, o null se non c'è una data di inizio valida. */
+/** End date of the template's last activity, or null if there is no valid start date. */
 export function templateEndDate(template: TemplateOption, startsOn: string, calendar?: WorkCalendar | null): string | null {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(startsOn) || template.activities.length === 0) {
         return null;
@@ -25,7 +25,7 @@ export function templateEndDate(template: TemplateOption, startsOn: string, cale
     return dateOfWorkingDay(startsOn, Math.max(...template.activities.map((activity) => activity.end_day)), calendar ?? undefined);
 }
 
-/** Anteprima delle attività che il template creerà, con le date calcolate e gli assegnatari obbligatori. */
+/** Preview of the activities the template will create, with the computed dates and the required assignees. */
 export function TemplatePreview({ template, startsOn, dueOn, assignees, selected, onChange, errorFor, calendar }: TemplatePreviewProps) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(startsOn)) {
         return <p className="text-muted-foreground text-sm">Imposta la data di inizio per vedere l'anteprima delle attività.</p>;
@@ -51,7 +51,7 @@ export function TemplatePreview({ template, startsOn, dueOn, assignees, selected
             )}
 
             {template.activities.map((activity) => {
-                // Le persone dell'area suggerita vengono prima.
+                // The people of the suggested area come first.
                 const ordered = [...assignees].sort(
                     (a, b) =>
                         Number(b.area_id === activity.suggested_area_id && activity.suggested_area_id !== null) -

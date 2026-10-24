@@ -13,7 +13,7 @@ use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 
 /**
- * Registrazione di `$minutes` minuti della persona sull'attività, il giorno indicato.
+ * Entry of `$minutes` minutes by the person on the activity, on the given day.
  */
 function logHours(User $user, Activity $activity, string $date, int $minutes = 120, string $start = '09:00'): TimeEntry
 {
@@ -149,7 +149,7 @@ it('lists the registrations of a day per person, against the capacity of that da
             ->has('day_hours.people.0.entries', 2)
             ->where('day_hours.people.0.entries.0.started_at', '09:00'));
 
-    // persone indicate: compaiono anche senza registrazioni, e le festività azzerano la capacità
+    // given people: they appear even without entries, and holidays zero the capacity
     $this->actingAs($boss)->get(route('dashboard', ['day' => '2026-11-12', 'user_ids' => [$luca->id]]))
         ->assertInertia(fn (Assert $page) => $page
             ->has('day_hours.people', 1)

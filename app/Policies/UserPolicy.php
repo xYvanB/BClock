@@ -8,7 +8,7 @@ use App\Enum\Role;
 use App\Models\User;
 
 /**
- * Utenti: il Capo e l'HR gestiscono tutti, il Capo area solo quelli della propria area.
+ * Users: the Boss and HR manage everyone, the area head only those of their own area.
  */
 final class UserPolicy
 {
@@ -28,7 +28,7 @@ final class UserPolicy
             return true;
         }
 
-        // L'HR gestisce tutti tranne il Capo.
+        // HR manages everyone except the Boss.
         if ($actor->hasRole(Role::Hr)) {
             return ! $target->hasRole(Role::Boss);
         }

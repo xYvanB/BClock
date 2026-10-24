@@ -7,7 +7,7 @@ namespace App\DTO;
 use App\Enum\Role;
 
 /**
- * Dati validati per invitare o modificare un utente.
+ * Validated data to invite or edit a user.
  */
 final readonly class UserData
 {

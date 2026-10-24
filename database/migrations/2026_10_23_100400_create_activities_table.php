@@ -35,8 +35,8 @@ return new class extends Migration
             $table->primary(['activity_id', 'depends_on_id']);
         });
 
-        // Quote giornaliere salvate (decisione 2026-10-23): si sposta solo la quota di un giorno
-        // e la quota di un'attività si divide tra gli assegnatari.
+        // Stored daily allocations (decision 2026-10-23): only the allocation of one day moves
+        // and an activity's allocation is split among its assignees.
         Schema::create('activity_allocations', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('activity_id')->constrained()->cascadeOnDelete();

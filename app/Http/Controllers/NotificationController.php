@@ -13,7 +13,7 @@ use Inertia\Response;
 class NotificationController extends Controller
 {
     /**
-     * Elenco completo delle notifiche della persona, con filtro "non lette".
+     * Full list of the person's notifications, with an "unread" filter.
      */
     public function index(Request $request): Response
     {
@@ -32,7 +32,7 @@ class NotificationController extends Controller
     }
 
     /**
-     * Segna come letta una notifica della persona (mai di altri) e apre la pagina collegata.
+     * Marks a notification of the person (never of others) as read and opens the linked page.
      */
     public function read(Request $request, string $notification): RedirectResponse
     {

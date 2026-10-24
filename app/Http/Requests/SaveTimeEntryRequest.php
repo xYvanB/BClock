@@ -14,7 +14,7 @@ use Illuminate\Validation\Rule;
 class SaveTimeEntryRequest extends FormRequest
 {
     /**
-     * Autorizza prima della validazione (TimeEntryPolicy): su una registrazione esistente solo il proprietario.
+     * Authorizes before validation (TimeEntryPolicy): on an existing entry only the owner.
      */
     public function authorize(): bool
     {

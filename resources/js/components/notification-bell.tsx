@@ -8,14 +8,14 @@ import { Bell } from 'lucide-react';
 import { useEffect } from 'react';
 
 /**
- * Campanello nella topbar: pallino col numero delle notifiche non lette e pannello con le ultime.
- * Un clic su una notifica la segna come letta e apre la pagina collegata.
+ * Topbar bell: dot with the number of unread notifications and a panel with the latest ones.
+ * A click on a notification marks it as read and opens the linked page.
  */
 export function NotificationBell() {
     const { notifications, auth } = usePage<SharedData>().props;
     const userId = auth.user?.id;
 
-    // Tempo reale: quando il server annuncia notifiche nuove, il campanello si ricarica subito.
+    // Real time: when the server announces new notifications, the bell reloads at once.
     useEffect(() => {
         const echo = userId === undefined ? null : getEcho();
 

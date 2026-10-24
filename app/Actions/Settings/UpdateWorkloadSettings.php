@@ -12,7 +12,7 @@ use Throwable;
 final class UpdateWorkloadSettings
 {
     /**
-     * Salva le impostazioni del carico in transazione.
+     * Saves the workload settings in a transaction.
      *
      * @throws Throwable
      */

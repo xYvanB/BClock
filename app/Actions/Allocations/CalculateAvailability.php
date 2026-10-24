@@ -16,11 +16,11 @@ use Carbon\CarbonPeriod;
 final class CalculateAvailability
 {
     /**
-     * Ore disponibili di ogni persona in ogni giorno dell'intervallo (estremi inclusi).
+     * Available hours of each person on each day of the range (ends included).
      *
-     * Un giorno lavorativo cade in un giorno della settimana lavorativo (impostazioni) e non è festivo né di chiusura. La disponibilità è la capacità giornaliera della persona,
-     * ridotta delle ore dei permessi confermati e azzerata da ferie confermate; fuori dai giorni lavorativi è 0.
-     * Contano solo le assenze confermate (con tutte le approvazioni richieste).
+     * A working day falls on a working weekday (settings) and is neither a holiday nor a closure day. Availability is the person's daily capacity,
+     * reduced by the hours of confirmed leaves and zeroed by confirmed vacations; outside working days it is 0.
+     * Only confirmed absences count (with all the required approvals).
      *
      * @param  list<int>  $userIds
      * @return array{days: list<string>, working_days: list<string>, capacities: array<int, float>, hours: array<int, array<string, float>>}

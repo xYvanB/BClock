@@ -21,7 +21,7 @@ export const templateActivitySchema = z
     );
 
 /**
- * Controlli immediati lato client. Il server resta la fonte di verità (SaveProjectTemplateRequest).
+ * Immediate client-side checks. The server remains the source of truth (SaveProjectTemplateRequest).
  */
 export const templateSchema = z.object({
     name: z.string().trim().min(1, 'Il nome è obbligatorio').max(150, 'Massimo 150 caratteri'),

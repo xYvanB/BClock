@@ -10,7 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
 class RejectAbsenceRequest extends FormRequest
 {
     /**
-     * Autorizza prima della validazione (AbsencePolicy::reject).
+     * Authorizes before validation (AbsencePolicy::reject).
      */
     public function authorize(): bool
     {

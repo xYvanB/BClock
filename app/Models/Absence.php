@@ -73,7 +73,7 @@ class Absence extends Model
     }
 
     /**
-     * I dipendenti di un'area hanno bisogno anche dell'approvazione del loro Capo area.
+     * Employees of an area also need the approval of their area head.
      */
     public function requiresAreaHead(): bool
     {
@@ -81,7 +81,7 @@ class Absence extends Model
     }
 
     /**
-     * Chi dà la conferma finale: l'HR per tutti, tranne che per l'HR stessa, che la riceve dal Capo.
+     * Who gives the final confirmation: HR for everyone, except HR themselves, who receive it from the Boss.
      */
     public function finalApproverRole(): Role
     {
@@ -89,7 +89,7 @@ class Absence extends Model
     }
 
     /**
-     * Conferma finale data (dall'HR, o dal Capo se l'assenza è dell'HR).
+     * Final confirmation given (by HR, or by the Boss if the absence is HR's).
      */
     public function isApprovedByHr(): bool
     {
@@ -102,7 +102,7 @@ class Absence extends Model
     }
 
     /**
-     * Vero quando ha tutte le approvazioni richieste: da qui riduce la capacità.
+     * True when it has all the required approvals: from here it reduces capacity.
      */
     public function isFullyApproved(): bool
     {
@@ -110,7 +110,7 @@ class Absence extends Model
     }
 
     /**
-     * Ore di un permesso (null per le ferie), dall'orario di inizio e di fine.
+     * Hours of a leave (null for vacations), from the start and end times.
      */
     public function leaveHours(): ?float
     {
@@ -122,7 +122,7 @@ class Absence extends Model
     }
 
     /**
-     * Orario di inizio/fine nel formato H:i (il database li restituisce con i secondi).
+     * Start/end time in H:i format (the database returns them with seconds).
      */
     public function timeLabel(?string $time): ?string
     {
@@ -130,7 +130,7 @@ class Absence extends Model
     }
 
     /**
-     * Periodo leggibile, per messaggi e notifiche.
+     * Readable period, for messages and notifications.
      */
     public function periodLabel(): string
     {

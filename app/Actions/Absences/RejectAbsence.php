@@ -17,7 +17,7 @@ final class RejectAbsence
     public function __construct(private readonly NotifyUsers $notify) {}
 
     /**
-     * Rifiuta la richiesta con un motivo (che arriva alla persona); non riduce la capacità.
+     * Rejects the request with a reason (which reaches the person); it does not reduce capacity.
      *
      * @throws Throwable
      */

@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Promemoria programmati già inviati (persona + chiave dell'evento): evitano di rimandarli a ogni esecuzione.
+        // Scheduled reminders already sent (person + event key): they avoid resending them at every run.
         Schema::create('sent_reminders', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();

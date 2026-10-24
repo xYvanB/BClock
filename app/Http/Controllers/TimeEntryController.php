@@ -22,7 +22,7 @@ use Throwable;
 class TimeEntryController extends Controller
 {
     /**
-     * Le mie ore: registrazioni raggruppate per giorno, con filtri su periodo, progetto e attività.
+     * My hours: entries grouped by day, with filters on period, project and activity.
      */
     public function index(Request $request): Response
     {
@@ -118,7 +118,7 @@ class TimeEntryController extends Controller
     }
 
     /**
-     * Minuti totali registrati (da chiunque) sulle attività e sui progetti toccati dalla lista.
+     * Total minutes logged (by anyone) on the activities and projects touched by the list.
      *
      * @param  Collection<int, TimeEntry>  $entries
      * @return array{0: array<int, int>, 1: array<int, int>}

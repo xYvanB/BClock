@@ -12,7 +12,7 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
 /**
- * E-mail di una notifica. Va in coda e parte solo dopo il commit della transazione che l'ha generata.
+ * E-mail of a notification. It is queued and sent only after the transaction that generated it commits.
  */
 class AppNotificationMail extends Mailable implements ShouldQueue
 {

@@ -4,8 +4,8 @@ const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data non valida');
 const time = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Orario non valido');
 
 /**
- * Controlli immediati lato client. Il server resta la fonte di verità (SaveAbsenceRequest).
- * Le ferie coprono uno o più giorni; un permesso è in un solo giorno, con orario di inizio e di fine.
+ * Immediate client-side checks. The server remains the source of truth (SaveAbsenceRequest).
+ * Vacations cover one or more days; a leave is within a single day, with a start and end time.
  */
 export const absenceSchema = z
     .object({

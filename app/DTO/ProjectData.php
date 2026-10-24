@@ -7,14 +7,14 @@ namespace App\DTO;
 use App\Enum\WorkStatus;
 
 /**
- * Dati validati per creare o modificare un progetto (date nel formato Y-m-d).
+ * Validated data to create or edit a project (dates in Y-m-d format).
  */
 final readonly class ProjectData
 {
     /**
      * @param  list<int>  $memberIds
      * @param  list<int>  $contactIds
-     * @param  array<int, list<int>>  $templateAssignees  assegnatari per id di attività del template
+     * @param  array<int, list<int>>  $templateAssignees  assignees by template activity id
      */
     public function __construct(
         public int $clientId,

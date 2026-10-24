@@ -12,7 +12,7 @@ use Throwable;
 final class ArchiveProject
 {
     /**
-     * Archivia il progetto e le sue attività: sugli archiviati non si registrano più ore.
+     * Archives the project and its activities: no more hours are logged on archived ones.
      *
      * @throws Throwable
      */

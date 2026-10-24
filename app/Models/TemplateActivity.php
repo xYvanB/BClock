@@ -62,10 +62,10 @@ class TemplateActivity extends Model
     }
 
     /**
-     * Data del giorno lavorativo N: il giorno 1 è la data di inizio del progetto (se non è un giorno lavorativo,
-     * il primo successivo). Si contano solo i giorni della settimana lavorativi (`$weekdays`, 1 = lunedì … 7 = domenica,
-     * di norma lunedì–venerdì) che non siano festività o chiusure (`$closedDates`, date `Y-m-d`).
-     * La stessa formula è replicata in `resources/js/lib/template-days.ts`.
+     * Date of working day N: day 1 is the project start date (if it is not a working day,
+     * the first one after it). Only working weekdays (`$weekdays`, 1 = Monday … 7 = Sunday,
+     * normally Monday–Friday) that are not holidays or closures (`$closedDates`, `Y-m-d` dates) are counted.
+     * The same formula is replicated in `resources/js/lib/template-days.ts`.
      *
      * @param  list<int>  $weekdays
      * @param  list<string>  $closedDates

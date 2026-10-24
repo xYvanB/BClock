@@ -16,7 +16,7 @@ interface ProjectFormSheetProps {
     project: ProjectDetail | null;
     clients: ClientOption[];
     users: PersonOption[];
-    /** Solo alla creazione, e solo per chi può creare attività (non l'HR). */
+    /** Only at creation, and only for who can create activities (not HR). */
     templates?: TemplateOption[];
     assignees?: AssigneeOption[];
     onClose: () => void;
@@ -27,7 +27,7 @@ const fieldClass =
 
 const toggle = (list: number[], id: number) => (list.includes(id) ? list.filter((current) => current !== id) : [...list, id]);
 
-/** Drawer laterale per creare o modificare un progetto. Il cliente non si cambia dopo la creazione. */
+/** Side drawer to create or edit a project. The customer cannot be changed after creation. */
 export function ProjectFormSheet({ open, project, clients, users, templates = [], assignees = [], onClose }: ProjectFormSheetProps) {
     const { calendar } = usePage<SharedData>().props;
     const { data, setData, post, put, processing, errors, setError, clearErrors, reset } = useForm<ProjectFormData>({

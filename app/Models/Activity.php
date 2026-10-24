@@ -61,7 +61,7 @@ class Activity extends Model
     }
 
     /**
-     * Attività da cui questa dipende (fine → inizio).
+     * Activities this one depends on (end → start).
      *
      * @return BelongsToMany<Activity, $this>
      */
@@ -71,7 +71,7 @@ class Activity extends Model
     }
 
     /**
-     * Attività che dipendono da questa (la inverso di `dependencies`).
+     * Activities that depend on this one (the inverse of `dependencies`).
      *
      * @return BelongsToMany<Activity, $this>
      */
@@ -81,8 +81,8 @@ class Activity extends Model
     }
 
     /**
-     * Vero se far dipendere `$activityId` dalle attività `$dependencyIds` crea un ciclo: cioè se almeno una di esse
-     * dipende già, direttamente o no, da `$activityId`.
+     * True if making `$activityId` depend on the activities `$dependencyIds` creates a cycle: that is, if at least one of them
+     * already depends, directly or not, on `$activityId`.
      *
      * @param  list<int>  $dependencyIds
      */

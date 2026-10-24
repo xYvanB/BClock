@@ -12,7 +12,7 @@ use Throwable;
 final class CreateArea
 {
     /**
-     * Crea un'area in transazione.
+     * Creates an area in a transaction.
      *
      * @throws Throwable
      */

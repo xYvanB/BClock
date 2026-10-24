@@ -18,7 +18,7 @@ use Throwable;
 class PreferencesController extends Controller
 {
     /**
-     * Pagina delle preferenze personali (F14).
+     * Personal preferences page (F14).
      */
     public function edit(): Response
     {

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Enum;
 
 /**
- * Una richiesta pesa sulla capacità solo dopo la conferma dell'HR; l'HR può rifiutarla con un motivo.
+ * A request weighs on capacity only after the final confirmation; whoever confirms can reject it with a reason.
  */
 enum AbsenceStatus: string
 {

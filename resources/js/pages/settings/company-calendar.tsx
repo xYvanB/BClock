@@ -23,7 +23,7 @@ interface Props {
 
 const formatDate = (iso: string) => iso.split('-').reverse().join('/');
 
-/** Calendario aziendale (solo Capo e HR): giorni lavorativi della settimana, festività e chiusure extra. */
+/** Company calendar (Boss and HR only): working weekdays, holidays and extra closures. */
 export default function CompanyCalendar({ weekdays, closures }: Props) {
     const { data, setData, put, processing, errors } = useForm<{ weekdays: number[] }>({ weekdays });
     const [sheetOpen, setSheetOpen] = useState(false);

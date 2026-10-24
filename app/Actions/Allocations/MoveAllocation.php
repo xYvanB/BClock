@@ -21,14 +21,14 @@ final class MoveAllocation
     ) {}
 
     /**
-     * Sposta la quota di un giorno su un altro giorno lavorativo, per la stessa persona e la stessa attività.
+     * Moves the allocation of one day to another working day, for the same person and the same activity.
      *
-     * Si sposta solo quella quota, non l'attività. Oltre la scadenza dell'attività serve la conferma ($extendActivity)
-     * e la scadenza dell'attività si allunga fino al nuovo giorno; oltre la scadenza del progetto serve anche
-     * $extendProject e si allunga pure quella del progetto. Prima dell'inizio dell'attività non si può.
-     * Chi non è il proprietario della quota lo avvisa con una notifica. Si possono spostare solo alcune ore (`$hours`, al massimo quelle della quota): il resto resta dov'è.
-     * Se nel giorno di arrivo c'è già una quota della stessa attività, le ore si sommano. Un giorno di partenza
-     * svuotato resta come quota manuale a 0 ore, così una rigenerazione non lo riempie di nuovo.
+     * Only that allocation moves, not the activity. Beyond the activity due date the confirmation ($extendActivity) is required
+     * and the activity due date is extended to the new day; beyond the project due date $extendProject is also required
+     * and the project due date is extended too. Before the activity start it is not allowed.
+     * Whoever does not own the allocation notifies the owner. Only some hours can be moved (`$hours`, at most those of the allocation): the rest stays where it is.
+     * If the target day already has an allocation of the same activity, the hours add up. A source day
+     * that is emptied stays as a manual allocation of 0 hours, so a regeneration does not fill it again.
      *
      * @throws Throwable
      * @throws ValidationException

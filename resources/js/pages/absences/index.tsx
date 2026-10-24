@@ -19,7 +19,7 @@ interface AbsencesIndexProps {
 
 type Tab = 'absences' | 'holidays';
 
-/** Azione dell'HR che richiede un motivo: rifiutare una richiesta o eliminare un'assenza già confermata. */
+/** HR action that requires a reason: rejecting a request or deleting an already confirmed absence. */
 interface ReasonAction {
     kind: 'reject' | 'delete';
     absence: Absence;
@@ -37,7 +37,7 @@ const formatPeriod = (absence: Absence) => {
         : `${formatDate(absence.starts_on)} – ${formatDate(absence.ends_on)}`;
 };
 
-/** Chi ha già dato l'ok a una richiesta ancora in attesa (Capo area solo per i dipendenti). */
+/** Who already approved a still-pending request (area head only for employees). */
 const approvalProgress = (absence: Absence): string => {
     const steps = [`${absence.approver_label}: ${absence.hr_approved ? 'ok' : 'da fare'}`];
 
@@ -52,7 +52,7 @@ const statusLabel = { in_attesa: 'In attesa', confermata: 'Confermata', rifiutat
 
 const statusVariant = { in_attesa: 'secondary', confermata: 'default', rifiutata: 'destructive' } as const;
 
-/** Assenze (ognuno le proprie; il Capo area anche quelle della sua area, il Capo quelle dell'HR, l'HR tutte) e giorni non lavorativi. */
+/** Absences (everyone their own; the area head also their area's, the Boss HR's, HR everyone's) and non-working days. */
 export default function AbsencesIndex({ absences, holidays, can_manage_holidays }: AbsencesIndexProps) {
     const { auth } = usePage<SharedData>().props;
     const showPerson = auth.user.role !== 'dipendente';

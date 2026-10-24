@@ -17,7 +17,7 @@ interface Props {
     tolerance_hours: number;
 }
 
-/** Impostazioni del carico di lavoro (solo Capo e HR): tolleranza del livello "pieno" nel calendario. */
+/** Workload settings (Boss and HR only): tolerance of the "full" level in the calendar. */
 export default function WorkloadSettings({ tolerance_enabled, tolerance_hours }: Props) {
     const { data, setData, patch, processing, errors } = useForm({
         tolerance_enabled,

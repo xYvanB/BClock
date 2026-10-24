@@ -12,7 +12,7 @@ use Throwable;
 final class UpdatePreferences
 {
     /**
-     * Salva le preferenze dell'utente in transazione.
+     * Saves the user's preferences in a transaction.
      *
      * @throws Throwable
      */

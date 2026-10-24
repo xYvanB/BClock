@@ -31,7 +31,7 @@ class NotificationPreferencesRequest extends FormRequest
     }
 
     /**
-     * Le richieste da approvare restano sempre attive nell'app, qualunque cosa arrivi dal browser.
+     * Approval requests always stay on in the app, whatever comes from the browser.
      *
      * @return array<string, array{app: bool, mail: bool}>
      */

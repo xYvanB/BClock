@@ -10,7 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
 class MoveAllocationRequest extends FormRequest
 {
     /**
-     * Autorizza prima della validazione: spostare una quota è come modificare l'attività (ActivityPolicy).
+     * Authorizes before validation: moving an allocation is like editing the activity (ActivityPolicy).
      */
     public function authorize(): bool
     {
@@ -34,7 +34,7 @@ class MoveAllocationRequest extends FormRequest
     }
 
     /**
-     * Ore da spostare: se mancano si sposta tutta la quota.
+     * Hours to move: if missing, the whole allocation is moved.
      */
     public function hours(): ?float
     {

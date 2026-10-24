@@ -12,8 +12,8 @@ use Throwable;
 final class UpdateProjectTemplate
 {
     /**
-     * Aggiorna il nome e sostituisce le attività del template in transazione.
-     * I progetti già creati non cambiano: hanno le loro attività.
+     * Updates the name and replaces the template's activities in a transaction.
+     * Projects already created do not change: they have their own activities.
      *
      * @throws Throwable
      */

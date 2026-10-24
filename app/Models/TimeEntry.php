@@ -32,8 +32,8 @@ class TimeEntry extends Model
     ];
 
     /**
-     * Registrazioni che `$viewer` vede nella dashboard: tutte per il Capo e l'HR, quelle delle persone della sua area
-     * per il Capo area (solo le proprie se non ha un'area), le proprie per il Dipendente.
+     * Entries `$viewer` sees in the dashboard: all for the Boss and HR, those of the people of their area
+     * for the area head (only their own if they have no area), their own for the Employee.
      *
      * @param  Builder<TimeEntry>  $query
      */

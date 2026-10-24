@@ -8,7 +8,7 @@ use App\Enum\Role;
 use App\Models\User;
 
 /**
- * Le impostazioni dell'applicazione le gestiscono Capo e HR.
+ * The application settings are managed by the Boss and HR.
  */
 final class SettingPolicy
 {

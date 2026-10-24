@@ -19,7 +19,7 @@ use Throwable;
 class UserController extends Controller
 {
     /**
-     * Lista utenti: il Capo e l'HR vedono tutti, il Capo area solo la propria area.
+     * User list: the Boss and HR see everyone, the area head only their own area.
      */
     public function index(Request $request): Response
     {

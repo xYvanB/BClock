@@ -12,7 +12,7 @@ use App\Models\Project;
 use App\Models\User;
 
 /**
- * Lunedì 2026-11-09 … venerdì 2026-11-13 sono cinque giorni lavorativi.
+ * Monday 2026-11-09 … Friday 2026-11-13 are five working days.
  *
  * @param  list<User>  $assignees
  */
@@ -47,7 +47,7 @@ it('skips weekends and holidays', function (): void {
     Holiday::factory()->create(['date' => '2026-11-11']);
     $user = User::factory()->employee()->create();
 
-    // da venerdì a martedì: ven 6, (sab, dom), lun 9, mar 10, mer 11 festivo -> ven, lun, mar
+    // from Friday to Tuesday: Fri 6, (Sat, Sun), Mon 9, Tue 10, Wed 11 holiday -> Fri, Mon, Tue
     $activity = allocatedActivity([$user], '2026-11-06', '2026-11-11', '9.00');
 
     expect($activity->allocations()->orderBy('date')->pluck('date')->map->toDateString()->all())
@@ -67,7 +67,7 @@ it('splits between assignees and gives nothing to a person on a confirmed absenc
     $luca = User::factory()->employee()->create();
     Absence::factory()->for($luca)->confirmed()->create(['starts_on' => '2026-11-09', 'ends_on' => '2026-11-10']);
 
-    // 10 coppie persona-giorno, 2 in assenza -> 8 quote da 1,25 ore
+    // 10 person-day pairs, 2 absent -> 8 allocations of 1.25 hours
     $activity = allocatedActivity([$anna, $luca]);
 
     expect($activity->allocations()->count())->toBe(8)

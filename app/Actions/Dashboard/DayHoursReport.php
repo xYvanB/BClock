@@ -13,9 +13,9 @@ final class DayHoursReport
     public function __construct(private readonly CalculateAvailability $availability) {}
 
     /**
-     * Ore registrate in un giorno, per persona, con il totale rispetto alla capacità del giorno (festivi, ferie e
-     * permessi confermati compresi). Senza persone indicate mostra quelle visibili che quel giorno hanno registrazioni.
-     * Le persone non visibili a `$viewer` sono ignorate.
+     * Hours logged on one day, per person, with the total against the day's capacity (holidays, vacations and
+     * confirmed leaves included). Without given people it shows the visible ones who have entries that day.
+     * People not visible to `$viewer` are ignored.
      *
      * @param  list<int>  $userIds
      * @return array{

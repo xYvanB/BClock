@@ -14,7 +14,7 @@ use Illuminate\Validation\Validator;
 class SaveClientRequest extends FormRequest
 {
     /**
-     * Autorizza prima della validazione (ClientPolicy), così chi non può riceve 403 e non errori di campo.
+     * Authorizes before validation (ClientPolicy), so whoever cannot gets 403 and not field errors.
      */
     public function authorize(): bool
     {

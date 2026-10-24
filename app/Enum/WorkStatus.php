@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Enum;
 
 /**
- * Stato condiviso da progetti e attività.
+ * Status shared by projects and activities.
  */
 enum WorkStatus: string
 {

@@ -21,7 +21,7 @@ final class CreateActivity
     ) {}
 
     /**
-     * Crea un'attività con i suoi assegnatari in transazione; gli assegnatari (tranne chi la crea) ricevono una notifica.
+     * Creates an activity with its assignees in a transaction; the assignees (except the creator) receive a notification.
      *
      * @throws Throwable
      */

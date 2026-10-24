@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Enum;
 
 /**
- * Perché un giorno è non lavorativo, oltre al weekend.
+ * Why a day is non-working, besides the weekend.
  */
 enum HolidayKind: string
 {
-    /** @var string Festività (Natale, Ognissanti…) */
+    /** @var string Public holiday (Christmas, All Saints…) */
     case Holiday = 'festivo';
 
-    /** @var string Chiusura extra dell'azienda, non legata a una festività */
+    /** @var string Extra company closure, not tied to a holiday */
     case Closure = 'chiusura';
 
     /**

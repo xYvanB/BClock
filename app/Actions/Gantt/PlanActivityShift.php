@@ -27,17 +27,17 @@ final class PlanActivityShift
     private ?array $weekdays = null;
 
     /**
-     * Calcola, senza modificare nulla, cosa succede se si sposta o si ridimensiona un'attività nel Gantt.
+     * Computes, without changing anything, what happens if an activity is moved or resized in the Gantt.
      *
-     * - `move`: l'attività si sposta di tanti giorni lavorativi quanti ne separano il vecchio inizio dal nuovo
-     *   (inizio e scadenza insieme);
-     * - `resize_end`: cambia solo la scadenza;
-     * - `resize_start`: cambia solo l'inizio.
+     * - `move`: the activity moves by as many working days as separate the old start from the new one
+     *   (start and due date together);
+     * - `resize_end`: only the due date changes;
+     * - `resize_start`: only the start changes.
      *
-     * Con `move` e `resize_end` tutte le attività che dipendono da questa, direttamente o no, si spostano dello stesso
-     * numero di giorni lavorativi. Il piano elenca i cambi, le scadenze di progetto da estendere e i motivi che
-     * impediscono tutto lo spostamento (attività chiuse nella catena, permessi mancanti, date incoerenti): se c'è
-     * anche un solo blocco non si sposta niente.
+     * With `move` and `resize_end` all the activities that depend on this one, directly or not, move by the same
+     * number of working days. The plan lists the changes, the project due dates to extend and the reasons that
+     * block the whole move (closed activities in the chain, missing leaves, inconsistent dates): if there is
+     * any single blocker nothing moves.
      *
      * @return array{
      *     mode: string,
@@ -138,7 +138,7 @@ final class PlanActivityShift
     }
 
     /**
-     * Sposta una data di `$days` giorni lavorativi (indietro se negativo); weekend e festivi non contano.
+     * Shifts a date by `$days` working days (backwards if negative); weekends and holidays do not count.
      */
     public function shiftWorkingDays(string $date, int $days): string
     {
@@ -157,7 +157,7 @@ final class PlanActivityShift
     }
 
     /**
-     * Giorni lavorativi con segno per andare da `$from` a `$to`: in avanti quelli in (from, to], indietro quelli in [to, from).
+     * Signed working days to go from `$from` to `$to`: forwards those in (from, to], backwards those in [to, from).
      */
     public function workingDaysBetween(string $from, string $to): int
     {
@@ -183,7 +183,7 @@ final class PlanActivityShift
     }
 
     /**
-     * Tutte le attività che dipendono da questa, direttamente o no (senza ripetizioni).
+     * All the activities that depend on this one, directly or not (without repetitions).
      *
      * @return Collection<int, Activity>
      */

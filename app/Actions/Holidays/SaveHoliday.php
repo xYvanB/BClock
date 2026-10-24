@@ -17,7 +17,7 @@ final class SaveHoliday
     public function __construct(private readonly RegenerateAllocations $allocations) {}
 
     /**
-     * Un periodo di chiusura: una riga per ogni giorno lavorativo (weekend e giorni già chiusi si saltano).
+     * A closure period: one row for every working day (weekends and already closed days are skipped).
      *
      * @param  array<string, mixed>  $attributes
      */
@@ -42,7 +42,7 @@ final class SaveHoliday
     }
 
     /**
-     * Crea un festivo o aggiorna quello indicato, in transazione.
+     * Creates a holiday or updates the given one, in a transaction.
      *
      * @throws Throwable
      */

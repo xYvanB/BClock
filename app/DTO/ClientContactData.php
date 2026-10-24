@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\DTO;
 
 /**
- * Referente di un cliente; `id` è valorizzato solo per i referenti già salvati.
+ * A customer contact; `id` is set only for contacts already saved.
  */
 final readonly class ClientContactData
 {

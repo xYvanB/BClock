@@ -13,8 +13,8 @@ use Throwable;
 final class UpdateClient
 {
     /**
-     * Aggiorna il cliente e sincronizza i referenti per id: i progetti li richiamano,
-     * quindi non si ricreano; quelli non più presenti vengono eliminati.
+     * Updates the customer and syncs the contacts by id: projects reference them,
+     * so they are not recreated; those no longer present are deleted.
      *
      * @throws Throwable
      */

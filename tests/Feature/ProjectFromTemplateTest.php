@@ -13,7 +13,7 @@ use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 
 /**
- * Template con due attività: giorni lavorativi 1–2 e 3–5.
+ * Template with two activities: working days 1–2 and 3–5.
  *
  * @return array{0: ProjectTemplate, 1: TemplateActivity, 2: TemplateActivity}
  */
@@ -53,7 +53,7 @@ it('creates the activities of the template with working-day dates, hours, status
     $anna = User::factory()->employee()->create();
     $luca = User::factory()->employee()->create();
 
-    // Il progetto parte venerdì 6 novembre: giorno 1 = ven 6, 2 = lun 9, 3 = mar 10, 5 = gio 12.
+    // The project starts on Friday 6 November: day 1 = Fri 6, 2 = Mon 9, 3 = Tue 10, 5 = Thu 12.
     $this->actingAs(User::factory()->boss()->create())
         ->post(route('projects.store'), projectFromTemplatePayload($client, $template, [
             $analysis->id => [$anna->id],

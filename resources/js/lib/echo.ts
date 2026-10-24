@@ -4,8 +4,8 @@ import Pusher from 'pusher-js';
 let echo: Echo<'reverb'> | null = null;
 
 /**
- * Connessione al server WebSocket (Reverb), creata alla prima richiesta. Senza chiave configurata o se la connessione
- * non parte restituisce null: l'app funziona lo stesso, solo senza aggiornamenti in tempo reale.
+ * Connection to the WebSocket server (Reverb), created on first request. Without a configured key or if the connection
+ * does not start it returns null: the app works anyway, just without real-time updates.
  */
 export function getEcho(): Echo<'reverb'> | null {
     const key = import.meta.env.VITE_REVERB_APP_KEY;

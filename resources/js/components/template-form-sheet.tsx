@@ -31,14 +31,14 @@ const emptyActivity = (): TemplateActivityFormData => ({
     suggested_role: '',
 });
 
-/** Drawer laterale per creare o modificare un template di progetto (7.9): attività riordinabili con i pulsanti su/giù. */
+/** Side drawer to create or edit a project template (7.9): activities can be reordered with the up/down buttons. */
 export function TemplateFormSheet({ open, template, areas, onClose }: TemplateFormSheetProps) {
     const { data, setData, post, put, processing, errors, setError, clearErrors, reset } = useForm<TemplateFormData>({
         name: '',
         activities: [],
     });
 
-    // Gli errori annidati del server (es. `activities.0.name`) non sono nel tipo degli errori del form.
+    // The server's nested errors (e.g. `activities.0.name`) are not in the form's errors type.
     const fieldErrors = errors as Record<string, string | undefined>;
 
     useEffect(() => {
@@ -76,7 +76,7 @@ export function TemplateFormSheet({ open, template, areas, onClose }: TemplateFo
 
         const reordered = [...data.activities];
         [reordered[index], reordered[target]] = [reordered[target], reordered[index]];
-        // Gli errori del server sono indicizzati per posizione: dopo lo spostamento non corrispondono più.
+        // The server errors are indexed by position: after the move they no longer match.
         clearErrors();
         setData('activities', reordered);
     };

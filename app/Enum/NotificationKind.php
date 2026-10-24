@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Enum;
 
 /**
- * Tipi di notifica che la persona può ricevere nell'app e per e-mail.
+ * Notification types a person can receive in the app and by e-mail.
  */
 enum NotificationKind: string
 {
@@ -33,7 +33,7 @@ enum NotificationKind: string
     }
 
     /**
-     * Le richieste da approvare non si possono spegnere nell'app: chi deve approvare deve saperlo.
+     * Approval requests cannot be turned off in the app: whoever has to approve must know.
      */
     public function isMandatoryInApp(): bool
     {

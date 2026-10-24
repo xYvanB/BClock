@@ -15,7 +15,7 @@ interface TimerStartSheetProps {
 const fieldClass =
     'border-input bg-background focus-visible:ring-ring h-9 w-full rounded-md border px-3 text-sm focus-visible:ring-1 focus-visible:outline-none';
 
-/** Drawer per avviare un timer: attività e descrizione facoltativa (F4). */
+/** Drawer to start a timer: activity and optional description (F4). */
 export function TimerStartSheet({ open, activities, onClose }: TimerStartSheetProps) {
     const { data, setData, post, processing, errors, setError, clearErrors, reset } = useForm({ activity_id: '', description: '' });
 

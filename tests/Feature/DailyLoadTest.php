@@ -13,7 +13,7 @@ use App\Models\Holiday;
 use App\Models\User;
 
 /**
- * Lunedì 2026-11-09 … venerdì 2026-11-13; sabato 14 e domenica 15.
+ * Monday 2026-11-09 … Friday 2026-11-13; Saturday 14 and Sunday 15.
  *
  * @param  list<User>  $assignees
  */
@@ -114,7 +114,7 @@ it('has no level on a free day without work, and stays overloaded when work is a
 
     expect(loadOf($user, '2026-11-14'))->toBe(['capacity' => 0.0, 'load' => 0.0, 'level' => null]);
 
-    // attività solo nel fine settimana: le ore ripiegano sui due giorni
+    // activity only on the weekend: the hours fall back onto the two days
     loadActivity([$user], '4.00', '2026-11-14', '2026-11-15');
 
     expect(loadOf($user, '2026-11-14'))->toMatchArray(['capacity' => 0.0, 'load' => 2.0, 'level' => LoadLevel::Over]);
@@ -128,7 +128,7 @@ it('lowers the capacity to match a confirmed leave, which can make a day full or
     $absence = Absence::factory()->for($user)->leave('2026-11-09', '09:00', '13:00')->create();
     expect(loadOf($user, '2026-11-09')['level'])->toBe(LoadLevel::Full);
 
-    // la conferma ricalcola le quote: il lavoro si sposta sugli altri giorni dell'attività, qui nessuno
+    // the confirmation recalculates the allocations: the work moves to the other days of the activity, here nobody
     $this->actingAs(User::factory()->hr()->create())->post(route('absences.confirm', $absence));
 
     expect(loadOf($user, '2026-11-09'))->toMatchArray(['capacity' => 4.0, 'load' => 8.0, 'level' => LoadLevel::Over]);

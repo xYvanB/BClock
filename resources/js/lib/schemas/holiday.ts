@@ -3,8 +3,8 @@ import { z } from 'zod';
 const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data non valida');
 
 /**
- * Controlli immediati lato client. Il server resta la fonte di verità (SaveHolidayRequest).
- * `until` è l'ultimo giorno di un periodo di chiusura (vuoto = un solo giorno).
+ * Immediate client-side checks. The server remains the source of truth (SaveHolidayRequest).
+ * `until` is the last day of a closure period (empty = a single day).
  */
 export const holidaySchema = z
     .object({

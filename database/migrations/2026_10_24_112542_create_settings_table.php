@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Impostazioni dell'applicazione (non dell'utente), come coppie chiave-valore.
+        // Application settings (not the user's), as key-value pairs.
         Schema::create('settings', function (Blueprint $table): void {
             $table->string('key')->primary();
             $table->text('value')->nullable();

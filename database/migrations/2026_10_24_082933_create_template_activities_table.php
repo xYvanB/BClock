@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Durata relativa in giorni lavorativi dall'inizio del progetto (il giorno 1 è la data di inizio).
+        // Relative duration in working days from the project start (day 1 is the start date).
         Schema::create('template_activities', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('project_template_id')->constrained()->cascadeOnDelete();

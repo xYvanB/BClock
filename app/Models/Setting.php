@@ -17,10 +17,10 @@ class Setting extends Model
 
     public const string WORKING_WEEKDAYS = 'working_weekdays';
 
-    /** Giorni lavorativi di partenza: da lunedì (1) a venerdì (5), numerati come `dayOfWeekIso`. */
+    /** Default working days: Monday (1) to Friday (5), numbered like `dayOfWeekIso`. */
     public const array DEFAULT_WORKING_WEEKDAYS = [1, 2, 3, 4, 5];
 
-    /** Tolleranza proposta quando la si attiva per la prima volta. */
+    /** Tolerance proposed when it is enabled for the first time. */
     public const float DEFAULT_LOAD_TOLERANCE_HOURS = 0.5;
 
     protected $primaryKey = 'key';
@@ -48,7 +48,7 @@ class Setting extends Model
     }
 
     /**
-     * Giorni della settimana in cui si lavora (1 = lunedì … 7 = domenica), definiti da Capo e HR.
+     * Weekdays that are worked (1 = Monday … 7 = Sunday), defined by the Boss and HR.
      *
      * @return list<int>
      */
@@ -66,7 +66,7 @@ class Setting extends Model
     }
 
     /**
-     * Ore di scarto entro cui un giorno conta come "pieno". Il valore salvato resta anche a tolleranza spenta.
+     * Hours of difference within which a day counts as "full". The saved value is kept even when the tolerance is off.
      */
     public static function configuredLoadToleranceHours(): float
     {
@@ -74,7 +74,7 @@ class Setting extends Model
     }
 
     /**
-     * Tolleranza effettiva: 0 se spenta.
+     * Effective tolerance: 0 if off.
      */
     public static function loadToleranceHours(): float
     {

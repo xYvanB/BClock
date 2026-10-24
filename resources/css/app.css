@@ -70,7 +70,7 @@
   color utility to any element that depends on these defaults.
 */
 @layer base {
-    /* Controlli nativi (icona di date e ore, barre di scorrimento) nello stesso schema chiaro/scuro dell'interfaccia */
+    /* Native controls (date and time icon, scrollbars) in the same light/dark scheme as the interface */
     html {
         color-scheme: light;
     }
@@ -134,7 +134,7 @@
     }
 }
 
-/* Titoli in Cinzel nelle palette BClock (come il sito di riferimento); il wireframe resta in Inter. */
+/* Headings in Cinzel in the BClock palettes (like the reference site); the wireframe stays in Inter. */
 [data-tema='scuro'] h1,
 [data-tema='chiaro'] h1,
 [data-tema='personalizzata'] h1 {

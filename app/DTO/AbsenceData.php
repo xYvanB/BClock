@@ -7,7 +7,7 @@ namespace App\DTO;
 use App\Enum\AbsenceType;
 
 /**
- * Dati validati per creare o modificare un'assenza. Orari solo per i permessi.
+ * Validated data to create or edit an absence. Times only for leaves.
  */
 final readonly class AbsenceData
 {

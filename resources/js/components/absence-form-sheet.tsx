@@ -18,7 +18,7 @@ interface AbsenceFormSheetProps {
 const fieldClass =
     'border-input bg-background focus-visible:ring-ring h-9 w-full rounded-md border px-3 text-sm focus-visible:ring-1 focus-visible:outline-none';
 
-/** Drawer laterale per richiedere o modificare una propria assenza; resta in attesa finché non ha tutte le approvazioni. */
+/** Side drawer to request or edit one's own absence; it stays pending until it has all the approvals. */
 export function AbsenceFormSheet({ open, absence, onClose }: AbsenceFormSheetProps) {
     const { data, setData, post, put, processing, errors, setError, clearErrors, reset } = useForm<AbsenceFormData>({
         type: 'ferie',
@@ -46,7 +46,7 @@ export function AbsenceFormSheet({ open, absence, onClose }: AbsenceFormSheetPro
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open, absence]);
 
-    /** Un permesso è in un solo giorno: la data di fine segue quella di inizio. */
+    /** A leave is within a single day: the end date follows the start date. */
     const changeStartDate = (value: string) =>
         setData((current) => ({ ...current, starts_on: value, ends_on: current.type === 'permesso' ? value : current.ends_on }));
 

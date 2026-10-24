@@ -11,7 +11,7 @@ use Illuminate\Validation\Rule;
 class ShiftActivityRequest extends FormRequest
 {
     /**
-     * Autorizza prima della validazione: spostare un'attività è come modificarla (ActivityPolicy).
+     * Authorizes before validation: moving an activity is like editing it (ActivityPolicy).
      */
     public function authorize(): bool
     {
@@ -39,7 +39,7 @@ class ShiftActivityRequest extends FormRequest
     }
 
     /**
-     * Filtri e zoom da mantenere dopo lo spostamento.
+     * Filters and zoom to keep after the move.
      *
      * @return array<string, mixed>
      */

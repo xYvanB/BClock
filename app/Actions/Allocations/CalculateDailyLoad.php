@@ -14,13 +14,13 @@ final class CalculateDailyLoad
     public function __construct(private readonly CalculateAvailability $availability) {}
 
     /**
-     * Carico di ogni persona in ogni giorno dell'intervallo: ore assegnate (somma delle quote delle attività
-     * aperte), ore disponibili e livello. Le attività completate o archiviate non contano.
+     * Load of each person on each day of the range: assigned hours (sum of the allocations of open
+     * activities), available hours and level. Completed or archived activities do not count.
      *
-     * Il livello confronta i due valori al centesimo di ora: meno è "sotto capacità", uguale "pieno", più
-     * "sovraccarico". Se Capo o HR hanno attivato la tolleranza (impostazioni), "pieno" copre anche uno scarto
-     * fino a quelle ore, in più o in meno; non si applica ai giorni senza ore disponibili. Un giorno senza ore disponibili e senza quote (weekend, festivo, ferie) non ha livello (null);
-     * con quote assegnate resta "sovraccarico".
+     * The level compares the two values to the hundredth of an hour: less is "under capacity", equal "full", more
+     * "overloaded". If the Boss or HR enabled the tolerance (settings), "full" also covers a difference
+     * up to that many hours, over or under; it does not apply to days without available hours. A day with no available hours and no allocations (weekend, holiday, vacation) has no level (null);
+     * with assigned allocations it stays "overloaded".
      *
      * @param  list<int>  $userIds
      * @return array<int, array<string, array{capacity: float, load: float, level: LoadLevel|null}>>

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\DTO;
 
 /**
- * Dati validati per creare o modificare un'area.
+ * Validated data to create or edit an area.
  */
 final readonly class AreaData
 {

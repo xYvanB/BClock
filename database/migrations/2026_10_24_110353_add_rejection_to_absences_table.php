@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Motivo del rifiuto dell'HR, mostrato alla persona che ha fatto la richiesta.
+        // Reason for HR's rejection, shown to the person who made the request.
         Schema::table('absences', function (Blueprint $table): void {
             $table->text('rejection_reason')->nullable()->after('status');
         });

@@ -17,7 +17,7 @@ use Throwable;
 class CompanyCalendarController extends Controller
 {
     /**
-     * Calendario aziendale (solo Capo e HR): giorni lavorativi della settimana, festività e chiusure extra.
+     * Company calendar (Boss and HR only): working weekdays, holidays and extra closures.
      */
     public function edit(): Response
     {

@@ -12,7 +12,7 @@ use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 
 /**
- * Attività assegnata alla persona, con le sue quote giornaliere.
+ * Activity assigned to the person, with its daily allocations.
  */
 function calendarActivity(User $user, string $hours, string $start = '2026-11-09', string $due = '2026-11-13', WorkStatus $status = WorkStatus::Todo): Activity
 {

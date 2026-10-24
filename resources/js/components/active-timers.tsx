@@ -7,15 +7,15 @@ import { AlertTriangle, Square, Timer } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 /**
- * Badge nella topbar con il numero di timer attivi; apre il pannello con un timer per riga
- * (attività, progetto, tempo trascorso, Stop). Dopo il limite di ore un timer è segnalato come dimenticato:
- * solo un avviso, nessuno stop automatico.
+ * Topbar badge with the number of active timers; opens the panel with one timer per row
+ * (activity, project, elapsed time, Stop). After the hour limit a timer is flagged as forgotten:
+ * a warning only, no automatic stop.
  */
 export function ActiveTimers() {
     const { timers, timer_warning_minutes, server_now } = usePage<SharedData>().props;
     const [now, setNow] = useState(() => Date.now());
 
-    // Differenza tra l'orologio del server e quello del browser, per un tempo trascorso corretto.
+    // Difference between the server clock and the browser's, for a correct elapsed time.
     const skew = useMemo(() => Date.parse(server_now) - Date.now(), [server_now]);
 
     useEffect(() => {

@@ -27,7 +27,7 @@ export interface ActiveTimer {
     activity_name: string;
     project_name: string;
     description: string | null;
-    /** Istante di avvio, ISO 8601 con offset. */
+    /** Start instant, ISO 8601 with offset. */
     started_at: string;
 }
 
@@ -39,9 +39,9 @@ export interface SharedData {
     timers: ActiveTimer[];
     timer_warning_minutes: number;
     notifications: SharedNotifications | null;
-    /** Ora del server (ISO 8601): corregge l'orologio del browser nel tempo trascorso. */
+    /** Server time (ISO 8601): corrects the browser clock in the elapsed time. */
     server_now: string;
-    /** Calendario aziendale: giorni lavorativi della settimana (1 = lunedì … 7 = domenica) e date di festività o chiusura. */
+    /** Company calendar: working weekdays (1 = Monday … 7 = Sunday) and holiday or closure dates. */
     calendar: WorkCalendar | null;
     [key: string]: unknown;
 }
@@ -139,7 +139,7 @@ export interface ActivityListItem {
     can_update: boolean;
 }
 
-/** Attività tra cui scegliere "dipende da" (stesso progetto). */
+/** Activities to choose "depends on" from (same project). */
 export interface DependencyOption {
     id: number;
     name: string;
@@ -207,7 +207,7 @@ export interface TemplateListItem {
     activities: TemplateActivityItem[];
 }
 
-/** Template come opzione nel drawer del progetto: ogni attività ha l'id, serve per scegliere gli assegnatari. */
+/** Template as an option in the project drawer: every activity has the id, needed to choose the assignees. */
 export interface TemplateOption {
     id: number;
     name: string;
@@ -276,7 +276,7 @@ export interface Absence {
     hours: number | null;
     needs_area_head: boolean;
     hr_approved: boolean;
-    /** Chi dà la conferma finale: "HR", o "Capo" per le assenze dell'HR. */
+    /** Who gives the final confirmation: "HR", or "Capo" (Boss) for HR's absences. */
     approver_label: string;
     area_head_approved: boolean;
     note: string | null;
@@ -306,7 +306,7 @@ export interface AppNotification {
     is_read: boolean;
 }
 
-/** Notifiche condivise: non lette e ultime (campanello nella topbar). */
+/** Shared notifications: unread count and latest ones (topbar bell). */
 export interface SharedNotifications {
     unread_count: number;
     items: AppNotification[];
@@ -324,7 +324,7 @@ export type LoadLevel = 'sotto_capacita' | 'pieno' | 'sovraccarico';
 
 export interface CalendarDay {
     date: string;
-    /** Giorno della settimana in cui non si lavora (impostazioni del calendario aziendale). */
+    /** Weekday that is not worked (company calendar settings). */
     is_off: boolean;
     holiday: string | null;
     is_today: boolean;
@@ -388,7 +388,7 @@ export type GanttShiftMode = 'move' | 'resize_start' | 'resize_end';
 
 export interface GanttPreview {
     activity_id: number;
-    /** La richiesta a cui si riferisce l'anteprima: serve a scartare quelle rimaste dalla richiesta precedente. */
+    /** The request the preview refers to: used to discard those left over from the previous request. */
     requested: { mode: GanttShiftMode; start: string; due: string };
     mode: GanttShiftMode;
     shift: number;

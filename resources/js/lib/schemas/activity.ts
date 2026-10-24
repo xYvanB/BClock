@@ -3,8 +3,8 @@ import { z } from 'zod';
 const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data non valida');
 
 /**
- * Controlli immediati lato client. Il server resta la fonte di verità (SaveActivityRequest),
- * compreso il limite della scadenza del progetto.
+ * Immediate client-side checks. The server remains the source of truth (SaveActivityRequest),
+ * including the project due date limit.
  */
 export const activitySchema = z
     .object({

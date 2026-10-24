@@ -12,7 +12,7 @@ use Throwable;
 final class ArchiveActivity
 {
     /**
-     * Archivia l'attività: sugli archiviati non si registrano più ore né si avviano timer.
+     * Archives the activity: no more hours are logged and no timers started on archived ones.
      *
      * @throws Throwable
      */

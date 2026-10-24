@@ -19,7 +19,7 @@ import {
 import AppLogo from './app-logo';
 
 interface RoleNavItem extends NavItem {
-    /** Se assente, la voce è visibile a tutti i ruoli. */
+    /** If absent, the item is visible to all roles. */
     roles?: Role[];
 }
 

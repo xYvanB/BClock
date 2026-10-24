@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class PruneNotificationsCommand extends Command
 {
-    /** Giorni dopo i quali una notifica si cancella. */
+    /** Days after which a notification is deleted. */
     public const KEEP_DAYS = 90;
 
     protected $signature = 'notifications:prune';
@@ -21,7 +21,7 @@ class PruneNotificationsCommand extends Command
     {
         $deleted = DatabaseNotification::where('created_at', '<', now()->subDays(self::KEEP_DAYS))->delete();
 
-        // i promemoria già inviati servono solo finché l'evento è attuale
+        // sent reminders only matter while the event is current
         DB::table('sent_reminders')->where('sent_at', '<', now()->subDays(self::KEEP_DAYS * 2))->delete();
 
         $this->info("Notifiche cancellate: {$deleted}.");

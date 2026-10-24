@@ -13,9 +13,9 @@ use Illuminate\Database\Eloquent\Builder;
 final class ProjectHoursReport
 {
     /**
-     * Ore per progetto nel periodo: previste, utilizzate nel periodo e utilizzate in totale.
-     * Con un progetto scelto aggiunge la suddivisione per attività e per persona.
-     * Conta solo ciò che `$viewer` può vedere (vedi `TimeEntry::scopeVisibleTo`).
+     * Hours per project in the period: planned, used in the period and used overall.
+     * With a chosen project it adds the breakdown by activity and by person.
+     * Counts only what `$viewer` can see (see `TimeEntry::scopeVisibleTo`).
      *
      * @return array{
      *     total_hours: float,

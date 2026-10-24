@@ -41,7 +41,7 @@ function Empty({ children }: { children: ReactNode }) {
     return <p className="text-muted-foreground border-sidebar-border/70 rounded-md border border-dashed p-6 text-center text-sm">{children}</p>;
 }
 
-/** Barra orizzontale: parte piena = `value` su `max`; rossa se supera il massimo. */
+/** Horizontal bar: filled part = `value` out of `max`; red if it exceeds the maximum. */
 function Bar({ value, max, label }: { value: number; max: number; label: string }) {
     const ratio = max > 0 ? value / max : value > 0 ? 1 : 0;
 
@@ -52,7 +52,7 @@ function Bar({ value, max, label }: { value: number; max: number; label: string 
     );
 }
 
-/** Dashboard (F11): schede diverse per ruolo, ognuna con i propri filtri; l'export CSV è per periodo, progetto e area. */
+/** Dashboard (F11): different cards per role, each with its own filters; the CSV export is by period, project and area. */
 export default function Dashboard({ filters, project_hours, day_hours, worked_hours, can_export }: DashboardProps) {
     const [form, setForm] = useState({
         from: filters.from,

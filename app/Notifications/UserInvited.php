@@ -10,7 +10,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\URL;
 
 /**
- * Email di invito con link firmato per scegliere la password (valido 7 giorni).
+ * Invitation e-mail with a signed link to choose the password (valid 7 days).
  */
 class UserInvited extends Notification
 {

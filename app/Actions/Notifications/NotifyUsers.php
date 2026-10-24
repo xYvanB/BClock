@@ -14,9 +14,9 @@ use Illuminate\Support\Facades\Mail;
 final class NotifyUsers
 {
     /**
-     * Avvisa le persone indicate, una volta sola ciascuna e mai chi ha fatto l'azione, secondo le loro preferenze:
-     * nell'app (sempre per le richieste da approvare, con un avviso in tempo reale al browser) e/o per e-mail. Si usa dentro le transazioni delle Action:
-     * la notifica nell'app ne segue l'esito, l'e-mail parte in coda solo dopo il commit.
+     * Notifies the given people, once each and never the person who performed the action, according to their preferences:
+     * in the app (always for approval requests, with a real-time alert to the browser) and/or by e-mail. Used inside the Actions' transactions:
+     * the in-app notification follows their outcome, the e-mail is queued only after the commit.
      *
      * @param  iterable<User>  $users
      */

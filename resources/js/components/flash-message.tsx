@@ -2,7 +2,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 
-/** Mostra il messaggio di conferma dell'ultima azione (flash di sessione). */
+/** Shows the confirmation message of the last action (session flash). */
 export function FlashMessage() {
     const { flash } = usePage<SharedData>().props;
 

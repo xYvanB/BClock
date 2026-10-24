@@ -34,7 +34,7 @@ interface GanttProps {
     preview?: GanttPreview | null;
 }
 
-/** Spostamento richiesto, in attesa dell'anteprima e della conferma. */
+/** Requested move, awaiting the preview and confirmation. */
 interface ShiftRequest {
     activity: GanttActivity;
     mode: GanttShiftMode;
@@ -64,14 +64,14 @@ const diffDays = (from: string, to: string) => Math.round((toUtc(to) - toUtc(fro
 const addDays = (iso: string, days: number) => new Date(toUtc(iso) + days * DAY_MS).toISOString().slice(0, 10);
 const formatDate = (iso: string) => iso.split('-').reverse().join('/');
 const monthName = (iso: string) => new Date(toUtc(iso)).toLocaleDateString('it-IT', { month: 'long', year: 'numeric', timeZone: 'UTC' });
-/** Giorno non lavorativo: un giorno della settimana in cui non si lavora (impostazioni) oppure una festività o chiusura. */
+/** Non-working day: a weekday that is not worked (settings) or a holiday or closure. */
 const isOffDay = (iso: string, calendar: WorkCalendar | null) => {
     const weekday = new Date(toUtc(iso)).getUTCDay() === 0 ? 7 : new Date(toUtc(iso)).getUTCDay();
 
     return calendar ? !calendar.working_weekdays.includes(weekday) || calendar.closures.includes(iso) : weekday > 5;
 };
 
-/** Segmenti dei mesi per l'intestazione: etichetta, posizione e larghezza in pixel. */
+/** Month segments for the header: label, position and width in pixels. */
 function buildMonths(from: string, totalDays: number, px: number): { label: string; left: number; width: number }[] {
     const months: { label: string; left: number; width: number }[] = [];
 
@@ -89,7 +89,7 @@ function buildMonths(from: string, totalDays: number, px: number): { label: stri
     return months;
 }
 
-/** Gantt (F10): attività per progetto con dipendenze; le barre si spostano e si ridimensionano, con anteprima della catena. */
+/** Gantt (F10): activities per project with dependencies; bars can be moved and resized, with a preview of the chain. */
 export default function GanttIndex({ zoom, filters, from, to, today, projects, filter_options, preview }: GanttProps) {
     const { calendar } = usePage<SharedData>().props;
     const px = PX_PER_DAY[zoom];
@@ -111,7 +111,7 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
     const navigate = (extra: Record<string, unknown>) =>
         router.get(route('gantt.index'), query(extra), { preserveState: true, preserveScroll: true });
 
-    // Righe: una per progetto e una per attività; servono per le frecce e per le linee di scadenza.
+    // Rows: one per project and one per activity; they are needed for the arrows and the due date lines.
     const rows: ({ kind: 'project'; project: GanttProject } | { kind: 'activity'; activity: GanttActivity; project: GanttProject })[] = [];
     projects.forEach((project) => {
         rows.push({ kind: 'project', project });
@@ -198,7 +198,7 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
         );
     };
 
-    // Intestazione: mesi sopra, giorni (zoom giorno) o lunedì (zoom settimana) sotto.
+    // Header: months above, days (day zoom) or Mondays (week zoom) below.
     const months = buildMonths(from, totalDays, px);
     const ticks = Array.from({ length: totalDays }, (_, index) => addDays(from, index)).filter(
         (date) => zoom === 'day' || (zoom === 'week' && new Date(toUtc(date)).getUTCDay() === 1),

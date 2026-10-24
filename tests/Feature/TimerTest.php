@@ -83,7 +83,7 @@ it('turns a stopped timer into a time entry in local time and removes the timer'
     $user = User::factory()->employee()->create();
     $activity = Activity::factory()->create();
 
-    // Luglio: Roma è UTC+2, quindi 06:00 UTC sono le 08:00 locali.
+    // July: Rome is UTC+2, so 06:00 UTC is 08:00 local.
     $this->travelTo('2026-07-15 06:00:00');
     $this->actingAs($user)->post(route('timers.store'), ['activity_id' => $activity->id, 'description' => 'Mockup']);
     $timer = Timer::firstOrFail();
@@ -128,7 +128,7 @@ it('splits a timer that crosses midnight, one entry per local day', function ():
     $user = User::factory()->employee()->create();
     $activity = Activity::factory()->create();
 
-    // 21:30 UTC = 23:30 a Roma (luglio); si ferma alle 08:15 locali del giorno dopo.
+    // 21:30 UTC = 23:30 in Rome (July); it stops at 08:15 local the next day.
     $this->travelTo('2026-07-15 21:30:00');
     Timer::factory()->for($user)->for($activity)->create(['started_at' => now()]);
     $this->travelTo('2026-07-16 06:15:00');

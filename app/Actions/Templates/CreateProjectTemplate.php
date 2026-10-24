@@ -12,7 +12,7 @@ use Throwable;
 final class CreateProjectTemplate
 {
     /**
-     * Crea un template con le sue attività in transazione.
+     * Creates a template with its activities in a transaction.
      *
      * @throws Throwable
      */

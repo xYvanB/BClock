@@ -9,8 +9,8 @@ use App\Models\Activity;
 use App\Models\User;
 
 /**
- * Attività: il Capo gestisce tutto; il Capo area solo quelle i cui assegnatari sono tutti
- * della propria area; l'HR è in sola lettura; il Dipendente non ha la pagina.
+ * Activities: the Boss manages everything; the area head only those whose assignees are all
+ * of their own area; HR is read-only; the Employee does not have the page.
  */
 final class ActivityPolicy
 {

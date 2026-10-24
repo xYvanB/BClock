@@ -24,13 +24,13 @@ final class ShiftActivities
     ) {}
 
     /**
-     * Applica lo spostamento o il ridimensionamento calcolato da PlanActivityShift, ricalcolandolo al momento
-     * (le date o i permessi potrebbero essere cambiati dopo l'anteprima).
+     * Applies the move or resize computed by PlanActivityShift, recomputing it at the moment
+     * (the dates or the leaves may have changed after the preview).
      *
-     * Si sposta tutto o niente: con un blocco si rifiuta. Le scadenze dei progetti oltrepassate si estendono solo
-     * con `$confirmProjects`. Le quote spostate a mano di un'attività che si sposta di N giorni lavorativi si
-     * spostano anch'esse di N giorni; poi le quote di ogni attività toccata si ricalcolano e i suoi assegnatari (tranne chi la sposta)
-     * ricevono una sola notifica per attività.
+     * All or nothing: with a blocker it is refused. Exceeded project due dates are extended only
+     * with `$confirmProjects`. The manually moved allocations of an activity that moves by N working days
+     * move by N days too; then the allocations of every touched activity are recalculated and its assignees (except whoever moves it)
+     * receive a single notification per activity.
      *
      * @return list<array<string, mixed>> I cambi applicati
      *
@@ -82,7 +82,7 @@ final class ShiftActivities
     }
 
     /**
-     * Sposta di `$days` giorni lavorativi le quote manuali; quelle che finiscono lo stesso giorno si sommano.
+     * Shifts the manual allocations by `$days` working days; those landing on the same day add up.
      */
     private function shiftManualAllocations(Activity $activity, int $days): void
     {
@@ -98,7 +98,7 @@ final class ShiftActivities
             $shifted[$key] = ($shifted[$key] ?? 0) + (int) round((float) $allocation->hours * 100);
         }
 
-        // le quote automatiche si ricalcolano comunque: si tolgono anche loro per non andare in conflitto sul giorno di arrivo
+        // the automatic allocations are recalculated anyway: remove them too, so they do not collide on the target day
         $activity->allocations()->delete();
 
         foreach ($shifted as $key => $cents) {

@@ -15,7 +15,7 @@ use Illuminate\Validation\Validator;
 class SaveProjectTemplateRequest extends FormRequest
 {
     /**
-     * Autorizza prima della validazione (ProjectTemplatePolicy), così chi non può riceve 403 e non errori di campo.
+     * Authorizes before validation (ProjectTemplatePolicy), so whoever cannot gets 403 and not field errors.
      */
     public function authorize(): bool
     {

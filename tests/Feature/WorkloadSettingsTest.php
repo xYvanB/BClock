@@ -11,7 +11,7 @@ use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 
 /**
- * Un'attività di un solo giorno (lunedì 2026-11-09) con le ore indicate, assegnata alla persona.
+ * A single-day activity (Monday 2026-11-09) with the given hours, assigned to the person.
  */
 function mondayLoad(User $user, string $hours): ?LoadLevel
 {

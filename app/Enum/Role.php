@@ -6,16 +6,16 @@ namespace App\Enum;
 
 enum Role: string
 {
-    /** @var string Capo: vede e gestisce tutto */
+    /** @var string Boss: sees and manages everything */
     case Boss = 'capo';
 
-    /** @var string Capo area: gestisce la propria area */
+    /** @var string Area head: manages their own area */
     case AreaHead = 'capo_area';
 
-    /** @var string HR: vede tutto, gestisce festivi e assenze */
+    /** @var string HR: sees everything, manages holidays and absences */
     case Hr = 'hr';
 
-    /** @var string Dipendente: vede solo i propri dati */
+    /** @var string Employee: sees only their own data */
     case Employee = 'dipendente';
 
     /**
@@ -29,9 +29,9 @@ enum Role: string
     }
 
     /**
-     * Ruoli che questo ruolo può assegnare creando o modificando utenti.
-     * Solo il Capo assegna il ruolo Capo; il Capo area crea solo dipendenti della propria area
-     * (decisioni 2026-10-23, da confermare).
+     * Roles this role can assign when creating or editing users.
+     * Only the Boss assigns the Boss role; the area head creates only employees of their own area
+     * (decisions 2026-10-23, to be confirmed).
      *
      * @return list<self>
      */

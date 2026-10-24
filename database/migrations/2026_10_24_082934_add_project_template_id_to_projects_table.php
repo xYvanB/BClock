@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Template di origine: solo informativo, resta vuoto se il template viene eliminato.
+        // Source template: informational only, stays empty if the template is deleted.
         Schema::table('projects', function (Blueprint $table): void {
             $table->foreignId('project_template_id')->nullable()->after('client_id')->constrained()->nullOnDelete();
         });

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\DTO;
 
 /**
- * Dati validati per creare o modificare un template di progetto.
+ * Validated data to create or edit a project template.
  */
 final readonly class ProjectTemplateData
 {

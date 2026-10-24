@@ -12,7 +12,7 @@ use Throwable;
 final class UpdateTimeEntry
 {
     /**
-     * Modifica una registrazione in transazione. Le ore passate sono sempre modificabili.
+     * Edits a time entry in a transaction. Past hours are always editable.
      *
      * @throws Throwable
      */

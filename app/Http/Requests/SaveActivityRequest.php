@@ -16,7 +16,7 @@ use Illuminate\Validation\Validator;
 class SaveActivityRequest extends FormRequest
 {
     /**
-     * Autorizza prima della validazione (ActivityPolicy), così chi non può riceve 403 e non errori di campo.
+     * Authorizes before validation (ActivityPolicy), so whoever cannot gets 403 and not field errors.
      */
     public function authorize(): bool
     {
@@ -34,7 +34,7 @@ class SaveActivityRequest extends FormRequest
     {
         $assignees = Rule::exists('users', 'id');
 
-        // Il Capo area assegna solo persone della propria area.
+        // The area head assigns only people of their own area.
         if ($this->user()->hasRole(Role::AreaHead)) {
             $assignees->where('area_id', $this->user()->area_id);
         }
@@ -102,7 +102,7 @@ class SaveActivityRequest extends FormRequest
     }
 
     /**
-     * Si dipende solo da altre attività dello stesso progetto, e non da sé stessi.
+     * One depends only on other activities of the same project, and not on oneself.
      */
     private function dependencyRule(): mixed
     {

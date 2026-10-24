@@ -16,9 +16,9 @@ interface ActivityFormSheetProps {
     activity: ActivityListItem | null;
     projects: ProjectOption[];
     assignees: PersonOption[];
-    /** Attività del progetto da cui questa può dipendere (fine → inizio). */
+    /** Activities of the project this one can depend on (end → start). */
     dependencyOptions?: DependencyOption[];
-    /** Progetto preselezionato alla creazione (es. dal dettaglio progetto). */
+    /** Project preselected at creation (e.g. from the project detail). */
     defaultProjectId?: number;
     onClose: () => void;
 }
@@ -28,7 +28,7 @@ const fieldClass =
 
 const formatDate = (iso: string) => iso.split('-').reverse().join('/');
 
-/** Drawer laterale per creare o modificare un'attività (F8). Il progetto non si cambia dopo la creazione. */
+/** Side drawer to create or edit an activity (F8). The project cannot be changed after creation. */
 export function ActivityFormSheet({
     open,
     activity,
@@ -50,7 +50,7 @@ export function ActivityFormSheet({
         dependency_ids: [],
     });
 
-    // Gli errori per singolo assegnatario del server hanno la chiave `assignee_ids.N`.
+    // The server's per-assignee errors have the key `assignee_ids.N`.
     const assigneeError = Object.entries(errors).find(([key]) => key.startsWith('assignee_ids'))?.[1];
 
     const project = projects.find((candidate) => String(candidate.id) === data.project_id);
@@ -78,7 +78,7 @@ export function ActivityFormSheet({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open, activity]);
 
-    /** Archivia o elimina l'attività in modifica; un rifiuto del server (ore o timer) resta visibile nel drawer. */
+    /** Archives or deletes the activity being edited; a server refusal (hours or timers) stays visible in the drawer. */
     const runAction = (action: 'archive' | 'delete') => {
         if (!activity) {
             return;

@@ -7,13 +7,13 @@ namespace App\DTO;
 use App\Enum\HolidayKind;
 
 /**
- * Dati validati per creare o modificare un festivo.
+ * Validated data to create or edit a holiday.
  */
 final readonly class HolidayData
 {
     /**
-     * @param  string|null  $until  Ultimo giorno di un periodo di chiusura (solo alla creazione): ogni giorno lavorativo
-     *                              fra `$date` e `$until` diventa un giorno di chiusura
+     * @param  string|null  $until  Last day of a closure period (only at creation): every working day
+     *                              between `$date` and `$until` becomes a closure day
      */
     public function __construct(
         public string $date,

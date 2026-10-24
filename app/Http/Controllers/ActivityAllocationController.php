@@ -13,7 +13,7 @@ use Throwable;
 class ActivityAllocationController extends Controller
 {
     /**
-     * Sposta la quota di un giorno (calendario F9).
+     * Moves the allocation of one day (calendar F9).
      *
      * @throws Throwable
      */

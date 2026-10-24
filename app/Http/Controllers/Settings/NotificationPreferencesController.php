@@ -17,7 +17,7 @@ use Throwable;
 class NotificationPreferencesController extends Controller
 {
     /**
-     * Scelte della persona per tipo di notifica: nell'app e per e-mail.
+     * The person's choices per notification type: in the app and by e-mail.
      */
     public function edit(Request $request): Response
     {

@@ -3,7 +3,7 @@ import { z } from 'zod';
 const time = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Orario non valido');
 
 /**
- * Controlli immediati lato client. Il server resta la fonte di verità (SaveTimeEntryRequest).
+ * Immediate client-side checks. The server remains the source of truth (SaveTimeEntryRequest).
  */
 export const timeEntrySchema = z
     .object({

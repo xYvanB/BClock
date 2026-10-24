@@ -26,7 +26,7 @@ const timeFormatLabels: Record<TimeFormat, string> = { '24h': '24 ore', '12h': '
 
 const fieldClass = 'border-input bg-background focus-visible:ring-ring h-9 w-full rounded-md border px-3 text-sm focus-visible:ring-1 focus-visible:outline-none';
 
-/** Primo accesso da invito (F2): scelta della password e delle preferenze. */
+/** First access from an invitation (F2): choice of the password and preferences. */
 export default function AcceptInvitation({ invitee, options }: Props) {
     const { data, setData, post, processing, errors } = useForm<InvitationForm>({
         password: '',
@@ -37,7 +37,7 @@ export default function AcceptInvitation({ invitee, options }: Props) {
 
     const submit: FormEventHandler = (event) => {
         event.preventDefault();
-        // L'URL firmato (con scadenza e firma) è quello della pagina corrente.
+        // The signed URL (with expiry and signature) is the current page's.
         post(window.location.href);
     };
 

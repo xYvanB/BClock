@@ -22,8 +22,8 @@ final class ConfirmAbsence
     ) {}
 
     /**
-     * Registra la conferma finale (HR, o Capo per le assenze dell'HR) o l'approvazione del Capo area. Quando ci sono
-     * tutte le approvazioni richieste l'assenza diventa confermata e da lì riduce la capacità della persona.
+     * Records the final confirmation (HR, or the Boss for HR absences) or the area head's approval. Once all the required
+     * approvals are in, the absence becomes confirmed and from then on reduces the person's capacity.
      *
      * @throws Throwable
      */

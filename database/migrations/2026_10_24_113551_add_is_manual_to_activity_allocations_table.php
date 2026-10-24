@@ -10,8 +10,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Le quote spostate a mano nel calendario non vengono più toccate quando l'attività si rigenera.
-        // Il giorno di partenza resta come quota manuale a 0 ore, così la rigenerazione non lo riempie di nuovo.
+        // Allocations moved by hand in the calendar are no longer touched when the activity is regenerated.
+        // The source day stays as a manual allocation of 0 hours, so regeneration does not fill it again.
         Schema::table('activity_allocations', function (Blueprint $table): void {
             $table->boolean('is_manual')->default(false)->after('hours');
         });

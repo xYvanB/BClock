@@ -14,7 +14,7 @@ use Illuminate\Validation\Rules\Password;
 class AcceptInvitationRequest extends FormRequest
 {
     /**
-     * L'accesso è garantito dal link firmato (middleware signed).
+     * Access is guaranteed by the signed link (signed middleware).
      */
     public function authorize(): bool
     {

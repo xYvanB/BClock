@@ -259,7 +259,7 @@ it('asks the boss, not hr, to confirm an absence of hr, and tells every boss', f
     }
     expect($other->unreadNotifications()->count())->toBe(0);
 
-    // né l'HR stessa né un'altra HR possono confermarla: solo il Capo
+    // neither HR themselves nor another HR can confirm it: only the Boss
     $this->actingAs($hr)->post(route('absences.confirm', $absence))->assertForbidden();
     $this->actingAs($other)->post(route('absences.confirm', $absence))->assertForbidden();
     expect($absence->refresh()->status)->toBe(AbsenceStatus::Pending);
@@ -285,7 +285,7 @@ it('lets the boss reject an absence of hr with a reason, and shows it to the bos
     $this->actingAs($boss)->post(route('absences.reject', $hrAbsence), ['reason' => 'Periodo di chiusura bilanci'])->assertSessionHasNoErrors();
     expect($hrAbsence->refresh()->status)->toBe(AbsenceStatus::Rejected);
 
-    // la persona non conferma né rifiuta le proprie, e il Capo non decide sulle assenze dei dipendenti
+    // the person neither confirms nor rejects their own, and the Boss does not decide on employees' absences
     $this->actingAs($boss)->post(route('absences.confirm', $employeeAbsence))->assertForbidden();
     $this->actingAs($boss)->post(route('absences.confirm', $mine))->assertForbidden();
 });

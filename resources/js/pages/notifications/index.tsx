@@ -11,7 +11,7 @@ interface Props {
     filter: 'all' | 'unread';
 }
 
-/** Elenco completo delle notifiche della persona, con filtro "non lette" e paginazione. */
+/** Full list of the person's notifications, with an "unread" filter and pagination. */
 export default function NotificationsIndex({ list, filter }: Props) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

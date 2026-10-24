@@ -94,7 +94,7 @@ export default function Preferences({ options }: Props) {
         custom_colors: { ...options.custom_defaults, ...(auth.user.custom_colors ?? {}) },
     });
 
-    // Se si esce senza salvare, torna alla palette salvata (letta dal ref: dopo un salvataggio è già quella nuova).
+    // Leaving without saving goes back to the saved palette (read from the ref: after a save it is already the new one).
     const savedRef = useRef({ palette: saved, colors: auth.user.custom_colors });
     savedRef.current = { palette: saved, colors: auth.user.custom_colors };
     useEffect(() => () => applyPalette(savedRef.current.palette, savedRef.current.colors), []);

@@ -6,7 +6,7 @@ interface HoursProgressProps {
     plannedHours: number;
 }
 
-/** Barra di avanzamento ore usate / previste, con ⚠️ se si supera il previsto (solo avviso). */
+/** Progress bar of used / planned hours, with ⚠️ if the plan is exceeded (warning only). */
 export function HoursProgress({ usedMinutes, plannedHours }: HoursProgressProps) {
     const plannedMinutes = plannedHours * 60;
     const overBudget = plannedMinutes > 0 ? usedMinutes > plannedMinutes : usedMinutes > 0;

@@ -18,19 +18,19 @@ it('seeds a coherent demo data set', function (): void {
         ->and(Activity::count())->toBeGreaterThanOrEqual(20)
         ->and(TimeEntry::count())->toBeGreaterThan(50);
 
-    // ogni attività aperta ha le quote che sommano alle ore previste
+    // every open activity has allocations that sum to the planned hours
     Activity::whereIn('status', [WorkStatus::Todo, WorkStatus::InProgress, WorkStatus::WaitingClient])->get()->each(function (Activity $activity): void {
         expect(round((float) $activity->allocations()->sum('hours'), 2))->toBe(round((float) $activity->planned_hours, 2), $activity->name);
     });
 
-    // le attività stanno dentro il loro progetto, e le dipendenze nello stesso progetto
+    // the activities stay within their project, and the dependencies within the same project
     Activity::with(['project', 'dependencies'])->get()->each(function (Activity $activity): void {
         expect($activity->starts_on->toDateString() >= $activity->project->starts_on->toDateString())->toBeTrue($activity->name)
             ->and($activity->due_on->toDateString() <= $activity->project->due_on->toDateString())->toBeTrue($activity->name);
         $activity->dependencies->each(fn (Activity $dependency) => expect($dependency->project_id)->toBe($activity->project_id));
     });
 
-    // nessuna persona ha registrazioni sovrapposte
+    // nobody has overlapping entries
     TimeEntry::all()->groupBy(fn (TimeEntry $entry): string => $entry->user_id.'|'.$entry->date->toDateString())->each(function ($entries): void {
         $sorted = $entries->sortBy('started_at')->values();
         foreach ($sorted as $index => $entry) {
@@ -40,7 +40,7 @@ it('seeds a coherent demo data set', function (): void {
         }
     });
 
-    // le assenze confermate dei dipendenti hanno la doppia approvazione; ci sono tutti gli stati
+    // employees' confirmed absences have the double approval; every status is present
     Absence::where('status', AbsenceStatus::Confirmed)->get()->each(fn (Absence $absence) => expect($absence->isFullyApproved())->toBeTrue());
     expect(Absence::pluck('status')->unique()->count())->toBe(3);
 });

@@ -46,7 +46,7 @@ class Project extends Model
     }
 
     /**
-     * Template di origine, solo informativo.
+     * Source template, informational only.
      *
      * @return BelongsTo<ProjectTemplate, $this>
      */

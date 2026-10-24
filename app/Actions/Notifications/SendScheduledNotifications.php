@@ -17,16 +17,16 @@ use Throwable;
 
 final class SendScheduledNotifications
 {
-    /** Una scadenza è "vicina" quando cade oggi o nei giorni indicati. */
+    /** A due date is "near" when it falls today or within the given days. */
     public const int DUE_SOON_DAYS = 1;
 
     public function __construct(private readonly NotifyUsers $notify) {}
 
     /**
-     * Manda i promemoria che dipendono dal tempo: scadenza vicina, timer dimenticato, sforamento delle ore di un progetto.
-     * Ogni promemoria arriva una volta sola a ciascuna persona (tabella `sent_reminders`), anche se il comando gira ogni ora.
+     * Sends the time-based reminders: near due date, forgotten timer, a project exceeding its hours.
+     * Each reminder reaches each person only once (`sent_reminders` table), even if the command runs every hour.
      *
-     * @return int Quanti promemoria sono stati mandati
+     * @return int How many reminders were sent
      *
      * @throws Throwable
      */
@@ -102,7 +102,7 @@ final class SendScheduledNotifications
     }
 
     /**
-     * Manda il promemoria solo se questa persona non l'ha già ricevuto con questa chiave.
+     * Sends the reminder only if this person has not already received it with this key.
      */
     private function once(User $user, string $key, NotificationKind $kind, string $message, string $url): int
     {

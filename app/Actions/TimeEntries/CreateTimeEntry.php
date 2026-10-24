@@ -14,8 +14,8 @@ use Throwable;
 final class CreateTimeEntry
 {
     /**
-     * Registra ore per l'utente, in transazione (manuali per impostazione predefinita, o dal timer).
-     * Lo sforamento delle ore previste è solo un avviso e non blocca la registrazione.
+     * Logs hours for the user, in a transaction (manual by default, or from the timer).
+     * Exceeding the planned hours is only a warning and does not block the entry.
      *
      * @throws Throwable
      */

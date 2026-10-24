@@ -8,7 +8,7 @@ use App\Enum\Role;
 use App\Models\User;
 
 /**
- * Le aree le gestisce solo il Capo.
+ * Areas are managed only by the Boss.
  */
 final class AreaPolicy
 {

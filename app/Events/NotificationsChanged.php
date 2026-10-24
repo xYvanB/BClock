@@ -13,9 +13,9 @@ use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 
 /**
- * Avvisa il browser della persona che ci sono notifiche nuove: il campanello si ricarica subito, senza aggiornamento
- * periodico. Parte solo dopo il commit della transazione che ha creato la notifica e non porta dati. Se il server
- * WebSocket non risponde l'errore viene segnalato nei log ma non blocca l'azione dell'utente (ShouldRescue).
+ * Tells the person's browser that there are new notifications: the bell reloads at once, without periodic
+ * refresh. It is sent only after the transaction that created the notification commits and carries no data. If the
+ * WebSocket server does not answer, the error is logged but does not block the user's action (ShouldRescue).
  */
 class NotificationsChanged implements ShouldBroadcastNow, ShouldDispatchAfterCommit, ShouldRescue
 {

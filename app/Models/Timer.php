@@ -15,7 +15,7 @@ class Timer extends Model
     use HasFactory;
 
     /**
-     * Dopo quanti minuti un timer ancora attivo viene segnalato come dimenticato (solo avviso, nessuno stop automatico).
+     * After how many minutes a still-active timer is flagged as forgotten (warning only, no automatic stop).
      */
     public const int WARNING_AFTER_MINUTES = 480;
 

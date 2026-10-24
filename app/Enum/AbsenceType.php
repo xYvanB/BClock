@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Enum;
 
 /**
- * Tipo di assenza di una persona.
+ * Type of a person's absence.
  */
 enum AbsenceType: string
 {

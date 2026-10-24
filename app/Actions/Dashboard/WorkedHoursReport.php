@@ -15,9 +15,9 @@ use Illuminate\Database\Eloquent\Builder;
 final class WorkedHoursReport
 {
     /**
-     * Ore lavorate: persone × periodi (giorno, settimana da lunedì o mese) nell'intervallo, con i totali.
-     * Si possono filtrare per persona e per area; mostra solo chi `$viewer` può vedere e ha ore nel periodo.
-     * I periodi ai bordi sono tagliati sull'intervallo richiesto.
+     * Worked hours: people × periods (day, week starting Monday or month) in the range, with totals.
+     * Can be filtered by person and by area; shows only who `$viewer` can see and who has hours in the period.
+     * Periods at the edges are cut to the requested range.
      *
      * @return array{
      *     granularity: string,

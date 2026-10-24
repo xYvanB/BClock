@@ -25,10 +25,10 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Dati dimostrativi per provare a mano calendario, Gantt e dashboard: tre aree con una ventina di persone, sette progetti
- * con attività concatenate, ore registrate nelle ultime settimane, assenze in tutti gli stati e i festivi.
- * Le date sono relative a oggi (la settimana in corso parte dal lunedì). Si aggiunge ai dati di DatabaseSeeder e non
- * duplica nulla se viene rieseguito. Solo per sviluppo: le password sono "password".
+ * Demo data to try the calendar, Gantt and dashboard by hand: three areas with about twenty people, seven projects
+ * with chained activities, hours logged in the last weeks, absences in every status and the holidays.
+ * Dates are relative to today (the current week starts on Monday). It adds to the DatabaseSeeder data and does not
+ * duplicate anything if rerun. For development only: the passwords are "password".
  */
 class DemoDataSeeder extends Seeder
 {
@@ -43,7 +43,7 @@ class DemoDataSeeder extends Seeder
         mt_srand(2026);
         $this->week0 = CarbonImmutable::today(config('app.local_timezone'))->startOfWeek(CarbonInterface::MONDAY);
 
-        // tutto o niente: se manca un dato di base (le aree o gli utenti di DatabaseSeeder) non resta nulla a metà
+        // all or nothing: if a base datum is missing (the areas or users of DatabaseSeeder) nothing is left half done
         DB::transaction(function (): void {
             $design = Area::where('name', 'Design')->firstOrFail();
             $development = Area::where('name', 'Sviluppo')->firstOrFail();
@@ -55,13 +55,13 @@ class DemoDataSeeder extends Seeder
             $this->timeEntries();
             $this->absences($people);
 
-            // festivi e assenze confermate cambiano le quote: si ricalcolano una volta sola, alla fine
+            // holidays and confirmed absences change the allocations: recalculate them only once, at the end
             app(RegenerateAllocations::class)->handle();
         });
     }
 
     /**
-     * @return array<string, User> Persone per chiave breve (nome in minuscolo)
+     * @return array<string, User> People by short key (lowercase name)
      */
     private function people(Area $design, Area $development, Area $marketing): array
     {
@@ -93,7 +93,7 @@ class DemoDataSeeder extends Seeder
             ]);
         }
 
-        // Marco lavora part-time: 6 ore al giorno
+        // Marco works part-time: 6 hours a day
         $people['marco']->update(['daily_capacity' => 6]);
 
         return $people;
@@ -128,9 +128,9 @@ class DemoDataSeeder extends Seeder
         $bianchi = Client::where('company_name', 'Bianchi SpA')->firstOrFail();
         $rossi = Client::where('company_name', 'Rossi Srl')->firstOrFail();
 
-        // [nome, descrizione, cliente, stato progetto, attività]
-        // attività: [nome, [settimana, giorno] di inizio, [settimana, giorno] di fine, ore, stato, assegnatari, dipende da]
-        // le settimane si contano da quella in corso (0), i giorni da 1 (lunedì) a 5 (venerdì)
+        // [name, description, customer, project status, activities]
+        // activity: [name, [week, day] of start, [week, day] of end, hours, status, assignees, depends on]
+        // weeks are counted from the current one (0), days from 1 (Monday) to 5 (Friday)
         $projects = [
             ['E-commerce Verdi', 'Negozio online con catalogo e pagamenti', $verdi, WorkStatus::InProgress, [
                 ['Analisi e requisiti', [-3, 1], [-3, 3], 16, WorkStatus::Done, ['sara', 'elena'], []],
@@ -198,7 +198,7 @@ class DemoDataSeeder extends Seeder
     }
 
     /**
-     * Ore registrate nei giorni feriali passati sulle attività già iniziate di ciascuno, senza sovrapposizioni.
+     * Hours logged on past weekdays on each person's already started activities, without overlaps.
      */
     private function timeEntries(): void
     {
@@ -258,7 +258,7 @@ class DemoDataSeeder extends Seeder
     }
 
     /**
-     * Assenze in tutti gli stati, compresa la doppia conferma dei dipendenti (Capo area e HR).
+     * Absences in every status, including the employees' double confirmation (area head and HR).
      *
      * @param  array<string, User>  $people
      */
@@ -273,12 +273,12 @@ class DemoDataSeeder extends Seeder
 
         // ferie confermate da entrambi
         $confirmed($people['elena'], ['type' => AbsenceType::Vacation, 'starts_on' => $this->day(1, 1), 'ends_on' => $this->day(1, 3), 'note' => 'Viaggio']);
-        // ferie del Capo area: basta l'HR
+        // area head's vacation: HR is enough
         $confirmed($people['luca'], ['type' => AbsenceType::Vacation, 'starts_on' => $this->day(3, 1), 'ends_on' => $this->day(3, 5)], false);
-        // permesso confermato di poche ore
+        // confirmed leave of a few hours
         $confirmed($people['davide'], ['type' => AbsenceType::Leave, 'starts_on' => $this->day(0, 5), 'ends_on' => $this->day(0, 5), 'starts_time' => '10:00', 'ends_time' => '12:00', 'note' => 'Visita medica']);
 
-        // in attesa: permesso senza approvazioni, ferie con la sola approvazione del Capo area
+        // pending: a leave without approvals, a vacation with only the area head's approval
         Absence::create([
             'user_id' => $people['paolo']->id, 'type' => AbsenceType::Leave, 'status' => AbsenceStatus::Pending,
             'starts_on' => $this->day(1, 2), 'ends_on' => $this->day(1, 2), 'starts_time' => '14:00', 'ends_time' => '16:30',
@@ -289,7 +289,7 @@ class DemoDataSeeder extends Seeder
             'area_head_confirmed_by' => $people['luca']->id, 'area_head_confirmed_at' => now(),
         ]);
 
-        // rifiutata, con il motivo
+        // rejected, with the reason
         Absence::create([
             'user_id' => $people['marco']->id, 'type' => AbsenceType::Vacation, 'status' => AbsenceStatus::Rejected,
             'starts_on' => $this->day(1, 4), 'ends_on' => $this->day(1, 5), 'rejection_reason' => 'Consegna del logo in quei giorni',

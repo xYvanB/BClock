@@ -32,11 +32,11 @@ interface CalendarProps {
     people: CalendarPerson[];
 }
 
-/** Spostamento di una quota in attesa di conferma (oltre la scadenza dell'attività o del progetto). */
+/** Allocation move awaiting confirmation (beyond the activity or project due date). */
 interface PendingMove {
     item: CalendarItem;
     toDate: string;
-    /** Nel giorno di arrivo c'è già una quota della stessa attività: le ore si sommano e si sceglie quante spostarne. */
+    /** The target day already has an allocation of the same activity: the hours add up and one chooses how many to move. */
     merges: boolean;
 }
 
@@ -68,7 +68,7 @@ const rangeTitle = (view: 'week' | 'month', from: string, to: string, date: stri
         ? new Date(`${date}T00:00:00`).toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })
         : `${formatDate(from)} – ${formatDate(to)}`;
 
-/** Calendario del carico (F9): per persona e giorno le ore assegnate rispetto a quelle disponibili; le quote si spostano. */
+/** Workload calendar (F9): per person and day, the assigned hours against the available ones; allocations can be moved. */
 export default function CalendarIndex({ view, date, from, to, previous, next, area_id, areas, days, people }: CalendarProps) {
     const [selected, setSelected] = useState<{ personId: number; date: string } | null>(null);
     const [dragged, setDragged] = useState<{ item: CalendarItem; personId: number; fromDate: string } | null>(null);
@@ -111,8 +111,8 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
         );
 
     /**
-     * Sposta la quota (tutta, o `hours` ore). Chiede prima conferma se il giorno scelto è oltre la scadenza dell'attività
-     * o del progetto, o se lì c'è già una quota della stessa attività (per scegliere quante ore spostare).
+     * Moves the allocation (all of it, or `hours` hours). First asks for confirmation if the chosen day is beyond the activity
+     * or project due date, or if there is already an allocation of the same activity (to choose how many hours to move).
      */
     const requestMove = (item: CalendarItem, fromDate: string, toDate: string, personId: number, hours = '') => {
         setMoveError(null);

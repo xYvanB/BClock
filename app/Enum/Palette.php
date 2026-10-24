@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Enum;
 
 /**
- * Palette dell'interfaccia: le modalità della collezione `Tema` di FigCraft.
- * I colori stanno in resources/css/tema.css (esportato da FigCraft).
+ * Interface palette: the modes of FigCraft's `Tema` collection.
+ * The colors live in resources/css/tema.css (exported from FigCraft).
  */
 enum Palette: string
 {
-    /** @var string Scala di grigi del wireframe */
+    /** @var string Wireframe grayscale */
     case Wireframe = 'wireframe';
 
     /** @var string BClock scuro/oro (predefinita) */
@@ -23,8 +23,8 @@ enum Palette: string
     case Custom = 'personalizzata';
 
     /**
-     * Colori che la persona può scegliere nella palette personalizzata (gli altri si ricavano da questi nel CSS).
-     * Il valore è il colore di partenza, uguale alla palette scura.
+     * Colors a person can choose in the custom palette (the others are derived from these in the CSS).
+     * The value is the starting color, equal to the dark palette.
      *
      * @var array<string, string>
      */
@@ -40,8 +40,8 @@ enum Palette: string
     ];
 
     /**
-     * Stile inline dell'elemento <html> per la palette personalizzata: i colori scelti più il colore del testo sul
-     * primario (scuro o chiaro, a seconda di quanto è chiaro il primario). Vuoto per le altre palette.
+     * Inline style of the <html> element for the custom palette: the chosen colors plus the text color on the
+     * primary (dark or light, depending on how light the primary is). Empty for the other palettes.
      *
      * @param  array<string, string>|null  $colors
      */
@@ -75,7 +75,7 @@ enum Palette: string
     }
 
     /**
-     * Le palette scure attivano anche la classe `dark` di Tailwind.
+     * Dark palettes also enable Tailwind's `dark` class.
      */
     public function isDark(): bool
     {

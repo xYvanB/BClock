@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\App;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Applica la lingua scelta dall'utente (preferenza personale, F14).
+ * Applies the language chosen by the user (personal preference, F14).
  */
 class SetUserLocale
 {

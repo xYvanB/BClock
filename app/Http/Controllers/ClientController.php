@@ -19,7 +19,7 @@ use Throwable;
 class ClientController extends Controller
 {
     /**
-     * Un progetto è "attivo" se non è né completato né archiviato.
+     * A project is "active" if it is neither completed nor archived.
      */
     private const array INACTIVE_STATUSES = [WorkStatus::Done, WorkStatus::Archived];
 

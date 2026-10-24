@@ -21,8 +21,8 @@ final class CreateProject
     public function __construct(private readonly GenerateActivityAllocations $allocations) {}
 
     /**
-     * Crea un progetto con membri e referenti in transazione; se è dato un template crea anche
-     * le sue attività (date dai giorni lavorativi relativi, assegnatari scelti nell'anteprima).
+     * Creates a project with members and contacts in a transaction; if a template is given it also creates
+     * its activities (dates from the relative working days, assignees chosen in the preview).
      *
      * @throws Throwable
      */

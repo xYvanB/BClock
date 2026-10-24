@@ -8,7 +8,7 @@ use App\Enum\Role;
 use App\Models\User;
 
 /**
- * Festività e chiusure le gestiscono Capo e HR (impostazioni del calendario aziendale); tutti le vedono.
+ * Holidays and closures are managed by the Boss and HR (company calendar settings); everyone sees them.
  */
 final class HolidayPolicy
 {

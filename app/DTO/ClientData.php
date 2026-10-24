@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\DTO;
 
 /**
- * Dati validati per creare o modificare un cliente con i suoi referenti.
+ * Validated data to create or edit a customer with its contacts.
  */
 final readonly class ClientData
 {
@@ -18,7 +18,7 @@ final readonly class ClientData
     ) {}
 
     /**
-     * Referenti con esattamente un principale: se nessuno lo è, lo diventa il primo.
+     * Contacts with exactly one main one: if none is, the first becomes it.
      *
      * @return list<ClientContactData>
      */

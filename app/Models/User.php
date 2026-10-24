@@ -23,7 +23,7 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
-     * Valori predefiniti allineati alle colonne del database, disponibili anche prima del refresh.
+     * Default values aligned with the database columns, available even before a refresh.
      *
      * @var array<string, mixed>
      */
@@ -104,8 +104,8 @@ class User extends Authenticatable
     }
 
     /**
-     * Persone di cui `$viewer` vede i dati nella dashboard: il Capo e l'HR tutte, il Capo area quelle della sua area
-     * (solo sé stesso se non ha un'area), il Dipendente solo sé stesso.
+     * People whose data `$viewer` sees in the dashboard: the Boss and HR all, the area head those of their area
+     * (only themselves if they have no area), the Employee only themselves.
      *
      * @param  Builder<User>  $query
      */
@@ -129,8 +129,8 @@ class User extends Authenticatable
     }
 
     /**
-     * Se la persona vuole questo tipo di notifica nell'app (`app`) o per e-mail (`mail`): vale la sua scelta, altrimenti
-     * il default del tipo. Le richieste da approvare arrivano sempre nell'app.
+     * Whether the person wants this notification type in the app (`app`) or by e-mail (`mail`): their choice counts, otherwise
+     * the type's default. Approval requests always arrive in the app.
      */
     public function wantsNotification(NotificationKind $kind, string $channel): bool
     {

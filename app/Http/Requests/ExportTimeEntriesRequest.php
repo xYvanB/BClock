@@ -10,7 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
 class ExportTimeEntriesRequest extends FormRequest
 {
     /**
-     * L'export CSV è di Capo, Capo area (la sua area) e HR; il Dipendente no.
+     * The CSV export is for the Boss, area head (their area) and HR; not for the Employee.
      */
     public function authorize(): bool
     {

@@ -17,8 +17,8 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 
 /**
- * Dati dimostrativi presi dal wireframe (Mario Rossi, Giulia Verdi, Sito Rossi…).
- * Solo per sviluppo: le password degli utenti di prova sono "password".
+ * Demo data taken from the wireframe (Mario Rossi, Giulia Verdi, Sito Rossi…).
+ * For development only: the test users' passwords are "password".
  */
 class DatabaseSeeder extends Seeder
 {
@@ -108,7 +108,7 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // più persone, progetti, ore e assenze per provare calendario, Gantt e dashboard
+        // more people, projects, hours and absences to try the calendar, Gantt and dashboard
         $this->call(DemoDataSeeder::class);
     }
 }

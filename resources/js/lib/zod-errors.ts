@@ -1,8 +1,8 @@
 import { type ZodError } from 'zod';
 
 /**
- * Trasforma un errore Zod in un oggetto percorso → messaggio (il primo messaggio per percorso).
- * I percorsi annidati usano la stessa notazione degli errori del server, es. `contacts.0.email`.
+ * Turns a Zod error into a path → message object (the first message per path).
+ * Nested paths use the same notation as the server's errors, e.g. `contacts.0.email`.
  */
 export function flattenZodErrors<T extends string>(error: ZodError): Partial<Record<T, string>> {
     const errors: Partial<Record<T, string>> = {};

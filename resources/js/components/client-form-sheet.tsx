@@ -18,7 +18,7 @@ interface ClientFormSheetProps {
 
 const emptyContact = (isPrimary: boolean): ClientContactFormData => ({ id: null, name: '', email: '', phone: '', is_primary: isPrimary });
 
-/** Drawer laterale per creare o modificare un cliente con i suoi referenti (F6). */
+/** Side drawer to create or edit a customer with its contacts (F6). */
 export function ClientFormSheet({ open, client, onClose }: ClientFormSheetProps) {
     const { data, setData, post, put, processing, errors, setError, clearErrors, reset } = useForm<ClientFormData>({
         company_name: '',
@@ -28,7 +28,7 @@ export function ClientFormSheet({ open, client, onClose }: ClientFormSheetProps)
     const [confirmingRemoval, setConfirmingRemoval] = useState<number | null>(null);
     const linkedProjects = (id: number | null) => client?.contacts.find((contact) => contact.id === id)?.projects_count ?? 0;
 
-    // Gli errori annidati del server (es. `contacts.0.email`) non sono nel tipo degli errori del form.
+    // The server's nested errors (e.g. `contacts.0.email`) are not in the form's errors type.
     const fieldErrors = errors as Record<string, string | undefined>;
 
     useEffect(() => {
@@ -61,11 +61,11 @@ export function ClientFormSheet({ open, client, onClose }: ClientFormSheetProps)
     const removeContact = (index: number) => {
         setConfirmingRemoval(null);
         const remaining = data.contacts.filter((_, position) => position !== index);
-        // Se si toglie il principale, lo diventa il primo rimasto.
+        // If the main one is removed, the first remaining becomes it.
         if (remaining.length > 0 && !remaining.some((contact) => contact.is_primary)) {
             remaining[0] = { ...remaining[0], is_primary: true };
         }
-        // Gli errori del server sono indicizzati per posizione: dopo la rimozione non corrispondono più.
+        // The server errors are indexed by position: after the removal they no longer match.
         clearErrors();
         setData('contacts', remaining);
     };

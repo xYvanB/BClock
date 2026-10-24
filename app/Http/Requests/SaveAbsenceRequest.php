@@ -17,8 +17,8 @@ use Illuminate\Validation\Validator;
 class SaveAbsenceRequest extends FormRequest
 {
     /**
-     * Autorizza prima della validazione (AbsencePolicy): chiunque inserisce le proprie assenze,
-     * si modificano solo le proprie in attesa.
+     * Authorizes before validation (AbsencePolicy): anyone enters their own absences,
+     * only their own pending ones can be edited.
      */
     public function authorize(): bool
     {
@@ -30,7 +30,7 @@ class SaveAbsenceRequest extends FormRequest
     }
 
     /**
-     * Le ferie coprono uno o più giorni interi; un permesso è in un solo giorno, con orario di inizio e fine.
+     * Vacations cover one or more whole days; a leave is within a single day, with a start and end time.
      *
      * @return array<string, array<int, mixed>>
      */
@@ -61,8 +61,8 @@ class SaveAbsenceRequest extends FormRequest
     }
 
     /**
-     * Un permesso non supera la capacità giornaliera; le assenze della stessa persona non si sovrappongono
-     * (quelle rifiutate non contano, e due permessi nello stesso giorno vanno bene se gli orari non si toccano).
+     * A leave does not exceed the daily capacity; a person's absences do not overlap
+     * (rejected ones do not count, and two leaves on the same day are fine if their times do not touch).
      */
     public function after(): array
     {
@@ -74,7 +74,7 @@ class SaveAbsenceRequest extends FormRequest
 
                 $isLeave = $this->input('type') === AbsenceType::Leave->value;
 
-                // un permesso non può cadere in un giorno non lavorativo, le ferie devono avere almeno un giorno lavorativo
+                // a leave cannot fall on a non-working day, a vacation must have at least one working day
                 $workingDays = app(CalculateAvailability::class)
                     ->handle([$this->user()->id], $this->string('starts_on')->toString(), $this->string('ends_on')->toString())['working_days'];
 

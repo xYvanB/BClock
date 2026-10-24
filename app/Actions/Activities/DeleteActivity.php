@@ -12,8 +12,8 @@ use Throwable;
 final class DeleteActivity
 {
     /**
-     * Elimina un'attività solo se non ha ore registrate né timer attivi (altrimenti si archivia).
-     * Assegnatari, dipendenze e quote giornaliere vanno con lei.
+     * Deletes an activity only if it has no logged hours or active timers (otherwise archive it).
+     * Assignees, dependencies and daily allocations go with it.
      *
      * @throws Throwable
      */

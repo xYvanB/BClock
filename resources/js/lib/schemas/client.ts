@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 /**
- * Controlli immediati lato client. Il server resta la fonte di verità (SaveClientRequest).
+ * Immediate client-side checks. The server remains the source of truth (SaveClientRequest).
  */
 export const clientContactSchema = z.object({
     id: z.number().nullable(),

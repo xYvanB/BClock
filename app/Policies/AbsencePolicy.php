@@ -10,9 +10,9 @@ use App\Models\Absence;
 use App\Models\User;
 
 /**
- * Ognuno inserisce le proprie assenze e le modifica finché sono in attesa; quelle del Capo non le approva nessuno
- * e le gestisce lui. Le conferma l'HR; per i dipendenti
- * serve anche l'approvazione del loro Capo area. Entrambi possono rifiutare, con un motivo.
+ * Everyone enters their own absences and edits them while pending; the Boss's are approved by nobody
+ * and managed by the Boss. HR confirms them; for employees
+ * the approval of their area head is also required. Both can reject, with a reason.
  */
 final class AbsencePolicy
 {
@@ -22,8 +22,8 @@ final class AbsencePolicy
     }
 
     /**
-     * L'HR può rimuovere qualunque assenza (quelle confermate solo con un motivo);
-     * la persona solo le proprie in attesa o rifiutate.
+     * HR can remove any absence (confirmed ones only with a reason);
+     * the person only their own pending or rejected ones.
      */
     public function delete(User $user, Absence $absence): bool
     {
@@ -35,7 +35,7 @@ final class AbsencePolicy
     }
 
     /**
-     * Conferma finale: dell'HR, o del Capo se l'assenza è dell'HR (nessuno conferma le proprie).
+     * Final confirmation: by HR, or by the Boss if the absence is HR's (nobody confirms their own).
      */
     public function confirm(User $user, Absence $absence): bool
     {
@@ -46,7 +46,7 @@ final class AbsencePolicy
     }
 
     /**
-     * Approvazione del Capo area dell'area del dipendente.
+     * Approval by the area head of the employee's area.
      */
     public function approve(User $user, Absence $absence): bool
     {

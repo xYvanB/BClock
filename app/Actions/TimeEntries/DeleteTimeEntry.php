@@ -11,7 +11,7 @@ use Throwable;
 final class DeleteTimeEntry
 {
     /**
-     * Elimina una registrazione in transazione.
+     * Deletes a time entry in a transaction.
      *
      * @throws Throwable
      */

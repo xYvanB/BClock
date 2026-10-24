@@ -10,8 +10,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // I permessi hanno un orario (nello stesso giorno); le assenze dei dipendenti hanno anche
-        // l'approvazione del Capo area, oltre alla conferma dell'HR (`confirmed_by`/`confirmed_at`).
+        // Leaves have a time (within the same day); employees' absences also have
+        // the area head's approval, besides HR's confirmation (`confirmed_by`/`confirmed_at`).
         Schema::table('absences', function (Blueprint $table): void {
             $table->time('starts_time')->nullable()->after('ends_on');
             $table->time('ends_time')->nullable()->after('starts_time');

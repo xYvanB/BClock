@@ -22,8 +22,8 @@ final class UpdateActivity
     ) {}
 
     /**
-     * Aggiorna l'attività e i suoi assegnatari in transazione. Il progetto non cambia. Chi viene aggiunto riceve la notifica
-     * dell'assegnazione; chi resta assegnato, quella delle date spostate (se sono cambiate). Chi agisce non è avvisato.
+     * Updates the activity and its assignees in a transaction. The project does not change. Whoever is added receives the
+     * assignment notification; whoever stays assigned receives the moved-dates one (if the dates changed). The actor is not notified.
      *
      * @throws Throwable
      */

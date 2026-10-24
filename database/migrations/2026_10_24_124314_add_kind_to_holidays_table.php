@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Ogni giorno non lavorativo è una festività o una chiusura extra decisa dall'azienda (ponti, ferie collettive).
+        // Every non-working day is a holiday or an extra closure decided by the company (bridge days, collective vacations).
         Schema::table('holidays', function (Blueprint $table): void {
             $table->string('kind', 20)->default('festivo')->after('name');
         });

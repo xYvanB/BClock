@@ -24,7 +24,7 @@ use Throwable;
 class ActivityController extends Controller
 {
     /**
-     * Lista attività: il Capo e l'HR le vedono tutte, il Capo area quelle con almeno un assegnatario della propria area.
+     * Activity list: the Boss and HR see them all, the area head those with at least one assignee of their own area.
      */
     public function index(Request $request): Response
     {

@@ -12,7 +12,7 @@ use Illuminate\Validation\Rule;
 class SaveAreaRequest extends FormRequest
 {
     /**
-     * Autorizza prima della validazione (AreaPolicy), così chi non può riceve 403 e non errori di campo.
+     * Authorizes before validation (AreaPolicy), so whoever cannot gets 403 and not field errors.
      */
     public function authorize(): bool
     {

@@ -33,7 +33,7 @@ class AbsenceFactory extends Factory
     }
 
     /**
-     * Permesso di poche ore nello stesso giorno.
+     * A leave of a few hours on the same day.
      */
     public function leave(string $date = '2026-11-09', string $from = '09:00', string $to = '11:00'): static
     {
@@ -47,7 +47,7 @@ class AbsenceFactory extends Factory
     }
 
     /**
-     * Confermata dall'HR (e, per i dipendenti di un'area, anche approvata dal Capo area).
+     * Confirmed by HR (and, for employees of an area, also approved by the area head).
      */
     public function confirmed(?User $by = null): static
     {

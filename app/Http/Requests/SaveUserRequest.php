@@ -13,7 +13,7 @@ use Illuminate\Validation\Rule;
 class SaveUserRequest extends FormRequest
 {
     /**
-     * Autorizza prima della validazione (UserPolicy), così chi non può riceve 403 e non errori di campo.
+     * Authorizes before validation (UserPolicy), so whoever cannot gets 403 and not field errors.
      */
     public function authorize(): bool
     {
@@ -33,7 +33,7 @@ class SaveUserRequest extends FormRequest
         $target = $this->route('user');
         $assignable = array_map(fn (Role $role) => $role->value, $this->user()->role->assignableRoles());
 
-        // Nessuno cambia il proprio ruolo: evita auto-promozioni e il blocco dell'unico Capo.
+        // Nobody changes their own role: avoids self-promotion and locking out the only Boss.
         if ($target?->is($this->user())) {
             $assignable = [$target->role->value];
         }
@@ -54,7 +54,7 @@ class SaveUserRequest extends FormRequest
     }
 
     /**
-     * Il Capo area opera solo sulla propria area: l'area è forzata e non modificabile.
+     * The area head works only on their own area: the area is forced and cannot be changed.
      */
     public function toDto(): UserData
     {

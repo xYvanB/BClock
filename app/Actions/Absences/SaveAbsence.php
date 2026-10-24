@@ -18,9 +18,9 @@ use Throwable;
 final class SaveAbsence
 {
     /**
-     * Crea un'assenza della persona (in attesa; quelle del Capo sono subito confermate, nessuno le approva) o aggiorna
-     * quella indicata, in transazione. Modificarla azzera le approvazioni già date. Una nuova richiesta di un dipendente
-     * avvisa il suo Capo area e l'HR, una dell'HR avvisa il Capo.
+     * Creates an absence for the person (pending; the Boss's absences are confirmed at once, nobody approves them) or updates
+     * the given one, in a transaction. Editing it clears the approvals already given. A new request from an employee
+     * notifies their area head and HR; one from HR notifies the Boss.
      */
     public function __construct(
         private readonly RegenerateAllocations $allocations,
@@ -52,7 +52,7 @@ final class SaveAbsence
                     'area_head_confirmed_at' => null,
                 ]);
 
-                // l'assenza del Capo resta confermata, quindi le quote seguono le nuove date
+                // the Boss's absence stays confirmed, so the allocations follow the new dates
                 if ($user->hasRole(Role::Boss)) {
                     $this->allocations->handle(min($previous[0], $data->startsOn), max($previous[1], $data->endsOn), [$user->id]);
                 }
@@ -80,7 +80,7 @@ final class SaveAbsence
     }
 
     /**
-     * Avvisa chi deve approvare: il Capo area del dipendente e chi dà la conferma finale (HR, o il Capo per l'HR).
+     * Notifies who has to approve: the employee's area head and whoever gives the final confirmation (HR, or the Boss for HR).
      */
     private function notifyApprovers(User $user, Absence $absence, string $verb): void
     {

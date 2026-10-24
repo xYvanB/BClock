@@ -14,12 +14,12 @@ final class RegenerateAllocations
     public function __construct(private readonly GenerateActivityAllocations $generate) {}
 
     /**
-     * Ricalcola le quote delle attività ancora aperte che toccano l'intervallo (tutte, se non indicato),
-     * eventualmente solo di quelle con almeno uno degli assegnatari indicati.
-     * Serve quando cambia il calendario: un festivo o un'assenza confermata.
+     * Recalculates the allocations of still-open activities that touch the range (all of them, if not given),
+     * optionally only those with at least one of the given assignees.
+     * Needed when the calendar changes: a holiday or a confirmed absence.
      *
      * @param  list<int>|null  $userIds
-     * @return int Numero di attività ricalcolate
+     * @return int Number of activities recalculated
      *
      * @throws Throwable
      */

@@ -16,7 +16,7 @@ use Throwable;
 class WorkloadSettingsController extends Controller
 {
     /**
-     * Impostazioni del carico di lavoro (solo Capo e HR).
+     * Workload settings (Boss and HR only).
      */
     public function edit(): Response
     {

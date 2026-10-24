@@ -8,8 +8,8 @@ use App\Models\TimeEntry;
 use App\Models\User;
 
 /**
- * Ognuno registra e modifica le proprie ore. La visibilità delle ore altrui
- * (Capo, Capo area, HR) arriva con il filtro per persona.
+ * Everyone logs and edits their own hours. The visibility of others' hours
+ * (Boss, area head, HR) comes with the per-person filter.
  */
 final class TimeEntryPolicy
 {

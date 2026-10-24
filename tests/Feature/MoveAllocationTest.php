@@ -14,7 +14,7 @@ use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 
 /**
- * Attività lun 2026-11-09 … ven 2026-11-13, 10 ore su 5 giorni (2 ore al giorno), in un progetto che scade il 2026-11-20.
+ * Activity Mon 2026-11-09 … Fri 2026-11-13, 10 hours over 5 days (2 hours a day), in a project due on 2026-11-20.
  *
  * @param  list<User>  $assignees
  */
@@ -54,7 +54,7 @@ it('moves the quota of one day onto another working day of the activity', functi
         ->assertRedirect(route('calendar.index'))
         ->assertSessionHasNoErrors();
 
-    // il mercoledì ha la sua quota e quella del lunedì; il lunedì resta vuoto
+    // Wednesday has its own allocation and Monday's; Monday stays empty
     expect((float) quotaOn($activity, $user, '2026-11-11')->hours)->toBe(4.0)
         ->and((float) $from->refresh()->hours)->toBe(0.0)
         ->and(round((float) $activity->allocations()->sum('hours'), 2))->toBe(10.0)
@@ -67,7 +67,7 @@ it('moves onto a day without a quota, creating it', function (): void {
     $first = quotaOn($activity, $user, '2026-11-09');
     $this->actingAs(User::factory()->boss()->create())->post(route('allocations.move', $first), ['date' => '2026-11-10']);
 
-    // il lunedì è ora a 0: spostare di nuovo il martedì sul lunedì lo riempie
+    // Monday is now at 0: moving Tuesday onto Monday again fills it
     $tuesday = quotaOn($activity, $user, '2026-11-10');
     $this->actingAs(User::factory()->boss()->create())->post(route('allocations.move', $tuesday), ['date' => '2026-11-09'])->assertSessionHasNoErrors();
 
@@ -216,13 +216,13 @@ it('keeps them when the planned hours change, and drops them when the person or 
     expect((float) quotaOn($activity, $anna, '2026-11-10')->hours)->toBe(2.0)
         ->and(round((float) $activity->allocations()->sum('hours'), 2))->toBe(20.0);
 
-    // Luca esce dall'attività: le sue quote manuali spariscono e le ore tornano sulle altre
+    // Luca leaves the activity: his manual allocations disappear and the hours go back to the others
     $activity->assignees()->detach($luca);
     app(GenerateActivityAllocations::class)->handle($activity);
     expect($activity->allocations()->where('user_id', $luca->id)->exists())->toBeFalse()
         ->and(round((float) $activity->allocations()->sum('hours'), 2))->toBe(20.0);
 
-    // l'attività si accorcia al 10: le quote fuori periodo spariscono e, se quelle manuali occupano ogni giorno rimasto, le ore tornano comunque tutte
+    // the activity shortens to the 10th: allocations outside the period disappear and, if the manual ones fill every remaining day, all the hours still come back
     $activity->update(['due_on' => '2026-11-10']);
     app(GenerateActivityAllocations::class)->handle($activity);
     expect($activity->allocations()->whereDate('date', '>', '2026-11-10')->exists())->toBeFalse()

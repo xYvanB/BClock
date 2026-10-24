@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * Riga di attività per le tabelle: richiede `project.client`, `assignees`, `dependencies` e `used_minutes` (withSum) già caricati.
+ * Activity row for tables: requires `project.client`, `assignees`, `dependencies` and `used_minutes` (withSum) to be already loaded.
  *
  * @mixin Activity
  */

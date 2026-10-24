@@ -13,7 +13,7 @@ use Throwable;
 final class DeleteProject
 {
     /**
-     * Elimina un progetto solo se non ha ore registrate né timer attivi (altrimenti si archivia); le sue attività vanno con lui.
+     * Deletes a project only if it has no logged hours or active timers (otherwise archive it); its activities go with it.
      *
      * @throws Throwable
      */

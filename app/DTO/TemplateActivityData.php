@@ -7,7 +7,7 @@ namespace App\DTO;
 use App\Enum\Role;
 
 /**
- * Attività di un template; la posizione è quella nell'elenco inviato.
+ * Activity of a template; the position is the one in the submitted list.
  */
 final readonly class TemplateActivityData
 {

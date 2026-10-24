@@ -21,7 +21,7 @@ interface Props {
     preferences: Preference[];
 }
 
-/** Per ogni tipo di notifica: riceverla nell'app e/o per e-mail. Le richieste da approvare restano sempre attive nell'app. */
+/** For each notification type: receive it in the app and/or by e-mail. Approval requests always stay on in the app. */
 export default function NotificationSettings({ preferences }: Props) {
     const { data, setData, put, processing } = useForm<Record<string, { app: boolean; mail: boolean }>>(
         Object.fromEntries(preferences.map((preference) => [preference.kind, { app: preference.app, mail: preference.mail }])),

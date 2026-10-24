@@ -24,7 +24,7 @@ class Holiday extends Model
     ];
 
     /**
-     * Tutte le date non lavorative per festività o chiusura (`Y-m-d`).
+     * All the non-working dates for holidays or closures (`Y-m-d`).
      *
      * @return list<string>
      */

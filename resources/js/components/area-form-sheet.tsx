@@ -15,7 +15,7 @@ interface AreaFormSheetProps {
     onClose: () => void;
 }
 
-/** Drawer laterale per creare o modificare un'area (F13). */
+/** Side drawer to create or edit an area (F13). */
 export function AreaFormSheet({ open, area, onClose }: AreaFormSheetProps) {
     const { data, setData, post, put, processing, errors, setError, clearErrors, reset } = useForm<AreaFormData>({
         name: '',

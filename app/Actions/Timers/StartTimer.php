@@ -15,8 +15,8 @@ use Throwable;
 final class StartTimer
 {
     /**
-     * Avvia un timer per l'utente, in transazione. Se ne possono avere più d'uno, ma uno solo per attività:
-     * con due richieste insieme la seconda trova l'indice unico e riceve lo stesso errore della validazione.
+     * Starts a timer for the user, in a transaction. One can have several, but only one per activity:
+     * with two simultaneous requests the second hits the unique index and gets the same error as validation.
      *
      * @throws Throwable
      */

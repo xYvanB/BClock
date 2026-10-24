@@ -28,7 +28,7 @@ const sidebarNavItems: NavItem[] = [
     },
 ];
 
-/** Impostazioni dell'applicazione: le vedono solo Capo e HR. */
+/** Application settings: seen only by the Boss and HR. */
 const adminNavItems: NavItem[] = [
     { title: 'Calendario aziendale', url: '/settings/company-calendar', icon: null },
     { title: 'Carico di lavoro', url: '/settings/workload', icon: null },

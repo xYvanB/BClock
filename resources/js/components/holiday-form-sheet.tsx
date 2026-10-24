@@ -12,7 +12,7 @@ import { FormEventHandler, useEffect } from 'react';
 interface HolidayFormSheetProps {
     open: boolean;
     holiday: Holiday | null;
-    /** Tipo preselezionato quando se ne crea uno nuovo. */
+    /** Type preselected when creating a new one. */
     defaultKind?: HolidayFormData['kind'];
     onClose: () => void;
 }
@@ -20,7 +20,7 @@ interface HolidayFormSheetProps {
 const fieldClass =
     'border-input bg-background focus-visible:ring-ring h-9 w-full rounded-md border px-3 text-sm focus-visible:ring-1 focus-visible:outline-none';
 
-/** Drawer laterale per aggiungere o modificare una festività o una chiusura aziendale (Capo e HR). */
+/** Side drawer to add or edit a holiday or a company closure (Boss and HR). */
 export function HolidayFormSheet({ open, holiday, defaultKind = 'festivo', onClose }: HolidayFormSheetProps) {
     const { data, setData, post, put, processing, errors, setError, clearErrors, reset } = useForm<HolidayFormData>({
         date: '',

@@ -16,7 +16,7 @@ use Inertia\Response;
 use Throwable;
 
 /**
- * Primo accesso da invito (F2): le route sono protette dal link firmato.
+ * First access from an invitation (F2): the routes are protected by the signed link.
  */
 class InvitationController extends Controller
 {

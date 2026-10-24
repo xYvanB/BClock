@@ -8,8 +8,8 @@ use App\Enum\Role;
 use App\Models\User;
 
 /**
- * I template li vedono e li gestiscono solo Capo e Capo area. L'HR e il Dipendente no
- * (l'HR non può nemmeno usarli: creare un progetto da template crea attività, e l'HR è in sola lettura su di esse).
+ * Templates are seen and managed only by the Boss and area head. Not by HR or the Employee
+ * (HR cannot even use them: creating a project from a template creates activities, and HR is read-only on those).
  */
 final class ProjectTemplatePolicy
 {

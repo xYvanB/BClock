@@ -7,13 +7,13 @@ namespace App\DTO;
 use App\Enum\WorkStatus;
 
 /**
- * Dati validati per creare o modificare un'attività (date nel formato Y-m-d).
+ * Validated data to create or edit an activity (dates in Y-m-d format).
  */
 final readonly class ActivityData
 {
     /**
      * @param  list<int>  $assigneeIds
-     * @param  list<int>|null  $dependencyIds  Attività da cui dipende (fine → inizio); null lascia le dipendenze com'erano
+     * @param  list<int>|null  $dependencyIds  Activities it depends on (end → start); null leaves the dependencies as they were
      */
     public function __construct(
         public int $projectId,

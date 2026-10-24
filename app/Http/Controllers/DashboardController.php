@@ -19,13 +19,13 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DashboardController extends Controller
 {
-    /** Giorni massimi di un periodo, per non costruire tabelle enormi. */
+    /** Maximum days of a period, to avoid building huge tables. */
     private const int MAX_PERIOD_DAYS = 366;
 
     /**
-     * Dashboard (F11): schede diverse per ruolo, ognuna con i suoi filtri.
-     * - Ore per progetto e ore per persona in un giorno: Capo, Capo area (la sua area) e Dipendente (le proprie);
-     * - Ore lavorate: tutti i ruoli (l'HR vede solo questa).
+     * Dashboard (F11): different cards per role, each with its own filters.
+     * - Hours per project and hours per person in a day: Boss, area head (their area) and Employee (their own);
+     * - Worked hours: all roles (HR sees only this one).
      */
     public function index(
         Request $request,
@@ -71,7 +71,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Export CSV delle registrazioni nel periodo, filtrabile per progetto e area (il Capo area vede solo la sua).
+     * CSV export of the entries in the period, filterable by project and area (the area head sees only their own).
      */
     public function export(ExportTimeEntriesRequest $request): StreamedResponse
     {
@@ -119,7 +119,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Periodo richiesto (default: il mese in corso); la fine non precede l'inizio e il periodo ha un tetto.
+     * Requested period (default: the current month); the end does not precede the start and the period has a cap.
      *
      * @return array{string, string}
      */

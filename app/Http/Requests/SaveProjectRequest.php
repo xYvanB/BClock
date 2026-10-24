@@ -22,7 +22,7 @@ use Illuminate\Validation\Validator;
 class SaveProjectRequest extends FormRequest
 {
     /**
-     * Autorizza prima della validazione (ProjectPolicy), così chi non può riceve 403 e non errori di campo.
+     * Authorizes before validation (ProjectPolicy), so whoever cannot gets 403 and not field errors.
      */
     public function authorize(): bool
     {
@@ -42,7 +42,7 @@ class SaveProjectRequest extends FormRequest
 
         return [
             ...$this->templateRules($project instanceof Project),
-            // Il cliente si sceglie alla creazione e poi non cambia: i referenti dipendono da lui.
+            // The customer is chosen at creation and then does not change: the contacts depend on it.
             'client_id' => $project instanceof Project
                 ? ['sometimes', Rule::in([$project->client_id])]
                 : ['required', 'integer', Rule::exists('clients', 'id')],
@@ -120,8 +120,8 @@ class SaveProjectRequest extends FormRequest
     }
 
     /**
-     * Il template si sceglie solo alla creazione e solo da chi può creare attività (l'HR no).
-     * Ogni attività del template richiede almeno un assegnatario, con le regole di SaveActivityRequest.
+     * The template is chosen only at creation and only by who can create activities (not HR).
+     * Every template activity requires at least one assignee, with the rules of SaveActivityRequest.
      *
      * @return array<string, array<int, mixed>>
      */
@@ -182,8 +182,8 @@ class SaveProjectRequest extends FormRequest
     }
 
     /**
-     * "Archiviato" si imposta solo con l'azione Archivia (che archivia anche le attività):
-     * dal form è ammesso soltanto per un progetto già archiviato, così si può comunque modificarlo.
+     * "Archived" is set only with the Archive action (which also archives the activities):
+     * from the form it is allowed only for an already archived project, so it can still be edited.
      */
     private function statusRule(): Enum
     {

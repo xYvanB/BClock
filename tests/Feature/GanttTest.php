@@ -30,7 +30,7 @@ function ganttActivity(Project $project, string $name, string $start, string $du
 }
 
 /**
- * Progetto 1-nov … 31-dic con tre attività a catena: A (lun 9 – mer 11) ← B (gio 12 – ven 13) ← C (lun 16 – mar 17).
+ * Project 1 Nov … 31 Dec with three chained activities: A (Mon 9 – Wed 11) ← B (Thu 12 – Fri 13) ← C (Mon 16 – Tue 17).
  *
  * @return array{Project, Activity, Activity, Activity, User}
  */
@@ -58,7 +58,7 @@ function shiftRequest(array $data = []): array
 it('moves an activity and every activity depending on it by the same working days', function (): void {
     [, $a, $b, $c] = ganttChain();
 
-    // A parte mercoledì 11 invece di lunedì 9: +2 giorni lavorativi
+    // A starts on Wednesday 11 instead of Monday 9: +2 working days
     $this->actingAs(User::factory()->boss()->create())
         ->post(route('gantt.shift', $a), shiftRequest())
         ->assertRedirect(route('gantt.index'))
@@ -75,12 +75,12 @@ it('skips weekends and holidays when it counts the days', function (): void {
     Holiday::factory()->create(['date' => '2026-11-12']);
     [, $a, $b] = ganttChain();
 
-    // +4 giorni lavorativi: A lun 9→ ven 13; B gio 12 (festivo!) – ven 13 → +4 lavorativi
+    // +4 working days: A Mon 9→ Fri 13; B Thu 12 (holiday!) – Fri 13 → +4 working
     $this->actingAs(User::factory()->boss()->create())
         ->post(route('gantt.shift', $a), shiftRequest(['starts_on' => '2026-11-13']))
         ->assertSessionHasNoErrors();
 
-    // lun 9 + 3 lavorativi (10, 11, 13: il 12 è festivo) = ven 13
+    // Mon 9 + 3 working (10, 11, 13: the 12th is a holiday) = Fri 13
     expect($a->refresh()->starts_on->toDateString())->toBe('2026-11-13')
         ->and($a->due_on->toDateString())->toBe('2026-11-17')
         ->and($b->refresh()->starts_on->toDateString())->toBe('2026-11-17');
@@ -161,7 +161,7 @@ it('moves nothing when the area head cannot edit one of the dependents', functio
     expect(session('errors')->first('activity'))->toContain('«B»')
         ->and($a->refresh()->starts_on->toDateString())->toBe('2026-11-09');
 
-    // senza dipendenti fuori area si può
+    // without dependents outside the area it is allowed
     $b->dependencies()->detach();
     $this->actingAs($head)->post(route('gantt.shift', $a), shiftRequest())->assertSessionHasNoErrors();
     expect($a->refresh()->starts_on->toDateString())->toBe('2026-11-11');
@@ -184,7 +184,7 @@ it('needs a confirmation to go past the project due date, and then extends the p
     $project->update(['due_on' => '2026-11-20']);
     $boss = User::factory()->boss()->create();
 
-    // C passerebbe a mer 18 – gio 19… con +4: mar 17 + 4 = lun 23, oltre il 20
+    // C would become Wed 18 – Thu 19… with +4: Tue 17 + 4 = Mon 23, past the 20th
     $request = shiftRequest(['starts_on' => '2026-11-13']);
 
     $this->actingAs($boss)->post(route('gantt.shift', $a), $request)->assertSessionHasErrors('confirm_projects');
@@ -209,7 +209,7 @@ it('recalculates the quotas of every moved activity and shifts the hand-moved on
     [, $a, $b, , $person] = ganttChain();
     $boss = User::factory()->boss()->create();
 
-    // A ha 3 giorni (3,33 h al giorno circa); si sposta la quota del lunedì sul mercoledì (a mano)
+    // A has 3 days (about 3.33 h a day); the Monday allocation is moved to Wednesday (by hand)
     $monday = $a->allocations()->whereDate('date', '2026-11-09')->firstOrFail();
     $this->actingAs($boss)->post(route('allocations.move', $monday), ['date' => '2026-11-10'])->assertSessionHasNoErrors();
     $manualBefore = (float) $a->allocations()->whereDate('date', '2026-11-10')->value('hours');

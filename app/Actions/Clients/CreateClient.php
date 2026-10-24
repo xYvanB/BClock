@@ -12,7 +12,7 @@ use Throwable;
 final class CreateClient
 {
     /**
-     * Crea un cliente con i suoi referenti in transazione.
+     * Creates a customer with its contacts in a transaction.
      *
      * @throws Throwable
      */

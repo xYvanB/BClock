@@ -8,7 +8,7 @@ use App\Enum\Role;
 use App\Models\User;
 
 /**
- * I clienti li vedono e li gestiscono Capo, Capo area e HR; il Dipendente no.
+ * Customers are seen and managed by the Boss, area head and HR; not by the Employee.
  */
 final class ClientPolicy
 {

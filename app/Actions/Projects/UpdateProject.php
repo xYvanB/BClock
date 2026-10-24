@@ -12,7 +12,7 @@ use Throwable;
 final class UpdateProject
 {
     /**
-     * Aggiorna il progetto, i membri e i referenti in transazione. Il cliente non cambia.
+     * Updates the project, the members and the contacts in a transaction. The customer does not change.
      *
      * @throws Throwable
      */

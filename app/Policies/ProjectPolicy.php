@@ -8,8 +8,8 @@ use App\Enum\Role;
 use App\Models\User;
 
 /**
- * I progetti li vedono e li gestiscono (creazione, modifica, archiviazione, eliminazione)
- * Capo, Capo area e HR; il Dipendente no.
+ * Projects are seen and managed (create, edit, archive, delete)
+ * by the Boss, area head and HR; not by the Employee.
  */
 final class ProjectPolicy
 {
