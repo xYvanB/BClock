@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Projects;
 
+use App\Actions\Allocations\GenerateActivityAllocations;
 use App\DTO\ProjectData;
 use App\Enum\WorkStatus;
 use App\Models\Project;
@@ -15,6 +16,8 @@ use Throwable;
 
 final class CreateProject
 {
+    public function __construct(private readonly GenerateActivityAllocations $allocations) {}
+
     /**
      * Crea un progetto con membri e referenti in transazione; se è dato un template crea anche
      * le sue attività (date dai giorni lavorativi relativi, assegnatari scelti nell'anteprima).
@@ -64,6 +67,7 @@ final class CreateProject
             ]);
 
             $activity->assignees()->sync($assigneesByTemplateActivity[$templateActivity->id] ?? []);
+            $this->allocations->handle($activity);
         }
     }
 }

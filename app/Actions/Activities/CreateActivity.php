@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Activities;
 
+use App\Actions\Allocations\GenerateActivityAllocations;
 use App\DTO\ActivityData;
 use App\Models\Activity;
 use Illuminate\Support\Facades\DB;
@@ -11,6 +12,8 @@ use Throwable;
 
 final class CreateActivity
 {
+    public function __construct(private readonly GenerateActivityAllocations $allocations) {}
+
     /**
      * Crea un'attività con i suoi assegnatari in transazione.
      *
@@ -30,6 +33,7 @@ final class CreateActivity
             ]);
 
             $activity->assignees()->sync($data->assigneeIds);
+            $this->allocations->handle($activity);
 
             return $activity;
         });
