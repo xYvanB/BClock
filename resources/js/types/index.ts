@@ -281,3 +281,35 @@ export interface AppNotification {
     id: string;
     message: string;
 }
+
+export type LoadLevel = 'sotto_capacita' | 'pieno' | 'sovraccarico';
+
+export interface CalendarDay {
+    date: string;
+    is_weekend: boolean;
+    holiday: string | null;
+    is_today: boolean;
+}
+
+export interface CalendarItem {
+    activity_id: number;
+    activity: string;
+    project: string;
+    hours: number;
+}
+
+export interface CalendarCell {
+    capacity: number;
+    load: number;
+    level: LoadLevel | null;
+    absence: AbsenceType | null;
+    items: CalendarItem[];
+}
+
+export interface CalendarPerson {
+    id: number;
+    name: string;
+    area_name: string | null;
+    is_self: boolean;
+    days: Record<string, CalendarCell>;
+}

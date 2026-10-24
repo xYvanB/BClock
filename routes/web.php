@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\AbsenceController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AreaController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\InvitationController;
@@ -60,6 +61,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('timers', [TimerController::class, 'store'])->name('timers.store');
     Route::post('timers/{timer}/stop', [TimerController::class, 'stop'])->name('timers.stop');
+
+    Route::get('calendar', [CalendarController::class, 'index'])->name('calendar.index');
 
     Route::get('absences', [AbsenceController::class, 'index'])->name('absences.index');
     Route::post('absences', [AbsenceController::class, 'store'])->name('absences.store');
