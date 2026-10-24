@@ -326,3 +326,48 @@ export interface CalendarPerson {
     is_self: boolean;
     days: Record<string, CalendarCell>;
 }
+
+export interface GanttActivity {
+    id: number;
+    name: string;
+    status: string;
+    starts_on: string;
+    due_on: string;
+    assignees: string[];
+    dependency_ids: number[];
+    can_move: boolean;
+}
+
+export interface GanttProject {
+    id: number;
+    name: string;
+    starts_on: string;
+    due_on: string;
+    activities: GanttActivity[];
+}
+
+export interface GanttFilters {
+    project_id: number | null;
+    area_id: number | null;
+    user_id: number | null;
+    status: string | null;
+}
+
+export type GanttShiftMode = 'move' | 'resize_start' | 'resize_end';
+
+export interface GanttPreview {
+    activity_id: number;
+    mode: GanttShiftMode;
+    shift: number;
+    changes: {
+        activity_id: number;
+        name: string;
+        project: string;
+        starts_on: string;
+        due_on: string;
+        new_starts_on: string;
+        new_due_on: string;
+    }[];
+    projects: { project_id: number; name: string; due_on: string; new_due_on: string }[];
+    blockers: string[];
+}

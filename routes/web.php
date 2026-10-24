@@ -8,6 +8,7 @@ use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\GanttController;
 use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\ProjectController;
@@ -64,6 +65,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('timers/{timer}/stop', [TimerController::class, 'stop'])->name('timers.stop');
 
     Route::get('calendar', [CalendarController::class, 'index'])->name('calendar.index');
+    Route::get('gantt', [GanttController::class, 'index'])->name('gantt.index');
+    Route::post('gantt/activities/{activity}/shift', [GanttController::class, 'shift'])->name('gantt.shift');
+
     Route::post('allocations/{allocation}/move', [ActivityAllocationController::class, 'move'])->name('allocations.move');
 
     Route::get('absences', [AbsenceController::class, 'index'])->name('absences.index');
