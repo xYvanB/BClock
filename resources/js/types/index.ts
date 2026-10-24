@@ -126,7 +126,15 @@ export interface ActivityListItem {
     planned_hours: number;
     used_minutes: number;
     status: string;
+    dependency_ids: number[];
     can_update: boolean;
+}
+
+/** Attività tra cui scegliere "dipende da" (stesso progetto). */
+export interface DependencyOption {
+    id: number;
+    name: string;
+    project_id: number;
 }
 
 export interface ClientOption {

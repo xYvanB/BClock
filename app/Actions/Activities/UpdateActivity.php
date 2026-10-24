@@ -32,6 +32,11 @@ final class UpdateActivity
             ]);
 
             $activity->assignees()->sync($data->assigneeIds);
+
+            if ($data->dependencyIds !== null) {
+                $activity->dependencies()->sync($data->dependencyIds);
+            }
+
             $this->allocations->handle($activity);
 
             return $activity;

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { statusLabel } from '@/lib/status';
 import { formatDay, formatMinutes } from '@/lib/time';
-import { type ActivityListItem, type BreadcrumbItem, type PersonOption, type ProjectOption } from '@/types';
+import { type ActivityListItem, type BreadcrumbItem, type DependencyOption, type PersonOption, type ProjectOption } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { AlertTriangle, Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -15,10 +15,11 @@ interface ActivitiesIndexProps {
     activities: ActivityListItem[];
     projects: ProjectOption[];
     assignees: PersonOption[];
+    dependency_options: DependencyOption[];
     can_create: boolean;
 }
 
-export default function ActivitiesIndex({ activities, projects, assignees, can_create }: ActivitiesIndexProps) {
+export default function ActivitiesIndex({ activities, projects, assignees, dependency_options, can_create }: ActivitiesIndexProps) {
     const [sheetOpen, setSheetOpen] = useState(false);
     const [editing, setEditing] = useState<ActivityListItem | null>(null);
 
@@ -113,7 +114,14 @@ export default function ActivitiesIndex({ activities, projects, assignees, can_c
                 )}
             </div>
 
-            <ActivityFormSheet open={sheetOpen} activity={editing} projects={projects} assignees={assignees} onClose={() => setSheetOpen(false)} />
+            <ActivityFormSheet
+                open={sheetOpen}
+                activity={editing}
+                projects={projects}
+                assignees={assignees}
+                dependencyOptions={dependency_options}
+                onClose={() => setSheetOpen(false)}
+            />
         </AppLayout>
     );
 }

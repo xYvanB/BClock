@@ -13,6 +13,7 @@ final readonly class ActivityData
 {
     /**
      * @param  list<int>  $assigneeIds
+     * @param  list<int>|null  $dependencyIds  Attività da cui dipende (fine → inizio); null lascia le dipendenze com'erano
      */
     public function __construct(
         public int $projectId,
@@ -23,5 +24,6 @@ final readonly class ActivityData
         public float $plannedHours,
         public WorkStatus $status,
         public array $assigneeIds,
+        public ?array $dependencyIds = null,
     ) {}
 }

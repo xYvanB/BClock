@@ -6,7 +6,7 @@ import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetT
 import { activitySchema, type ActivityFormData } from '@/lib/schemas/activity';
 import { statusOptions } from '@/lib/status';
 import { flattenZodErrors } from '@/lib/zod-errors';
-import { type ActivityListItem, type PersonOption, type ProjectOption } from '@/types';
+import { type ActivityListItem, type DependencyOption, type PersonOption, type ProjectOption } from '@/types';
 import { router, useForm } from '@inertiajs/react';
 import { Archive, Trash2 } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
@@ -16,6 +16,8 @@ interface ActivityFormSheetProps {
     activity: ActivityListItem | null;
     projects: ProjectOption[];
     assignees: PersonOption[];
+    /** Attività del progetto da cui questa può dipendere (fine → inizio). */
+    dependencyOptions?: DependencyOption[];
     /** Progetto preselezionato alla creazione (es. dal dettaglio progetto). */
     defaultProjectId?: number;
     onClose: () => void;
@@ -27,7 +29,15 @@ const fieldClass =
 const formatDate = (iso: string) => iso.split('-').reverse().join('/');
 
 /** Drawer laterale per creare o modificare un'attività (F8). Il progetto non si cambia dopo la creazione. */
-export function ActivityFormSheet({ open, activity, projects, assignees, defaultProjectId, onClose }: ActivityFormSheetProps) {
+export function ActivityFormSheet({
+    open,
+    activity,
+    projects,
+    assignees,
+    dependencyOptions = [],
+    defaultProjectId,
+    onClose,
+}: ActivityFormSheetProps) {
     const { data, setData, post, put, processing, errors, setError, clearErrors, reset } = useForm<ActivityFormData>({
         project_id: '',
         name: '',
@@ -37,6 +47,7 @@ export function ActivityFormSheet({ open, activity, projects, assignees, default
         planned_hours: '',
         status: 'da_fare',
         assignee_ids: [],
+        dependency_ids: [],
     });
 
     // Gli errori per singolo assegnatario del server hanno la chiave `assignee_ids.N`.
@@ -61,6 +72,7 @@ export function ActivityFormSheet({ open, activity, projects, assignees, default
                 planned_hours: activity ? String(activity.planned_hours) : '',
                 status: activity?.status ?? 'da_fare',
                 assignee_ids: activity?.assignees.map((person) => person.id) ?? [],
+                dependency_ids: activity?.dependency_ids ?? [],
             });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -87,6 +99,18 @@ export function ActivityFormSheet({ open, activity, projects, assignees, default
             router.delete(route('activities.destroy', activity.id), options);
         }
     };
+
+    const projectDependencyOptions = dependencyOptions.filter(
+        (option) => String(option.project_id) === data.project_id && option.id !== activity?.id,
+    );
+
+    const toggleDependency = (id: number) =>
+        setData(
+            'dependency_ids',
+            data.dependency_ids.includes(id) ? data.dependency_ids.filter((current) => current !== id) : [...data.dependency_ids, id],
+        );
+
+    const dependencyError = Object.entries(errors).find(([key]) => key.startsWith('dependency_ids'))?.[1];
 
     const toggleAssignee = (id: number) =>
         setData('assignee_ids', data.assignee_ids.includes(id) ? data.assignee_ids.filter((current) => current !== id) : [...data.assignee_ids, id]);
@@ -250,6 +274,26 @@ export function ActivityFormSheet({ open, activity, projects, assignees, default
                             </div>
                             <InputError message={assigneeError} />
                         </fieldset>
+
+                        {projectDependencyOptions.length > 0 && (
+                            <fieldset className="grid gap-2">
+                                <legend className="text-sm leading-none font-medium">Dipende da</legend>
+                                <p className="text-muted-foreground text-sm">Se queste attività si spostano nel Gantt, questa si sposta con loro.</p>
+                                <div className="border-sidebar-border/70 grid max-h-40 gap-1 overflow-y-auto rounded-md border p-2">
+                                    {projectDependencyOptions.map((option) => (
+                                        <label key={option.id} className="flex items-center gap-2 text-sm">
+                                            <input
+                                                type="checkbox"
+                                                checked={data.dependency_ids.includes(option.id)}
+                                                onChange={() => toggleDependency(option.id)}
+                                            />
+                                            {option.name}
+                                        </label>
+                                    ))}
+                                </div>
+                                <InputError message={dependencyError} />
+                            </fieldset>
+                        )}
 
                         {activity && (
                             <div className="border-sidebar-border/70 grid gap-3 border-t pt-4">

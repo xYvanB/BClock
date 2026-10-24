@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * Riga di attività per le tabelle: richiede `project.client`, `assignees` e `used_minutes` (withSum) già caricati.
+ * Riga di attività per le tabelle: richiede `project.client`, `assignees`, `dependencies` e `used_minutes` (withSum) già caricati.
  *
  * @mixin Activity
  */
@@ -35,6 +35,7 @@ class ActivityListResource extends JsonResource
             'planned_hours' => (float) $this->planned_hours,
             'used_minutes' => (int) $this->used_minutes,
             'status' => $this->status->value,
+            'dependency_ids' => $this->dependencies->pluck('id')->values(),
             'can_update' => $request->user()->can('update', $this->resource),
         ];
     }

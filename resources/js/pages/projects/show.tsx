@@ -311,6 +311,7 @@ export default function ProjectsShow({ project, activities, time_entries, client
                 activity={editingActivity}
                 projects={[{ id: project.id, name: project.name, client_name: project.client_name, due_on: project.due_on }]}
                 assignees={assignees}
+                dependencyOptions={activities.map((candidate) => ({ id: candidate.id, name: candidate.name, project_id: candidate.project_id }))}
                 defaultProjectId={project.id}
                 onClose={() => setActivityOpen(false)}
             />

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 
 class Activity extends Model
 {
@@ -67,6 +68,53 @@ class Activity extends Model
     public function dependencies(): BelongsToMany
     {
         return $this->belongsToMany(self::class, 'activity_dependencies', 'activity_id', 'depends_on_id');
+    }
+
+    /**
+     * Attività che dipendono da questa (la inverso di `dependencies`).
+     *
+     * @return BelongsToMany<Activity, $this>
+     */
+    public function dependents(): BelongsToMany
+    {
+        return $this->belongsToMany(self::class, 'activity_dependencies', 'depends_on_id', 'activity_id');
+    }
+
+    /**
+     * Vero se far dipendere `$activityId` dalle attività `$dependencyIds` crea un ciclo: cioè se almeno una di esse
+     * dipende già, direttamente o no, da `$activityId`.
+     *
+     * @param  list<int>  $dependencyIds
+     */
+    public static function wouldCreateCycle(int $activityId, array $dependencyIds): bool
+    {
+        $dependentsOf = DB::table('activity_dependencies')->get(['activity_id', 'depends_on_id'])
+            ->groupBy('depends_on_id')
+            ->map(fn ($rows) => $rows->pluck('activity_id')->all());
+
+        $seen = [];
+        $queue = [$activityId];
+
+        while ($queue !== []) {
+            $current = array_pop($queue);
+
+            foreach ($dependentsOf->get($current, []) as $dependent) {
+                if (isset($seen[$dependent])) {
+                    continue;
+                }
+
+                $seen[$dependent] = true;
+                $queue[] = $dependent;
+            }
+        }
+
+        foreach ($dependencyIds as $id) {
+            if ($id === $activityId || isset($seen[$id])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

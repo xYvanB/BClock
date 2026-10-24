@@ -124,7 +124,7 @@ class ProjectController extends Controller
             ],
             'activities' => ActivityListResource::collection(
                 $project->activities()
-                    ->with(['project.client:id,company_name', 'assignees:id,name,surname,area_id'])
+                    ->with(['project.client:id,company_name', 'assignees:id,name,surname,area_id', 'dependencies:id'])
                     ->withSum('timeEntries as used_minutes', 'duration_minutes')
                     ->orderBy('due_on')
                     ->orderBy('name')

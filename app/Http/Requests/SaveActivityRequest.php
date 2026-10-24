@@ -51,6 +51,8 @@ class SaveActivityRequest extends FormRequest
             'status' => ['required', Rule::enum(WorkStatus::class)],
             'assignee_ids' => ['required', 'array', 'min:1'],
             'assignee_ids.*' => ['integer', 'distinct', $assignees],
+            'dependency_ids' => ['sometimes', 'array'],
+            'dependency_ids.*' => ['integer', 'distinct', $this->dependencyRule()],
         ];
     }
 
@@ -60,6 +62,14 @@ class SaveActivityRequest extends FormRequest
     public function after(): array
     {
         return [
+            function (Validator $validator): void {
+                $activity = $this->route('activity');
+                $ids = array_map('intval', (array) $this->input('dependency_ids', []));
+
+                if ($activity instanceof Activity && $ids !== [] && ! $validator->errors()->has('dependency_ids.*') && Activity::wouldCreateCycle($activity->id, $ids)) {
+                    $validator->errors()->add('dependency_ids', 'Le dipendenze formerebbero un ciclo.');
+                }
+            },
             function (Validator $validator): void {
                 $project = $this->targetProject();
 
@@ -87,7 +97,19 @@ class SaveActivityRequest extends FormRequest
             plannedHours: (float) $this->input('planned_hours'),
             status: WorkStatus::from($this->string('status')->toString()),
             assigneeIds: array_values(array_map('intval', $this->input('assignee_ids', []))),
+            dependencyIds: $this->has('dependency_ids') ? array_values(array_map('intval', (array) $this->input('dependency_ids'))) : null,
         );
+    }
+
+    /**
+     * Si dipende solo da altre attività dello stesso progetto, e non da sé stessi.
+     */
+    private function dependencyRule(): mixed
+    {
+        $activity = $this->route('activity');
+        $rule = Rule::exists('activities', 'id')->where('project_id', $this->targetProject()?->id);
+
+        return $activity instanceof Activity ? $rule->whereNot('id', $activity->id) : $rule;
     }
 
     private function targetProject(): ?Project

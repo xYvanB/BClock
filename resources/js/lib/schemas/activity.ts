@@ -16,6 +16,7 @@ export const activitySchema = z
         planned_hours: z.string().refine((value) => value !== '' && Number(value) >= 0, 'Inserisci le ore previste'),
         status: z.string().min(1),
         assignee_ids: z.array(z.number()).min(1, 'Scegli almeno una persona'),
+        dependency_ids: z.array(z.number()),
     })
     .refine((activity) => activity.due_on >= activity.starts_on, {
         path: ['due_on'],

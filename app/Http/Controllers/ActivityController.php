@@ -36,7 +36,7 @@ class ActivityController extends Controller
         return Inertia::render('activities/index', [
             'activities' => ActivityListResource::collection(
                 Activity::query()
-                    ->with(['project.client:id,company_name', 'assignees:id,name,surname,area_id'])
+                    ->with(['project.client:id,company_name', 'assignees:id,name,surname,area_id', 'dependencies:id'])
                     ->withSum('timeEntries as used_minutes', 'duration_minutes')
                     ->when($isAreaHead, fn ($query) => $query->whereHas('assignees', fn ($q) => $q->where('users.area_id', $actor->area_id)))
                     ->orderBy('due_on')
@@ -60,6 +60,10 @@ class ActivityController extends Controller
                 ->orderBy('name')
                 ->get()
                 ->map(fn (User $user) => ['id' => $user->id, 'name' => $user->fullName()]),
+            'dependency_options' => Activity::query()
+                ->whereNot('status', WorkStatus::Archived->value)
+                ->orderBy('name')
+                ->get(['id', 'name', 'project_id']),
             'can_create' => $actor->can('create', Activity::class),
         ]);
     }
