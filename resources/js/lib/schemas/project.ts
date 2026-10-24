@@ -16,6 +16,8 @@ export const projectSchema = z
         status: z.string().min(1),
         member_ids: z.array(z.number()),
         contact_ids: z.array(z.number()),
+        template_id: z.string(),
+        template_assignees: z.record(z.string(), z.array(z.number())),
     })
     .refine((project) => project.due_on >= project.starts_on, {
         path: ['due_on'],

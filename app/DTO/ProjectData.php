@@ -14,6 +14,7 @@ final readonly class ProjectData
     /**
      * @param  list<int>  $memberIds
      * @param  list<int>  $contactIds
+     * @param  array<int, list<int>>  $templateAssignees  assegnatari per id di attività del template
      */
     public function __construct(
         public int $clientId,
@@ -25,5 +26,7 @@ final readonly class ProjectData
         public WorkStatus $status,
         public array $memberIds,
         public array $contactIds,
+        public ?int $templateId = null,
+        public array $templateAssignees = [],
     ) {}
 }

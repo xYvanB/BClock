@@ -24,6 +24,9 @@ function projectPayload(Client $client, array $overrides = []): array
         'status' => WorkStatus::Todo->value,
         'member_ids' => [],
         'contact_ids' => [],
+        // Il drawer li invia sempre, anche in modifica: devono essere vuoti e non dare errori.
+        'template_id' => '',
+        'template_assignees' => [],
     ], $overrides);
 }
 

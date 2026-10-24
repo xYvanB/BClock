@@ -1,4 +1,5 @@
 import InputError from '@/components/input-error';
+import { TemplatePreview, templateEndDate } from '@/components/template-preview';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -6,7 +7,7 @@ import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetT
 import { projectSchema, type ProjectFormData } from '@/lib/schemas/project';
 import { statusOptions } from '@/lib/status';
 import { flattenZodErrors } from '@/lib/zod-errors';
-import { type ClientOption, type PersonOption, type ProjectDetail } from '@/types';
+import { type AssigneeOption, type ClientOption, type PersonOption, type ProjectDetail, type TemplateOption } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { FormEventHandler, useEffect } from 'react';
 
@@ -15,6 +16,9 @@ interface ProjectFormSheetProps {
     project: ProjectDetail | null;
     clients: ClientOption[];
     users: PersonOption[];
+    /** Solo alla creazione, e solo per chi può creare attività (non l'HR). */
+    templates?: TemplateOption[];
+    assignees?: AssigneeOption[];
     onClose: () => void;
 }
 
@@ -24,7 +28,7 @@ const fieldClass =
 const toggle = (list: number[], id: number) => (list.includes(id) ? list.filter((current) => current !== id) : [...list, id]);
 
 /** Drawer laterale per creare o modificare un progetto. Il cliente non si cambia dopo la creazione. */
-export function ProjectFormSheet({ open, project, clients, users, onClose }: ProjectFormSheetProps) {
+export function ProjectFormSheet({ open, project, clients, users, templates = [], assignees = [], onClose }: ProjectFormSheetProps) {
     const { data, setData, post, put, processing, errors, setError, clearErrors, reset } = useForm<ProjectFormData>({
         client_id: '',
         name: '',
@@ -35,6 +39,8 @@ export function ProjectFormSheet({ open, project, clients, users, onClose }: Pro
         status: 'da_fare',
         member_ids: [],
         contact_ids: [],
+        template_id: '',
+        template_assignees: {},
     });
 
     const client = clients.find((candidate) => String(candidate.id) === data.client_id);
@@ -53,10 +59,14 @@ export function ProjectFormSheet({ open, project, clients, users, onClose }: Pro
                 status: project?.status ?? 'da_fare',
                 member_ids: project?.members.map((member) => member.id) ?? [],
                 contact_ids: project?.contacts.map((contact) => contact.id) ?? [],
+                template_id: '',
+                template_assignees: {},
             });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open, project]);
+
+    const template = templates.find((candidate) => String(candidate.id) === data.template_id);
 
     const changeClient = (clientId: string) => {
         setData((current) => ({ ...current, client_id: clientId, contact_ids: [] }));
@@ -66,9 +76,24 @@ export function ProjectFormSheet({ open, project, clients, users, onClose }: Pro
         event.preventDefault();
 
         const result = projectSchema.safeParse(data);
-        if (!result.success) {
-            const fieldErrors = flattenZodErrors<keyof ProjectFormData>(result.error);
-            (Object.keys(fieldErrors) as (keyof ProjectFormData)[]).forEach((field) => setError(field, fieldErrors[field] as string));
+        const fieldErrors: Record<string, string> = result.success ? {} : (flattenZodErrors<string>(result.error) as Record<string, string>);
+
+        if (template) {
+            const end = templateEndDate(template, data.starts_on);
+            if (end !== null && /^\d{4}-\d{2}-\d{2}$/.test(data.due_on) && end > data.due_on) {
+                fieldErrors.template_id =
+                    'Le attività del template finiscono oltre la scadenza del progetto: allunga la scadenza o scegli un altro template.';
+            }
+
+            template.activities.forEach((activity) => {
+                if ((data.template_assignees[String(activity.id)] ?? []).length === 0) {
+                    fieldErrors[`template_assignees.${activity.id}`] = 'Scegli almeno una persona';
+                }
+            });
+        }
+
+        if (Object.keys(fieldErrors).length > 0) {
+            Object.entries(fieldErrors).forEach(([field, message]) => setError(field as keyof ProjectFormData, message));
 
             return;
         }
@@ -198,6 +223,41 @@ export function ProjectFormSheet({ open, project, clients, users, onClose }: Pro
                                 <InputError message={errors.status} />
                             </div>
                         </div>
+
+                        {project === null && templates.length > 0 && (
+                            <div className="grid gap-3">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="project-template">Template (facoltativo)</Label>
+                                    <select
+                                        id="project-template"
+                                        className={fieldClass}
+                                        value={data.template_id}
+                                        onChange={(event) =>
+                                            setData((current) => ({ ...current, template_id: event.target.value, template_assignees: {} }))
+                                        }
+                                    >
+                                        <option value="">Nessuno</option>
+                                        {templates.map((candidate) => (
+                                            <option key={candidate.id} value={candidate.id}>
+                                                {candidate.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <InputError message={errors.template_id} />
+                                </div>
+                                {template && (
+                                    <TemplatePreview
+                                        template={template}
+                                        startsOn={data.starts_on}
+                                        dueOn={data.due_on}
+                                        assignees={assignees}
+                                        selected={data.template_assignees}
+                                        onChange={(selected) => setData('template_assignees', selected)}
+                                        errorFor={(key) => (errors as Record<string, string | undefined>)[key]}
+                                    />
+                                )}
+                            </div>
+                        )}
 
                         <fieldset className="grid gap-2">
                             <legend className="text-sm leading-none font-medium">Referenti del cliente</legend>

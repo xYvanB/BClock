@@ -5,7 +5,15 @@ import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { statusLabel, statusOptions } from '@/lib/status';
 import { formatDay } from '@/lib/time';
-import { type BreadcrumbItem, type ClientOption, type PersonOption, type ProjectListItem } from '@/types';
+import {
+    type AreaOption,
+    type AssigneeOption,
+    type BreadcrumbItem,
+    type ClientOption,
+    type PersonOption,
+    type ProjectListItem,
+    type TemplateOption,
+} from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -14,6 +22,7 @@ const breadcrumbs: BreadcrumbItem[] = [{ title: 'Progetti', href: '/projects' }]
 
 interface Filters {
     client_id: string;
+    area_id: string;
     status: string;
     archived: boolean;
 }
@@ -23,12 +32,15 @@ interface ProjectsIndexProps {
     filters: Filters;
     clients: ClientOption[];
     users: PersonOption[];
+    areas: AreaOption[];
+    templates: TemplateOption[];
+    assignees: AssigneeOption[];
 }
 
 const fieldClass =
     'border-input bg-background focus-visible:ring-ring h-9 rounded-md border px-3 text-sm focus-visible:ring-1 focus-visible:outline-none';
 
-export default function ProjectsIndex({ projects, filters, clients, users }: ProjectsIndexProps) {
+export default function ProjectsIndex({ projects, filters, clients, users, areas, templates, assignees }: ProjectsIndexProps) {
     const [sheetOpen, setSheetOpen] = useState(false);
 
     const applyFilters = (changes: Partial<Filters>) => {
@@ -36,7 +48,12 @@ export default function ProjectsIndex({ projects, filters, clients, users }: Pro
 
         router.get(
             route('projects.index'),
-            { client_id: next.client_id || undefined, status: next.status || undefined, archived: next.archived ? 1 : undefined },
+            {
+                client_id: next.client_id || undefined,
+                area_id: next.area_id || undefined,
+                status: next.status || undefined,
+                archived: next.archived ? 1 : undefined,
+            },
             { preserveState: true, preserveScroll: true, replace: true },
         );
     };
@@ -70,6 +87,19 @@ export default function ProjectsIndex({ projects, filters, clients, users }: Pro
                         ))}
                     </select>
                     <select
+                        aria-label="Filtra per area"
+                        className={fieldClass}
+                        value={filters.area_id}
+                        onChange={(event) => applyFilters({ area_id: event.target.value })}
+                    >
+                        <option value="">Tutte le aree</option>
+                        {areas.map((area) => (
+                            <option key={area.id} value={area.id}>
+                                {area.name}
+                            </option>
+                        ))}
+                    </select>
+                    <select
                         aria-label="Filtra per stato"
                         className={fieldClass}
                         value={filters.status}
@@ -91,7 +121,7 @@ export default function ProjectsIndex({ projects, filters, clients, users }: Pro
                 {projects.length === 0 ? (
                     <div className="border-sidebar-border/70 flex flex-col items-center gap-3 rounded-xl border border-dashed p-12 text-center">
                         <p className="text-muted-foreground">
-                            Nessun progetto{filters.client_id || filters.status ? ' con questi filtri' : ' – crea il primo'}
+                            Nessun progetto{filters.client_id || filters.area_id || filters.status ? ' con questi filtri' : ' – crea il primo'}
                         </p>
                         <Button onClick={() => setSheetOpen(true)}>Crea progetto</Button>
                     </div>
@@ -131,7 +161,15 @@ export default function ProjectsIndex({ projects, filters, clients, users }: Pro
                 )}
             </div>
 
-            <ProjectFormSheet open={sheetOpen} project={null} clients={clients} users={users} onClose={() => setSheetOpen(false)} />
+            <ProjectFormSheet
+                open={sheetOpen}
+                project={null}
+                clients={clients}
+                users={users}
+                templates={templates}
+                assignees={assignees}
+                onClose={() => setSheetOpen(false)}
+            />
         </AppLayout>
     );
 }

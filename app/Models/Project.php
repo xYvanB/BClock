@@ -23,6 +23,7 @@ class Project extends Model
      */
     protected $fillable = [
         'client_id',
+        'project_template_id',
         'name',
         'description',
         'starts_on',
@@ -42,6 +43,16 @@ class Project extends Model
             'planned_hours' => 'decimal:2',
             'status' => WorkStatus::class,
         ];
+    }
+
+    /**
+     * Template di origine, solo informativo.
+     *
+     * @return BelongsTo<ProjectTemplate, $this>
+     */
+    public function template(): BelongsTo
+    {
+        return $this->belongsTo(ProjectTemplate::class, 'project_template_id');
     }
 
     /**

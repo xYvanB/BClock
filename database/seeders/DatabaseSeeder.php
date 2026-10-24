@@ -11,6 +11,7 @@ use App\Models\Activity;
 use App\Models\Area;
 use App\Models\Client;
 use App\Models\Project;
+use App\Models\ProjectTemplate;
 use App\Models\TimeEntry;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -34,6 +35,23 @@ class DatabaseSeeder extends Seeder
         $rossi = Client::create(['company_name' => 'Rossi Srl']);
         $rossi->contacts()->create(['name' => 'Paolo Rossi', 'email' => 'paolo@rossi.it', 'phone' => '+39 011 000000', 'is_primary' => true]);
         $bianchi = Client::create(['company_name' => 'Bianchi SpA']);
+
+        $template = ProjectTemplate::create(['name' => 'Sito vetrina']);
+        foreach ([
+            ['Analisi e struttura', 'Raccolta requisiti e mappa del sito', 8, 1, 2, null],
+            ['Design grafico', 'Mockup delle pagine principali', 24, 3, 7, $design->id],
+            ['Sviluppo', 'Realizzazione del sito', 40, 8, 17, $development->id],
+        ] as $position => [$name, $description, $hours, $startDay, $endDay, $areaId]) {
+            $template->activities()->create([
+                'name' => $name,
+                'description' => $description,
+                'planned_hours' => $hours,
+                'start_day' => $startDay,
+                'end_day' => $endDay,
+                'position' => $position + 1,
+                'suggested_area_id' => $areaId,
+            ]);
+        }
 
         $siteRossi = Project::create([
             'client_id' => $rossi->id,

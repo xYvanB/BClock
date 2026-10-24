@@ -156,6 +156,12 @@ export default function ProjectsShow({ project, activities, time_entries, client
                                 <dt className="text-muted-foreground">Cliente</dt>
                                 <dd className="font-medium">{project.client_name}</dd>
                             </div>
+                            {project.template_name && (
+                                <div>
+                                    <dt className="text-muted-foreground">Template di origine</dt>
+                                    <dd className="font-medium">{project.template_name}</dd>
+                                </div>
+                            )}
                             <div>
                                 <dt className="text-muted-foreground">Date</dt>
                                 <dd className="font-medium">

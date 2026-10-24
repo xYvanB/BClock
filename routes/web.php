@@ -7,6 +7,7 @@ use App\Http\Controllers\AreaController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProjectTemplateController;
 use App\Http\Controllers\TimeEntryController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -38,6 +39,10 @@ Route::middleware(['auth'])->group(function () {
     Route::put('projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
     Route::post('projects/{project}/archive', [ProjectController::class, 'archive'])->name('projects.archive');
     Route::delete('projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
+
+    Route::get('templates', [ProjectTemplateController::class, 'index'])->name('templates.index');
+    Route::post('templates', [ProjectTemplateController::class, 'store'])->name('templates.store');
+    Route::put('templates/{projectTemplate}', [ProjectTemplateController::class, 'update'])->name('templates.update');
 
     Route::get('activities', [ActivityController::class, 'index'])->name('activities.index');
     Route::post('activities', [ActivityController::class, 'store'])->name('activities.store');

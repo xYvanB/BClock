@@ -143,6 +143,7 @@ export interface ProjectDetail {
     due_on: string;
     planned_hours: number;
     used_minutes: number;
+    template_name: string | null;
     members: PersonOption[];
     contacts: { id: number; name: string; email: string | null; phone: string | null }[];
 }
@@ -153,6 +154,33 @@ export interface ProjectTimeEntry {
     user_name: string;
     activity_name: string;
     duration_minutes: number;
+}
+
+export interface AssigneeOption extends PersonOption {
+    area_id: number | null;
+}
+
+export interface TemplateActivityItem {
+    name: string;
+    description: string | null;
+    planned_hours: number;
+    start_day: number;
+    end_day: number;
+    suggested_area_id: number | null;
+    suggested_role: Role | null;
+}
+
+export interface TemplateListItem {
+    id: number;
+    name: string;
+    activities: TemplateActivityItem[];
+}
+
+/** Template come opzione nel drawer del progetto: ogni attività ha l'id, serve per scegliere gli assegnatari. */
+export interface TemplateOption {
+    id: number;
+    name: string;
+    activities: (TemplateActivityItem & { id: number })[];
 }
 
 export interface ActivityOption {

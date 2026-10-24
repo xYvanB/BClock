@@ -3,7 +3,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem, type Role, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Building2, Clock, FolderKanban, ListChecks, LayoutGrid, Layers, Users } from 'lucide-react';
+import { Building2, Clock, FolderKanban, Layers, LayoutGrid, LayoutTemplate, ListChecks, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 interface RoleNavItem extends NavItem {
@@ -15,6 +15,7 @@ const mainNavItems: RoleNavItem[] = [
     { title: 'Dashboard', url: '/dashboard', icon: LayoutGrid },
     { title: 'Ore', url: '/time-entries', icon: Clock },
     { title: 'Progetti', url: '/projects', icon: FolderKanban, roles: ['capo', 'capo_area', 'hr'] },
+    { title: 'Template', url: '/templates', icon: LayoutTemplate, roles: ['capo', 'capo_area'] },
     { title: 'Attività', url: '/activities', icon: ListChecks, roles: ['capo', 'capo_area', 'hr'] },
     { title: 'Clienti', url: '/clients', icon: Building2, roles: ['capo', 'capo_area', 'hr'] },
     { title: 'Utenti', url: '/users', icon: Users, roles: ['capo', 'capo_area', 'hr'] },

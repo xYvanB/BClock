@@ -13,9 +13,12 @@ use App\Enum\WorkStatus;
 use App\Http\Requests\SaveProjectRequest;
 use App\Http\Resources\ActivityListResource;
 use App\Models\Activity;
+use App\Models\Area;
 use App\Models\Client;
 use App\Models\ClientContact;
 use App\Models\Project;
+use App\Models\ProjectTemplate;
+use App\Models\TemplateActivity;
 use App\Models\TimeEntry;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -42,6 +45,7 @@ class ProjectController extends Controller
 
         $filters = $request->validate([
             'client_id' => ['nullable', 'integer'],
+            'area_id' => ['nullable', 'integer'],
             'status' => ['nullable', Rule::enum(WorkStatus::class)],
             'archived' => ['nullable', 'boolean'],
         ]);
@@ -54,6 +58,10 @@ class ProjectController extends Controller
                 ->withSum('timeEntries as used_minutes', 'duration_minutes')
                 ->when($filters['client_id'] ?? null, fn ($query, $id) => $query->where('client_id', $id))
                 ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
+                ->when($filters['area_id'] ?? null, fn ($query, $areaId) => $query->whereHas(
+                    'activities.assignees',
+                    fn ($assignees) => $assignees->where('users.area_id', $areaId),
+                ))
                 ->when(
                     ! ($filters['status'] ?? null) && ! $showArchived,
                     fn ($query) => $query->whereNot('status', WorkStatus::Archived->value),
@@ -73,11 +81,15 @@ class ProjectController extends Controller
                 ]),
             'filters' => [
                 'client_id' => isset($filters['client_id']) ? (string) $filters['client_id'] : '',
+                'area_id' => isset($filters['area_id']) ? (string) $filters['area_id'] : '',
                 'status' => $filters['status'] ?? '',
                 'archived' => $showArchived,
             ],
             'clients' => $this->clientOptions(),
             'users' => $this->userOptions(),
+            'areas' => Area::query()->orderBy('name')->get(['id', 'name']),
+            'templates' => $this->templateOptions($request->user()),
+            'assignees' => $this->assigneeOptions($request->user()),
         ]);
     }
 
@@ -86,13 +98,14 @@ class ProjectController extends Controller
         $this->authorize('view', $project);
 
         $actor = $request->user();
-        $project->load(['client:id,company_name', 'members:id,name,surname', 'contacts']);
+        $project->load(['client:id,company_name', 'template:id,name', 'members:id,name,surname', 'contacts']);
         $usedMinutes = (int) $project->timeEntries()->sum('duration_minutes');
 
         return Inertia::render('projects/show', [
             'project' => [
                 'id' => $project->id,
                 'name' => $project->name,
+                'template_name' => $project->template?->name,
                 'description' => $project->description,
                 'client_id' => $project->client_id,
                 'client_name' => $project->client->company_name,
@@ -137,12 +150,7 @@ class ProjectController extends Controller
                 ]),
             'clients' => $this->clientOptions(),
             'users' => $this->userOptions(),
-            'assignees' => User::query()
-                ->when($actor->hasRole(Role::AreaHead), fn ($query) => $query->where('area_id', $actor->area_id))
-                ->orderBy('surname')
-                ->orderBy('name')
-                ->get()
-                ->map(fn (User $user) => ['id' => $user->id, 'name' => $user->fullName()]),
+            'assignees' => $this->assigneeOptions($actor),
             'can_create_activity' => $actor->can('create', Activity::class),
         ]);
     }
@@ -217,5 +225,50 @@ class ProjectController extends Controller
             ->orderBy('name')
             ->get()
             ->map(fn (User $user) => ['id' => $user->id, 'name' => $user->fullName()]);
+    }
+
+    /**
+     * Template con le attività, per la scelta nel drawer del progetto; vuoti per chi non può creare attività (HR).
+     *
+     * @return Collection<int, array<string, mixed>>
+     */
+    private function templateOptions(User $actor): Collection
+    {
+        if (! $actor->can('create', Activity::class)) {
+            return collect();
+        }
+
+        return ProjectTemplate::query()
+            ->with('activities')
+            ->orderBy('name')
+            ->get()
+            ->map(fn (ProjectTemplate $template) => [
+                'id' => $template->id,
+                'name' => $template->name,
+                'activities' => $template->activities->map(fn (TemplateActivity $activity) => [
+                    'id' => $activity->id,
+                    'name' => $activity->name,
+                    'planned_hours' => (float) $activity->planned_hours,
+                    'start_day' => $activity->start_day,
+                    'end_day' => $activity->end_day,
+                    'suggested_area_id' => $activity->suggested_area_id,
+                    'suggested_role' => $activity->suggested_role?->value,
+                ])->values(),
+            ]);
+    }
+
+    /**
+     * Persone assegnabili alle attività: il Capo area solo quelle della propria area.
+     *
+     * @return Collection<int, array{id: int, name: string, area_id: int|null}>
+     */
+    private function assigneeOptions(User $actor): Collection
+    {
+        return User::query()
+            ->when($actor->hasRole(Role::AreaHead), fn ($query) => $query->where('area_id', $actor->area_id))
+            ->orderBy('surname')
+            ->orderBy('name')
+            ->get()
+            ->map(fn (User $user) => ['id' => $user->id, 'name' => $user->fullName(), 'area_id' => $user->area_id]);
     }
 }

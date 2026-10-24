@@ -5,8 +5,13 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 use App\DTO\ProjectData;
+use App\Enum\Role;
 use App\Enum\WorkStatus;
+use App\Models\Activity;
 use App\Models\Project;
+use App\Models\ProjectTemplate;
+use App\Models\TemplateActivity;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
@@ -34,6 +39,7 @@ class SaveProjectRequest extends FormRequest
         $project = $this->route('project');
 
         return [
+            ...$this->templateRules($project instanceof Project),
             // Il cliente si sceglie alla creazione e poi non cambia: i referenti dipendono da lui.
             'client_id' => $project instanceof Project
                 ? ['sometimes', Rule::in([$project->client_id])]
@@ -62,6 +68,21 @@ class SaveProjectRequest extends FormRequest
     {
         return [
             function (Validator $validator): void {
+                $template = $this->selectedTemplate();
+
+                if ($template === null || $validator->errors()->hasAny(['starts_on', 'due_on'])
+                    || ! is_string($this->input('starts_on')) || ! is_string($this->input('due_on'))) {
+                    return;
+                }
+
+                $lastDay = (int) $template->activities->max('end_day');
+                $end = TemplateActivity::dateOfWorkingDay(CarbonImmutable::parse($this->input('starts_on')), $lastDay);
+
+                if ($end->toDateString() > $this->input('due_on')) {
+                    $validator->errors()->add('template_id', "Le attività del template finiscono il {$end->format('d/m/Y')}, oltre la scadenza del progetto: allunga la scadenza o scegli un altro template.");
+                }
+            },
+            function (Validator $validator): void {
                 $project = $this->route('project');
 
                 if (! $project instanceof Project || $validator->errors()->has('due_on') || ! is_string($this->input('due_on'))) {
@@ -79,6 +100,8 @@ class SaveProjectRequest extends FormRequest
 
     public function toDto(): ProjectData
     {
+        $template = $this->selectedTemplate();
+
         return new ProjectData(
             clientId: $this->targetClientId() ?? 0,
             name: $this->string('name')->trim()->toString(),
@@ -89,7 +112,71 @@ class SaveProjectRequest extends FormRequest
             status: WorkStatus::from($this->string('status')->toString()),
             memberIds: array_values(array_map('intval', $this->input('member_ids', []))),
             contactIds: array_values(array_map('intval', $this->input('contact_ids', []))),
+            templateId: $template?->id,
+            templateAssignees: $template === null ? [] : $this->templateAssignees(),
         );
+    }
+
+    /**
+     * Il template si sceglie solo alla creazione e solo da chi può creare attività (l'HR no).
+     * Ogni attività del template richiede almeno un assegnatario, con le regole di SaveActivityRequest.
+     *
+     * @return array<string, array<int, mixed>>
+     */
+    private function templateRules(bool $isUpdate): array
+    {
+        if ($isUpdate || ! $this->user()->can('create', Activity::class)) {
+            return ['template_id' => ['prohibited'], 'template_assignees' => ['prohibited']];
+        }
+
+        $rules = [
+            'template_id' => ['nullable', 'integer', Rule::exists('project_templates', 'id')],
+            'template_assignees' => ['nullable', 'array'],
+        ];
+
+        $template = $this->selectedTemplate();
+
+        if ($template === null) {
+            return $rules;
+        }
+
+        $assignees = Rule::exists('users', 'id');
+
+        if ($this->user()->hasRole(Role::AreaHead)) {
+            $assignees->where('area_id', $this->user()->area_id);
+        }
+
+        foreach ($template->activities as $activity) {
+            $rules["template_assignees.$activity->id"] = ['required', 'array', 'min:1'];
+            $rules["template_assignees.$activity->id.*"] = ['integer', 'distinct', $assignees];
+        }
+
+        return $rules;
+    }
+
+    private function selectedTemplate(): ?ProjectTemplate
+    {
+        $id = $this->input('template_id');
+
+        if ($this->route('project') instanceof Project || ! is_numeric($id)) {
+            return null;
+        }
+
+        return ProjectTemplate::with('activities')->find((int) $id);
+    }
+
+    /**
+     * @return array<int, list<int>>
+     */
+    private function templateAssignees(): array
+    {
+        $assignees = [];
+
+        foreach ((array) $this->input('template_assignees', []) as $templateActivityId => $userIds) {
+            $assignees[(int) $templateActivityId] = array_values(array_map('intval', (array) $userIds));
+        }
+
+        return $assignees;
     }
 
     /**
