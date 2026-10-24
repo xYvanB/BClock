@@ -32,8 +32,7 @@ const mainNavItems: RoleNavItem[] = [
     { title: 'Template', url: '/templates', icon: LayoutTemplate, roles: ['capo', 'capo_area'] },
     { title: 'Attività', url: '/activities', icon: ListChecks, roles: ['capo', 'capo_area', 'hr'] },
     { title: 'Clienti', url: '/clients', icon: Building2, roles: ['capo', 'capo_area', 'hr'] },
-    { title: 'Festivi e assenze', url: '/absences', icon: CalendarOff, roles: ['hr'] },
-    { title: 'Le mie assenze', url: '/absences', icon: CalendarOff, roles: ['capo', 'capo_area', 'dipendente'] },
+    { title: 'Assenze', url: '/absences', icon: CalendarOff },
     { title: 'Utenti', url: '/users', icon: Users, roles: ['capo', 'capo_area', 'hr'] },
     { title: 'Aree', url: '/areas', icon: Layers, roles: ['capo'] },
 ];

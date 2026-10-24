@@ -24,7 +24,8 @@ use Throwable;
 class AbsenceController extends Controller
 {
     /**
-     * L'HR vede le assenze di tutti (per confermarle); gli altri solo le proprie. I festivi li vedono tutti.
+     * L'HR vede le assenze di tutti (per confermarle); il Capo le proprie e quelle dell'HR (che deve confermare);
+     * il Capo area le proprie e quelle della sua area; il Dipendente le proprie. I festivi li vedono tutti.
      */
     public function index(Request $request): Response
     {
@@ -38,6 +39,10 @@ class AbsenceController extends Controller
 
                 if ($user->hasRole(Role::AreaHead) && $user->area_id !== null) {
                     $query->orWhereIn('user_id', User::where('area_id', $user->area_id)->select('id'));
+                }
+
+                if ($user->hasRole(Role::Boss)) {
+                    $query->orWhereIn('user_id', User::where('role', Role::Hr)->select('id'));
                 }
             }))
             ->orderByDesc('starts_on')
@@ -53,6 +58,7 @@ class AbsenceController extends Controller
                 'hours' => $absence->leaveHours(),
                 'needs_area_head' => $absence->requiresAreaHead(),
                 'hr_approved' => $absence->isApprovedByHr(),
+                'approver_label' => $absence->finalApproverRole() === Role::Boss ? 'Capo' : 'HR',
                 'area_head_approved' => $absence->isApprovedByAreaHead(),
                 'note' => $absence->note,
                 'rejection_reason' => $absence->rejection_reason,
@@ -89,7 +95,7 @@ class AbsenceController extends Controller
     {
         $action->handle($request->user(), $request->toDto());
 
-        return to_route('absences.index')->with('success', 'Richiesta inviata all\'HR.');
+        return to_route('absences.index')->with('success', 'Richiesta inviata.');
     }
 
     /**

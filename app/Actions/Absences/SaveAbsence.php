@@ -47,11 +47,16 @@ final class SaveAbsence
 
             $absence = Absence::create($attributes + ['user_id' => $user->id, 'status' => AbsenceStatus::Pending]);
 
+            // chi deve approvare viene avvisato: il Capo area del dipendente e, per le assenze dell'HR, il Capo
             if ($absence->requiresAreaHead()) {
                 Notification::send(
                     User::where('role', Role::AreaHead)->where('area_id', $user->area_id)->get(),
                     new AbsenceRequested($absence),
                 );
+            }
+
+            if ($user->hasRole(Role::Hr)) {
+                Notification::send(User::where('role', Role::Boss)->get(), new AbsenceRequested($absence));
             }
 
             return $absence;

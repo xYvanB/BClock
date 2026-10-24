@@ -66,22 +66,25 @@
     --t-success: #2e7d52;
 }
 
-/* Tema · Personalizzata (parte uguale allo scuro: modificare qui o in FigCraft) */
+/*
+ * Tema · Personalizzata: parte uguale allo scuro. La persona sceglie otto colori (Preferenze), applicati come stile
+ * inline su <html>; gli altri si ricavano da quelli.
+ */
 [data-tema='personalizzata'] {
     --t-bg: #0a0a0f;
     --t-surface: #1d1d33;
-    --t-surface-alt: #26264a;
-    --t-surface-sunken: #0f0f1a;
-    --t-border-subtle: #2a2a45;
-    --t-border: #3a3a5a;
-    --t-border-strong: #7d7d9e;
     --t-text: #c8c8d8;
-    --t-text-muted: #a0a0bb;
-    --t-text-subtle: #9696b2;
+    --t-border: #3a3a5a;
     --t-primary: #c9a84c;
-    --t-primary-muted: #9a8140;
-    --t-on-primary: #0a0a0f;
     --t-accent: #e8c97a;
     --t-danger: #e5736f;
     --t-success: #5fbf8a;
+    --t-on-primary: #0a0a0f;
+    --t-surface-alt: color-mix(in srgb, var(--t-surface) 85%, var(--t-text));
+    --t-surface-sunken: color-mix(in srgb, var(--t-bg) 70%, var(--t-surface));
+    --t-border-subtle: color-mix(in srgb, var(--t-border) 60%, var(--t-bg));
+    --t-border-strong: color-mix(in srgb, var(--t-border) 50%, var(--t-text));
+    --t-text-muted: color-mix(in srgb, var(--t-text) 85%, var(--t-bg));
+    --t-text-subtle: color-mix(in srgb, var(--t-text) 78%, var(--t-bg));
+    --t-primary-muted: color-mix(in srgb, var(--t-primary) 75%, var(--t-bg));
 }

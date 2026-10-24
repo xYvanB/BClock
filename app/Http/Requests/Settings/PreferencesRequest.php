@@ -27,6 +27,8 @@ class PreferencesRequest extends FormRequest
             'locale' => ['required', Rule::enum(AppLocale::class)],
             'time_format' => ['required', Rule::enum(TimeFormat::class)],
             'palette' => ['required', Rule::enum(Palette::class)],
+            'custom_colors' => ['nullable', 'array:'.implode(',', array_keys(Palette::CUSTOM_DEFAULTS))],
+            'custom_colors.*' => ['string', 'regex:/^#[0-9a-fA-F]{6}$/'],
         ];
     }
 
@@ -36,6 +38,7 @@ class PreferencesRequest extends FormRequest
             locale: AppLocale::from($this->string('locale')->toString()),
             timeFormat: TimeFormat::from($this->string('time_format')->toString()),
             palette: Palette::from($this->string('palette')->toString()),
+            customColors: $this->filled('custom_colors') ? array_map('strtolower', $this->input('custom_colors')) : null,
         );
     }
 }

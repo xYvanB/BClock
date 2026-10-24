@@ -20,15 +20,16 @@ final class MoveAllocation
      * Si sposta solo quella quota, non l'attività. Oltre la scadenza dell'attività serve la conferma ($extendActivity)
      * e la scadenza dell'attività si allunga fino al nuovo giorno; oltre la scadenza del progetto serve anche
      * $extendProject e si allunga pure quella del progetto. Prima dell'inizio dell'attività non si può.
-     * Se nel giorno di arrivo c'è già una quota della stessa attività, le ore si sommano. Il giorno di partenza
-     * resta come quota manuale a 0 ore, così una rigenerazione non lo riempie di nuovo.
+     * Si possono spostare solo alcune ore (`$hours`, al massimo quelle della quota): il resto resta dov'è.
+     * Se nel giorno di arrivo c'è già una quota della stessa attività, le ore si sommano. Un giorno di partenza
+     * svuotato resta come quota manuale a 0 ore, così una rigenerazione non lo riempie di nuovo.
      *
      * @throws Throwable
      * @throws ValidationException
      */
-    public function handle(ActivityAllocation $allocation, string $toDate, bool $extendActivity, bool $extendProject): ActivityAllocation
+    public function handle(ActivityAllocation $allocation, string $toDate, bool $extendActivity, bool $extendProject, ?float $hours = null): ActivityAllocation
     {
-        return DB::transaction(function () use ($allocation, $toDate, $extendActivity, $extendProject): ActivityAllocation {
+        return DB::transaction(function () use ($allocation, $toDate, $extendActivity, $extendProject, $hours): ActivityAllocation {
             $activity = $allocation->activity()->with('project')->firstOrFail();
             $project = $activity->project;
 
@@ -71,18 +72,23 @@ final class MoveAllocation
                 $project->update(['due_on' => $toDate]);
             }
 
-            $hours = (float) $allocation->hours;
+            $available = (float) $allocation->hours;
+            $moved = $hours === null ? $available : round($hours, 2);
+
+            if ($moved <= 0 || $moved > $available) {
+                throw ValidationException::withMessages(['hours' => 'Indica da 0,01 a '.rtrim(rtrim(number_format($available, 2, ',', ''), '0'), ',').' ore.']);
+            }
 
             $target = ActivityAllocation::query()->firstOrNew([
                 'activity_id' => $allocation->activity_id,
                 'user_id' => $allocation->user_id,
                 'date' => $toDate,
             ]);
-            $target->hours = round((float) ($target->exists ? $target->hours : 0) + $hours, 2);
+            $target->hours = round((float) ($target->exists ? $target->hours : 0) + $moved, 2);
             $target->is_manual = true;
             $target->save();
 
-            $allocation->update(['hours' => 0, 'is_manual' => true]);
+            $allocation->update(['hours' => round($available - $moved, 2), 'is_manual' => true]);
 
             return $target;
         });

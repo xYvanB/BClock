@@ -62,6 +62,7 @@ export interface User {
     locale: Locale;
     time_format: TimeFormat;
     palette: Palette;
+    custom_colors: Record<string, string> | null;
     avatar?: string;
     email_verified_at: string | null;
     created_at: string;
@@ -267,6 +268,8 @@ export interface Absence {
     hours: number | null;
     needs_area_head: boolean;
     hr_approved: boolean;
+    /** Chi dà la conferma finale: "HR", o "Capo" per le assenze dell'HR. */
+    approver_label: string;
     area_head_approved: boolean;
     note: string | null;
     rejection_reason: string | null;

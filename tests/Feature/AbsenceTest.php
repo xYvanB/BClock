@@ -245,33 +245,57 @@ it('ignores rejected absences when checking overlaps, and lets the owner delete 
     $this->assertDatabaseMissing('absences', ['id' => $rejected->id]);
 });
 
-it('notifies every boss when hr confirms their own absence, and only then', function (): void {
+it('asks the boss, not hr, to confirm an absence of hr, and tells every boss', function (): void {
     $hr = User::factory()->hr()->create();
     $bosses = User::factory()->boss()->count(2)->create();
-    $employee = User::factory()->employee()->create();
+    $other = User::factory()->hr()->create();
 
-    $own = Absence::factory()->for($hr)->create();
-    $other = Absence::factory()->for($employee)->create();
+    $this->actingAs($hr)->post(route('absences.store'), absencePayload())->assertSessionHasNoErrors();
+    $absence = Absence::firstOrFail();
 
-    $this->actingAs($hr)->post(route('absences.confirm', $other))->assertSessionHasNoErrors();
-    expect($bosses->first()->unreadNotifications()->count())->toBe(0);
-
-    $this->actingAs($hr)->post(route('absences.confirm', $own))->assertSessionHasNoErrors();
-
-    expect($own->refresh()->status)->toBe(AbsenceStatus::Confirmed);
     foreach ($bosses as $boss) {
         expect($boss->unreadNotifications()->count())->toBe(1);
     }
-    expect($employee->unreadNotifications()->count())->toBe(0);
+    expect($other->unreadNotifications()->count())->toBe(0);
+
+    // né l'HR stessa né un'altra HR possono confermarla: solo il Capo
+    $this->actingAs($hr)->post(route('absences.confirm', $absence))->assertForbidden();
+    $this->actingAs($other)->post(route('absences.confirm', $absence))->assertForbidden();
+    expect($absence->refresh()->status)->toBe(AbsenceStatus::Pending);
+
+    $this->actingAs($bosses->first())->post(route('absences.confirm', $absence))->assertSessionHasNoErrors();
+
+    expect($absence->refresh()->status)->toBe(AbsenceStatus::Confirmed)
+        ->and($absence->confirmed_by)->toBe($bosses->first()->id);
 });
 
-it('shows the boss the notification and lets them mark it as read', function (): void {
+it('lets the boss reject an absence of hr with a reason, and shows it to the boss only among the others', function (): void {
     $hr = User::factory()->hr()->create();
     $boss = User::factory()->boss()->create();
-    $this->actingAs($hr)->post(route('absences.confirm', Absence::factory()->for($hr)->create()));
+    $mine = Absence::factory()->for($boss)->create(['starts_on' => '2026-12-01', 'ends_on' => '2026-12-01']);
+    $hrAbsence = Absence::factory()->for($hr)->create();
+    $employeeAbsence = Absence::factory()->for(User::factory()->employee()->create())->create(['starts_on' => '2026-12-10', 'ends_on' => '2026-12-10']);
 
     $this->actingAs($boss)->get(route('absences.index'))
-        ->assertInertia(fn (Assert $page) => $page->has('notifications', 1));
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('absences', 2)
+            ->where('absences', fn ($rows) => collect($rows)->pluck('id')->sort()->values()->all() === collect([$mine->id, $hrAbsence->id])->sort()->values()->all()));
+
+    $this->actingAs($boss)->post(route('absences.reject', $hrAbsence), ['reason' => 'Periodo di chiusura bilanci'])->assertSessionHasNoErrors();
+    expect($hrAbsence->refresh()->status)->toBe(AbsenceStatus::Rejected);
+
+    // la persona non conferma né rifiuta le proprie, e il Capo non decide sulle assenze dei dipendenti
+    $this->actingAs($boss)->post(route('absences.confirm', $employeeAbsence))->assertForbidden();
+    $this->actingAs($boss)->post(route('absences.confirm', $mine))->assertForbidden();
+});
+
+it('shows the boss the notification of an absence of hr and lets them mark it as read', function (): void {
+    $hr = User::factory()->hr()->create();
+    $boss = User::factory()->boss()->create();
+    $this->actingAs($hr)->post(route('absences.store'), absencePayload());
+
+    $this->actingAs($boss)->get(route('absences.index'))
+        ->assertInertia(fn (Assert $page) => $page->has('notifications', 1)->where('absences.0.approver_label', 'Capo'));
 
     $this->actingAs($boss)->post(route('absences.notifications.read'))->assertRedirect(route('absences.index'));
 

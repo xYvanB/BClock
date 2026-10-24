@@ -3,7 +3,7 @@ import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-import { applyPalette } from '@/lib/palette';
+import { applyPalette, contrastRatio, customColorFields, type CustomColors } from '@/lib/palette';
 import { formatTime } from '@/lib/time';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type Locale, type Palette, type SharedData, type TimeFormat } from '@/types';
@@ -25,11 +25,12 @@ interface PreferencesForm {
     locale: Locale;
     time_format: TimeFormat;
     palette: Palette;
-    [key: string]: string;
+    custom_colors: CustomColors;
+    [key: string]: string | CustomColors;
 }
 
 interface Props {
-    options: { locales: Locale[]; time_formats: TimeFormat[]; palettes: Palette[] };
+    options: { locales: Locale[]; time_formats: TimeFormat[]; palettes: Palette[]; custom_defaults: CustomColors };
 }
 
 function OptionGroup<T extends string>({
@@ -62,7 +63,13 @@ function OptionGroup<T extends string>({
                         )}
                     >
                         <span className="flex items-center gap-2">
-                            <input type="radio" name={name} value={option.value} checked={value === option.value} onChange={() => onChange(option.value)} />
+                            <input
+                                type="radio"
+                                name={name}
+                                value={option.value}
+                                checked={value === option.value}
+                                onChange={() => onChange(option.value)}
+                            />
                             <span className="font-medium">{option.label}</span>
                         </span>
                         {option.hint && <span className="text-muted-foreground">{option.hint}</span>}
@@ -84,17 +91,31 @@ export default function Preferences({ options }: Props) {
         locale: auth.user.locale,
         time_format: auth.user.time_format,
         palette: auth.user.palette,
+        custom_colors: { ...options.custom_defaults, ...(auth.user.custom_colors ?? {}) },
     });
 
     // Se si esce senza salvare, torna alla palette salvata (letta dal ref: dopo un salvataggio è già quella nuova).
-    const savedRef = useRef(saved);
-    savedRef.current = saved;
-    useEffect(() => () => applyPalette(savedRef.current), []);
+    const savedRef = useRef({ palette: saved, colors: auth.user.custom_colors });
+    savedRef.current = { palette: saved, colors: auth.user.custom_colors };
+    useEffect(() => () => applyPalette(savedRef.current.palette, savedRef.current.colors), []);
 
     const choosePalette = (palette: Palette) => {
         setData('palette', palette);
-        applyPalette(palette);
+        applyPalette(palette, data.custom_colors);
     };
+
+    const chooseColor = (key: string, value: string) => {
+        const colors = { ...data.custom_colors, [key]: value };
+        setData('custom_colors', colors);
+        applyPalette('personalizzata', colors);
+    };
+
+    const resetColors = () => {
+        setData('custom_colors', options.custom_defaults);
+        applyPalette('personalizzata', options.custom_defaults);
+    };
+
+    const textContrast = contrastRatio(data.custom_colors.text, data.custom_colors.bg);
 
     const submit: FormEventHandler = (event) => {
         event.preventDefault();
@@ -117,7 +138,9 @@ export default function Preferences({ options }: Props) {
                         options={options.locales.map((locale) => ({ value: locale, label: localeLabels[locale] }))}
                         onChange={(locale) => setData('locale', locale)}
                     >
-                        <p className="text-muted-foreground text-sm">La lingua si salva da subito; i testi inglesi arriveranno con la traduzione dell'interfaccia.</p>
+                        <p className="text-muted-foreground text-sm">
+                            La lingua si salva da subito; i testi inglesi arriveranno con la traduzione dell'interfaccia.
+                        </p>
                     </OptionGroup>
 
                     <OptionGroup
@@ -150,6 +173,39 @@ export default function Preferences({ options }: Props) {
                     >
                         <p className="text-muted-foreground text-sm">L'anteprima è immediata; si conferma con Salva.</p>
                     </OptionGroup>
+
+                    {data.palette === 'personalizzata' && (
+                        <fieldset className="space-y-3">
+                            <legend className="text-sm font-medium">Colori della palette personalizzata</legend>
+                            <div className="grid gap-3 sm:grid-cols-2">
+                                {customColorFields.map((field) => (
+                                    <label key={field.key} className="border-input flex items-center gap-3 rounded-lg border p-2 text-sm">
+                                        <input
+                                            type="color"
+                                            value={data.custom_colors[field.key]}
+                                            onChange={(event) => chooseColor(field.key, event.target.value)}
+                                            className="h-9 w-12 shrink-0 cursor-pointer rounded border-0 bg-transparent p-0"
+                                        />
+                                        <span className="grid">
+                                            <span className="font-medium">{field.label}</span>
+                                            <span className="text-muted-foreground">
+                                                {field.hint} · {data.custom_colors[field.key]}
+                                            </span>
+                                        </span>
+                                    </label>
+                                ))}
+                            </div>
+                            {textContrast < 4.5 && (
+                                <p role="alert" className="text-destructive text-sm">
+                                    Il testo e lo sfondo hanno poco contrasto ({textContrast.toFixed(1)}:1): il testo si leggerà male. Meglio almeno
+                                    4,5:1.
+                                </p>
+                            )}
+                            <Button type="button" variant="outline" size="sm" onClick={resetColors}>
+                                Ripristina i colori di partenza
+                            </Button>
+                        </fieldset>
+                    )}
 
                     {(errors.locale || errors.time_format || errors.palette) && (
                         <p role="alert" className="text-destructive text-sm">

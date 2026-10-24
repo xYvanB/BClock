@@ -27,6 +27,7 @@ class PreferencesController extends Controller
                 'locales' => AppLocale::values(),
                 'time_formats' => TimeFormat::values(),
                 'palettes' => Palette::values(),
+                'custom_defaults' => Palette::CUSTOM_DEFAULTS,
             ],
         ]);
     }

@@ -70,6 +70,15 @@
   color utility to any element that depends on these defaults.
 */
 @layer base {
+    /* Controlli nativi (icona di date e ore, barre di scorrimento) nello stesso schema chiaro/scuro dell'interfaccia */
+    html {
+        color-scheme: light;
+    }
+
+    html.dark {
+        color-scheme: dark;
+    }
+
     *,
     ::after,
     ::before,

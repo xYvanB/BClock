@@ -34,11 +34,14 @@ final class AbsencePolicy
     }
 
     /**
-     * Conferma dell'HR.
+     * Conferma finale: dell'HR, o del Capo se l'assenza è dell'HR (nessuno conferma le proprie).
      */
     public function confirm(User $user, Absence $absence): bool
     {
-        return $user->hasRole(Role::Hr) && $absence->isPending() && ! $absence->isApprovedByHr();
+        return $user->id !== $absence->user_id
+            && $user->hasRole($absence->finalApproverRole())
+            && $absence->isPending()
+            && ! $absence->isApprovedByHr();
     }
 
     /**
@@ -55,7 +58,7 @@ final class AbsencePolicy
             return false;
         }
 
-        return $user->hasRole(Role::Hr) || $this->isAreaHeadOf($user, $absence);
+        return ($user->id !== $absence->user_id && $user->hasRole($absence->finalApproverRole())) || $this->isAreaHeadOf($user, $absence);
     }
 
     private function isAreaHeadOf(User $user, Absence $absence): bool

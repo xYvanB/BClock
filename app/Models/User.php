@@ -50,6 +50,7 @@ class User extends Authenticatable
         'locale',
         'time_format',
         'palette',
+        'custom_colors',
         'invited_at',
     ];
 
@@ -77,6 +78,7 @@ class User extends Authenticatable
             'locale' => AppLocale::class,
             'time_format' => TimeFormat::class,
             'palette' => Palette::class,
+            'custom_colors' => 'array',
             'daily_capacity' => 'decimal:2',
             'invited_at' => 'datetime',
         ];

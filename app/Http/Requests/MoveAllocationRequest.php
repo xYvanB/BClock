@@ -29,7 +29,16 @@ class MoveAllocationRequest extends FormRequest
             'date' => ['required', 'date_format:Y-m-d'],
             'extend_activity' => ['sometimes', 'boolean'],
             'extend_project' => ['sometimes', 'boolean'],
+            'hours' => ['nullable', 'numeric', 'gt:0', 'max:999'],
         ];
+    }
+
+    /**
+     * Ore da spostare: se mancano si sposta tutta la quota.
+     */
+    public function hours(): ?float
+    {
+        return $this->filled('hours') ? (float) $this->input('hours') : null;
     }
 
     public function toDate(): string

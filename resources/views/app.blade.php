@@ -2,7 +2,7 @@
     $palette = auth()->user()?->palette ?? \App\Enum\Palette::Dark;
 @endphp
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-tema="{{ $palette->value }}" @class(['dark' => $palette->isDark()])>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-tema="{{ $palette->value }}" @class(['dark' => $palette->isDark()]) style="{{ $palette->customStyle(auth()->user()?->custom_colors) }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">

@@ -36,6 +36,8 @@ interface CalendarProps {
 interface PendingMove {
     item: CalendarItem;
     toDate: string;
+    /** Nel giorno di arrivo c'è già una quota della stessa attività: le ore si sommano e si sceglie quante spostarne. */
+    merges: boolean;
 }
 
 const levelStyles: Record<LoadLevel, string> = {
@@ -73,6 +75,8 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
     const [pending, setPending] = useState<PendingMove | null>(null);
     const [moveError, setMoveError] = useState<string | null>(null);
     const [targets, setTargets] = useState<Record<number, string>>({});
+    const [partialHours, setPartialHours] = useState<Record<number, string>>({});
+    const [moveHours, setMoveHours] = useState('');
 
     const go = (params: { view?: string; date?: string; area_id?: number | null }) => {
         setSelected(null);
@@ -87,10 +91,10 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
         );
     };
 
-    const submitMove = (item: CalendarItem, toDate: string, extendActivity: boolean, extendProject: boolean) =>
+    const submitMove = (item: CalendarItem, toDate: string, extendActivity: boolean, extendProject: boolean, hours: string) =>
         router.post(
             route('allocations.move', item.allocation_id),
-            { date: toDate, extend_activity: extendActivity, extend_project: extendProject },
+            { date: toDate, extend_activity: extendActivity, extend_project: extendProject, hours: hours === '' ? null : hours.replace(',', '.') },
             {
                 preserveScroll: true,
                 preserveState: true,
@@ -106,21 +110,28 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
             },
         );
 
-    /** Chiede conferma se il giorno scelto è oltre la scadenza dell'attività o del progetto, altrimenti sposta subito. */
-    const requestMove = (item: CalendarItem, fromDate: string, toDate: string) => {
+    /**
+     * Sposta la quota (tutta, o `hours` ore). Chiede prima conferma se il giorno scelto è oltre la scadenza dell'attività
+     * o del progetto, o se lì c'è già una quota della stessa attività (per scegliere quante ore spostare).
+     */
+    const requestMove = (item: CalendarItem, fromDate: string, toDate: string, personId: number, hours = '') => {
         setMoveError(null);
 
         if (!item.can_move || toDate === '' || toDate === fromDate) {
             return;
         }
 
-        if (toDate > item.activity_due_on || toDate > item.project_due_on) {
-            setPending({ item, toDate });
+        const merges =
+            people.find((person) => person.id === personId)?.days[toDate]?.items.some((other) => other.activity_id === item.activity_id) ?? false;
+        setMoveHours(hours);
+
+        if (merges || toDate > item.activity_due_on || toDate > item.project_due_on) {
+            setPending({ item, toDate, merges });
 
             return;
         }
 
-        submitMove(item, toDate, false, false);
+        submitMove(item, toDate, false, false, hours);
     };
 
     const today = days.find((day) => day.is_today)?.date;
@@ -128,6 +139,7 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
     const selectedDay = selected ? days.find((day) => day.date === selected.date) : undefined;
     const selectedCell: CalendarCell | undefined = selectedPerson && selectedDay ? selectedPerson.days[selectedDay.date] : undefined;
     const beyondProject = pending !== null && pending.toDate > pending.item.project_due_on;
+    const beyondActivity = pending !== null && pending.toDate > pending.item.activity_due_on;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -254,7 +266,7 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
                                                     onDrop={(event) => {
                                                         event.preventDefault();
                                                         if (dropAllowed) {
-                                                            requestMove(dragged.item, dragged.fromDate, day.date);
+                                                            requestMove(dragged.item, dragged.fromDate, day.date, dragged.personId);
                                                         }
                                                         setDragged(null);
                                                     }}
@@ -342,11 +354,35 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
                                                         value={targets[item.allocation_id] ?? ''}
                                                         onChange={(event) => setTargets({ ...targets, [item.allocation_id]: event.target.value })}
                                                     />
+                                                    <label className="sr-only" htmlFor={`hours-${item.allocation_id}`}>
+                                                        Ore da spostare di {item.activity}
+                                                    </label>
+                                                    <Input
+                                                        id={`hours-${item.allocation_id}`}
+                                                        type="number"
+                                                        min="0.25"
+                                                        max={item.hours}
+                                                        step="0.25"
+                                                        placeholder="Tutte le ore"
+                                                        className="h-8 w-28"
+                                                        value={partialHours[item.allocation_id] ?? ''}
+                                                        onChange={(event) =>
+                                                            setPartialHours({ ...partialHours, [item.allocation_id]: event.target.value })
+                                                        }
+                                                    />
                                                     <Button
                                                         size="sm"
                                                         variant="outline"
                                                         disabled={!targets[item.allocation_id]}
-                                                        onClick={() => requestMove(item, selectedDay.date, targets[item.allocation_id])}
+                                                        onClick={() =>
+                                                            requestMove(
+                                                                item,
+                                                                selectedDay.date,
+                                                                targets[item.allocation_id],
+                                                                selectedPerson.id,
+                                                                partialHours[item.allocation_id] ?? '',
+                                                            )
+                                                        }
                                                     >
                                                         Sposta
                                                     </Button>
@@ -367,18 +403,50 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
                     {pending && (
                         <>
                             <DialogHeader>
-                                <DialogTitle>{beyondProject ? 'Sei sicuro?' : "Estendere la data di fine dell'attività?"}</DialogTitle>
-                                <DialogDescription>
+                                <DialogTitle>
                                     {beyondProject
-                                        ? `Il ${formatDate(pending.toDate)} è oltre la scadenza del progetto (${formatDate(pending.item.project_due_on)}). Confermando si estendono a quella data sia la scadenza del progetto sia quella dell'attività «${pending.item.activity}».`
-                                        : `L'attività «${pending.item.activity}» finisce il ${formatDate(pending.item.activity_due_on)}. Confermando, la sua data di fine diventa il ${formatDate(pending.toDate)}.`}
+                                        ? 'Sei sicuro?'
+                                        : beyondActivity
+                                          ? "Estendere la data di fine dell'attività?"
+                                          : 'Quante ore spostare?'}
+                                </DialogTitle>
+                                <DialogDescription>
+                                    {pending.merges &&
+                                        `Il ${formatDate(pending.toDate)} c'è già una quota di «${pending.item.activity}»: le ore spostate si sommano. `}
+                                    {beyondProject &&
+                                        `Il ${formatDate(pending.toDate)} è oltre la scadenza del progetto (${formatDate(pending.item.project_due_on)}). Confermando si estendono a quella data sia la scadenza del progetto sia quella dell'attività «${pending.item.activity}».`}
+                                    {!beyondProject &&
+                                        beyondActivity &&
+                                        `L'attività «${pending.item.activity}» finisce il ${formatDate(pending.item.activity_due_on)}. Confermando, la sua data di fine diventa il ${formatDate(pending.toDate)}.`}
                                 </DialogDescription>
                             </DialogHeader>
+                            <div className="grid gap-2">
+                                <label htmlFor="move-hours" className="text-sm font-medium">
+                                    Ore da spostare (su {formatHours(pending.item.hours)} del giorno)
+                                </label>
+                                <Input
+                                    id="move-hours"
+                                    type="number"
+                                    min="0.25"
+                                    max={pending.item.hours}
+                                    step="0.25"
+                                    placeholder="Tutte"
+                                    value={moveHours}
+                                    onChange={(event) => setMoveHours(event.target.value)}
+                                />
+                                <p className="text-muted-foreground text-sm">Lascia vuoto per spostarle tutte.</p>
+                            </div>
                             <DialogFooter>
                                 <Button variant="outline" onClick={() => setPending(null)}>
                                     Annulla
                                 </Button>
-                                <Button onClick={() => submitMove(pending.item, pending.toDate, true, beyondProject)}>Estendi e sposta</Button>
+                                <Button
+                                    onClick={() =>
+                                        submitMove(pending.item, pending.toDate, beyondActivity || beyondProject, beyondProject, moveHours)
+                                    }
+                                >
+                                    {beyondActivity || beyondProject ? 'Estendi e sposta' : 'Sposta'}
+                                </Button>
                             </DialogFooter>
                         </>
                     )}

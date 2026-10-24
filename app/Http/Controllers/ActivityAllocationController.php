@@ -24,6 +24,7 @@ class ActivityAllocationController extends Controller
             $request->toDate(),
             $request->boolean('extend_activity'),
             $request->boolean('extend_project'),
+            $request->hours(),
         );
 
         return back()->with('success', 'Quota spostata.');

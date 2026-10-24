@@ -80,6 +80,17 @@ class Absence extends Model
         return $this->user->hasRole(Role::Employee) && $this->user->area_id !== null;
     }
 
+    /**
+     * Chi dà la conferma finale: l'HR per tutti, tranne che per l'HR stessa, che la riceve dal Capo.
+     */
+    public function finalApproverRole(): Role
+    {
+        return $this->user->hasRole(Role::Hr) ? Role::Boss : Role::Hr;
+    }
+
+    /**
+     * Conferma finale data (dall'HR, o dal Capo se l'assenza è dell'HR).
+     */
     public function isApprovedByHr(): bool
     {
         return $this->confirmed_at !== null;

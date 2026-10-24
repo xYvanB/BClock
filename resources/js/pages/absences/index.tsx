@@ -41,7 +41,7 @@ const formatPeriod = (absence: Absence) => {
 
 /** Chi ha già dato l'ok a una richiesta ancora in attesa (Capo area solo per i dipendenti). */
 const approvalProgress = (absence: Absence): string => {
-    const steps = [`HR: ${absence.hr_approved ? 'ok' : 'da fare'}`];
+    const steps = [`${absence.approver_label}: ${absence.hr_approved ? 'ok' : 'da fare'}`];
 
     if (absence.needs_area_head) {
         steps.unshift(`Capo area: ${absence.area_head_approved ? 'ok' : 'da fare'}`);
@@ -58,8 +58,8 @@ const statusVariant = { in_attesa: 'secondary', confermata: 'default', rifiutata
 export default function AbsencesIndex({ absences, holidays, can_manage_holidays, notifications }: AbsencesIndexProps) {
     const { auth } = usePage<SharedData>().props;
     const isHr = auth.user.role === 'hr';
-    const showPerson = isHr || auth.user.role === 'capo_area';
-    const title = isHr ? 'Festivi e assenze' : 'Le mie assenze';
+    const showPerson = auth.user.role !== 'dipendente';
+    const title = 'Assenze';
     const breadcrumbs: BreadcrumbItem[] = [{ title, href: '/absences' }];
 
     const [tab, setTab] = useState<Tab>('absences');
@@ -227,8 +227,8 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays,
                 {tab === 'absences' &&
                     (absences.length === 0 ? (
                         <div className="border-sidebar-border/70 flex flex-col items-center gap-3 rounded-xl border border-dashed p-12 text-center">
-                            <p className="text-muted-foreground">{isHr ? 'Nessuna assenza richiesta' : 'Non hai richiesto assenze'}</p>
-                            {!isHr && <Button onClick={() => openAbsence(null)}>Richiedi un&apos;assenza</Button>}
+                            <p className="text-muted-foreground">{showPerson ? 'Nessuna assenza richiesta' : 'Non hai richiesto assenze'}</p>
+                            <Button onClick={() => openAbsence(null)}>Richiedi un&apos;assenza</Button>
                         </div>
                     ) : (
                         <div className="border-sidebar-border/70 overflow-x-auto rounded-xl border">

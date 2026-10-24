@@ -23,6 +23,7 @@ final class UpdatePreferences
                 'locale' => $data->locale,
                 'time_format' => $data->timeFormat,
                 'palette' => $data->palette,
+                'custom_colors' => $data->customColors ?? $user->custom_colors,
             ]);
 
             return $user;

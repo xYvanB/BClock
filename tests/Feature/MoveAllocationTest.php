@@ -248,3 +248,56 @@ it('exposes to the calendar what is needed to move a quota', function (): void {
     $this->actingAs(User::factory()->hr()->create())->get(route('calendar.index', ['date' => '2026-11-09']))
         ->assertInertia(fn (Assert $page) => $page->where('people', fn ($people) => collect($people)->firstWhere('id', $user->id)['days']['2026-11-09']['items'][0]['can_move'] === false));
 });
+
+it('moves only some of the hours, leaving the rest on the original day', function (): void {
+    $user = User::factory()->employee()->create();
+    $activity = movableActivity([$user]);
+    $quota = quotaOn($activity, $user, '2026-11-09');
+
+    $this->actingAs(User::factory()->boss()->create())
+        ->post(route('allocations.move', $quota), ['date' => '2026-11-11', 'hours' => '0.5'])
+        ->assertSessionHasNoErrors();
+
+    expect((float) $quota->refresh()->hours)->toBe(1.5)
+        ->and((float) quotaOn($activity, $user, '2026-11-11')->hours)->toBe(2.5)
+        ->and(round((float) $activity->allocations()->sum('hours'), 2))->toBe(10.0)
+        ->and($quota->is_manual)->toBeTrue();
+});
+
+it('moves part of the hours several times, always summing them on the destination', function (): void {
+    $user = User::factory()->employee()->create();
+    $activity = movableActivity([$user]);
+    $quota = quotaOn($activity, $user, '2026-11-09');
+    $boss = User::factory()->boss()->create();
+
+    $this->actingAs($boss)->post(route('allocations.move', $quota), ['date' => '2026-11-10', 'hours' => '0.75'])->assertSessionHasNoErrors();
+    $this->actingAs($boss)->post(route('allocations.move', $quota->refresh()), ['date' => '2026-11-10', 'hours' => '1.25'])->assertSessionHasNoErrors();
+
+    expect((float) $quota->refresh()->hours)->toBe(0.0)
+        ->and((float) quotaOn($activity, $user, '2026-11-10')->hours)->toBe(4.0);
+});
+
+it('refuses hours that are zero, negative or more than the quota, and moves nothing', function (string $hours): void {
+    $user = User::factory()->employee()->create();
+    $activity = movableActivity([$user]);
+    $quota = quotaOn($activity, $user, '2026-11-09');
+
+    $this->actingAs(User::factory()->boss()->create())
+        ->post(route('allocations.move', $quota), ['date' => '2026-11-11', 'hours' => $hours])
+        ->assertSessionHasErrors('hours');
+
+    expect((float) $quota->refresh()->hours)->toBe(2.0)
+        ->and((float) quotaOn($activity, $user, '2026-11-11')->hours)->toBe(2.0);
+})->with(['0', '-1', '2.5', 'molte']);
+
+it('does not extend the activity when the hours are refused', function (): void {
+    $user = User::factory()->employee()->create();
+    $activity = movableActivity([$user]);
+    $quota = quotaOn($activity, $user, '2026-11-09');
+
+    $this->actingAs(User::factory()->boss()->create())
+        ->post(route('allocations.move', $quota), ['date' => '2026-11-16', 'extend_activity' => true, 'hours' => '9'])
+        ->assertSessionHasErrors('hours');
+
+    expect($activity->refresh()->due_on->toDateString())->toBe('2026-11-13');
+});
