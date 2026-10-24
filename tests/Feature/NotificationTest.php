@@ -269,3 +269,24 @@ it('announces new notifications to the browser of the person, after the action',
 
     Event::assertDispatched(NotificationsChanged::class, fn ($event): bool => $event->userId === $person->id);
 });
+
+it('does not fail the action when the WebSocket server is down, and still saves the notification', function (): void {
+    config([
+        'broadcasting.default' => 'reverb',
+        'broadcasting.connections.reverb.key' => 'k',
+        'broadcasting.connections.reverb.secret' => 's',
+        'broadcasting.connections.reverb.app_id' => '1',
+        'broadcasting.connections.reverb.options.host' => '127.0.0.1',
+        'broadcasting.connections.reverb.options.port' => 1,
+        'broadcasting.connections.reverb.options.scheme' => 'http',
+        'broadcasting.connections.reverb.options.useTLS' => false,
+    ]);
+    $person = User::factory()->employee()->create();
+
+    $this->actingAs(User::factory()->boss()->create())
+        ->post(route('activities.store'), notificationActivityPayload(notificationProject(), [$person->id]))
+        ->assertSessionHasNoErrors()
+        ->assertRedirect();
+
+    expect(Activity::count())->toBe(1)->and($person->unreadNotifications()->count())->toBe(1);
+});
