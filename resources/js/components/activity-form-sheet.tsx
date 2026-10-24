@@ -7,8 +7,9 @@ import { activitySchema, type ActivityFormData } from '@/lib/schemas/activity';
 import { statusOptions } from '@/lib/status';
 import { flattenZodErrors } from '@/lib/zod-errors';
 import { type ActivityListItem, type PersonOption, type ProjectOption } from '@/types';
-import { useForm } from '@inertiajs/react';
-import { FormEventHandler, useEffect } from 'react';
+import { router, useForm } from '@inertiajs/react';
+import { Archive, Trash2 } from 'lucide-react';
+import { FormEventHandler, useEffect, useState } from 'react';
 
 interface ActivityFormSheetProps {
     open: boolean;
@@ -43,9 +44,14 @@ export function ActivityFormSheet({ open, activity, projects, assignees, default
 
     const project = projects.find((candidate) => String(candidate.id) === data.project_id);
 
+    const [confirming, setConfirming] = useState<'archive' | 'delete' | null>(null);
+    const [actionError, setActionError] = useState<string | null>(null);
+
     useEffect(() => {
         if (open) {
             clearErrors();
+            setConfirming(null);
+            setActionError(null);
             setData({
                 project_id: activity ? String(activity.project_id) : defaultProjectId ? String(defaultProjectId) : '',
                 name: activity?.name ?? '',
@@ -59,6 +65,28 @@ export function ActivityFormSheet({ open, activity, projects, assignees, default
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open, activity]);
+
+    /** Archivia o elimina l'attività in modifica; un rifiuto del server (ore o timer) resta visibile nel drawer. */
+    const runAction = (action: 'archive' | 'delete') => {
+        if (!activity) {
+            return;
+        }
+
+        const options = {
+            preserveScroll: true,
+            onSuccess: () => onClose(),
+            onError: (serverErrors: Record<string, string>) => {
+                setConfirming(null);
+                setActionError(serverErrors.activity ?? 'Operazione non riuscita.');
+            },
+        };
+
+        if (action === 'archive') {
+            router.post(route('activities.archive', activity.id), {}, options);
+        } else {
+            router.delete(route('activities.destroy', activity.id), options);
+        }
+    };
 
     const toggleAssignee = (id: number) =>
         setData('assignee_ids', data.assignee_ids.includes(id) ? data.assignee_ids.filter((current) => current !== id) : [...data.assignee_ids, id]);
@@ -222,6 +250,52 @@ export function ActivityFormSheet({ open, activity, projects, assignees, default
                             </div>
                             <InputError message={assigneeError} />
                         </fieldset>
+
+                        {activity && (
+                            <div className="border-sidebar-border/70 grid gap-3 border-t pt-4">
+                                <p className="text-sm font-medium">Azioni</p>
+
+                                {actionError && (
+                                    <div role="alert" className="border-destructive/50 bg-destructive/10 rounded-md border p-3 text-sm">
+                                        {actionError}
+                                    </div>
+                                )}
+
+                                <div className="flex flex-wrap gap-2">
+                                    {activity.status !== 'archiviato' && (
+                                        <Button type="button" variant="outline" size="sm" onClick={() => setConfirming('archive')}>
+                                            <Archive /> Archivia
+                                        </Button>
+                                    )}
+                                    {activity.used_minutes === 0 && (
+                                        <Button type="button" variant="outline" size="sm" onClick={() => setConfirming('delete')}>
+                                            <Trash2 /> Elimina
+                                        </Button>
+                                    )}
+                                </div>
+                                {activity.used_minutes > 0 && (
+                                    <p className="text-muted-foreground text-sm">Ha ore registrate: non si può eliminare, solo archiviare.</p>
+                                )}
+
+                                {confirming && (
+                                    <div role="alert" className="border-destructive/50 bg-destructive/10 grid gap-2 rounded-md border p-3 text-sm">
+                                        <p>
+                                            {confirming === 'archive'
+                                                ? "Archiviando l'attività non si potranno più registrare ore né avviare timer su di essa."
+                                                : "Eliminare definitivamente l'attività? L'operazione non si può annullare."}
+                                        </p>
+                                        <div className="flex justify-end gap-2">
+                                            <Button type="button" variant="outline" size="sm" onClick={() => setConfirming(null)}>
+                                                Annulla
+                                            </Button>
+                                            <Button type="button" variant="destructive" size="sm" onClick={() => runAction(confirming)}>
+                                                {confirming === 'archive' ? 'Archivia' : 'Elimina'}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     <SheetFooter className="flex-row justify-end gap-2">

@@ -78,6 +78,14 @@ class Activity extends Model
     }
 
     /**
+     * @return HasMany<Timer, $this>
+     */
+    public function timers(): HasMany
+    {
+        return $this->hasMany(Timer::class);
+    }
+
+    /**
      * @return HasMany<TimeEntry, $this>
      */
     public function timeEntries(): HasMany

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Actions\Activities\ArchiveActivity;
 use App\Actions\Activities\CreateActivity;
+use App\Actions\Activities\DeleteActivity;
 use App\Actions\Activities\UpdateActivity;
 use App\Enum\Role;
 use App\Enum\WorkStatus;
@@ -80,5 +82,29 @@ class ActivityController extends Controller
         $action->handle($activity, $request->toDto());
 
         return back()->with('success', 'Attività aggiornata.');
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function archive(Activity $activity, ArchiveActivity $action): RedirectResponse
+    {
+        $this->authorize('archive', $activity);
+
+        $action->handle($activity);
+
+        return back()->with('success', 'Attività archiviata.');
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function destroy(Activity $activity, DeleteActivity $action): RedirectResponse
+    {
+        $this->authorize('delete', $activity);
+
+        $action->handle($activity);
+
+        return back()->with('success', 'Attività eliminata.');
     }
 }

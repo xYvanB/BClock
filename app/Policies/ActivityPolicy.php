@@ -39,4 +39,14 @@ final class ActivityPolicy
         return $assignees->isNotEmpty()
             && $assignees->every(fn (User $assignee): bool => $assignee->area_id === $user->area_id);
     }
+
+    public function archive(User $user, Activity $activity): bool
+    {
+        return $this->update($user, $activity);
+    }
+
+    public function delete(User $user, Activity $activity): bool
+    {
+        return $this->update($user, $activity);
+    }
 }

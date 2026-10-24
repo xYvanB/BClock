@@ -48,6 +48,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('activities', [ActivityController::class, 'index'])->name('activities.index');
     Route::post('activities', [ActivityController::class, 'store'])->name('activities.store');
     Route::put('activities/{activity}', [ActivityController::class, 'update'])->name('activities.update');
+    Route::post('activities/{activity}/archive', [ActivityController::class, 'archive'])->name('activities.archive');
+    Route::delete('activities/{activity}', [ActivityController::class, 'destroy'])->name('activities.destroy');
 
     Route::get('clients', [ClientController::class, 'index'])->name('clients.index');
     Route::post('clients', [ClientController::class, 'store'])->name('clients.store');
