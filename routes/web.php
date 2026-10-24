@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AreaController;
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TimeEntryController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -28,6 +31,22 @@ Route::middleware(['auth'])->group(function () {
     Route::get('areas', [AreaController::class, 'index'])->name('areas.index');
     Route::post('areas', [AreaController::class, 'store'])->name('areas.store');
     Route::put('areas/{area}', [AreaController::class, 'update'])->name('areas.update');
+
+    Route::get('projects', [ProjectController::class, 'index'])->name('projects.index');
+    Route::post('projects', [ProjectController::class, 'store'])->name('projects.store');
+    Route::get('projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
+    Route::put('projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
+    Route::post('projects/{project}/archive', [ProjectController::class, 'archive'])->name('projects.archive');
+    Route::delete('projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
+
+    Route::get('activities', [ActivityController::class, 'index'])->name('activities.index');
+    Route::post('activities', [ActivityController::class, 'store'])->name('activities.store');
+    Route::put('activities/{activity}', [ActivityController::class, 'update'])->name('activities.update');
+
+    Route::get('clients', [ClientController::class, 'index'])->name('clients.index');
+    Route::post('clients', [ClientController::class, 'store'])->name('clients.store');
+    Route::get('clients/{client}', [ClientController::class, 'show'])->name('clients.show');
+    Route::put('clients/{client}', [ClientController::class, 'update'])->name('clients.update');
 
     Route::resource('time-entries', TimeEntryController::class)
         ->only(['index', 'store', 'update', 'destroy']);

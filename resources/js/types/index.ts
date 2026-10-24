@@ -62,6 +62,99 @@ export interface Area {
     users_count: number;
 }
 
+export interface ClientContact {
+    id: number;
+    name: string;
+    email: string | null;
+    phone: string | null;
+    is_primary: boolean;
+    projects_count: number;
+}
+
+export interface ClientListItem {
+    id: number;
+    company_name: string;
+    active_projects_count: number;
+    primary_contact: string | null;
+    contacts: ClientContact[];
+}
+
+export interface ClientDetail {
+    id: number;
+    company_name: string;
+    contacts: ClientContact[];
+    projects: { id: number; name: string; status: string; due_on: string | null }[];
+}
+
+export interface PersonOption {
+    id: number;
+    name: string;
+}
+
+export interface ProjectOption {
+    id: number;
+    name: string;
+    client_name: string;
+    due_on: string;
+}
+
+export interface ActivityListItem {
+    id: number;
+    name: string;
+    description: string | null;
+    project_id: number;
+    project_name: string;
+    project_due_on: string;
+    client_name: string;
+    assignees: PersonOption[];
+    starts_on: string;
+    due_on: string;
+    planned_hours: number;
+    used_minutes: number;
+    status: string;
+    can_update: boolean;
+}
+
+export interface ClientOption {
+    id: number;
+    company_name: string;
+    contacts: PersonOption[];
+}
+
+export interface ProjectListItem {
+    id: number;
+    name: string;
+    client_name: string;
+    status: string;
+    starts_on: string;
+    due_on: string;
+    planned_hours: number;
+    used_minutes: number;
+}
+
+export interface ProjectDetail {
+    id: number;
+    name: string;
+    description: string | null;
+    client_id: number;
+    client_name: string;
+    status: string;
+    starts_on: string;
+    due_on: string;
+    planned_hours: number;
+    used_minutes: number;
+    members: PersonOption[];
+    contacts: { id: number; name: string; email: string | null; phone: string | null }[];
+}
+
+export interface ProjectTimeEntry {
+    id: number;
+    date: string;
+    user_name: string;
+    activity_name: string;
+    duration_minutes: number;
+}
+
 export interface ActivityOption {
     id: number;
     name: string;

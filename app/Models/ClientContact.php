@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Database\Factories\ClientContactFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class ClientContact extends Model
 {
+    /** @use HasFactory<ClientContactFactory> */
+    use HasFactory;
+
     /**
      * @var list<string>
      */
@@ -36,5 +42,13 @@ class ClientContact extends Model
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
+    }
+
+    /**
+     * @return BelongsToMany<Project, $this>
+     */
+    public function projects(): BelongsToMany
+    {
+        return $this->belongsToMany(Project::class, 'project_contacts');
     }
 }
