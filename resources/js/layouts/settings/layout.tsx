@@ -21,6 +21,11 @@ const sidebarNavItems: NavItem[] = [
         url: '/settings/preferences',
         icon: null,
     },
+    {
+        title: 'Notifiche',
+        url: '/settings/notifications',
+        icon: null,
+    },
 ];
 
 /** Impostazioni dell'applicazione: le vedono solo Capo e HR. */

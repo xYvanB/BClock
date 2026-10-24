@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enum\AppLocale;
+use App\Enum\NotificationKind;
 use App\Enum\Palette;
 use App\Enum\Role;
 use App\Enum\TimeFormat;
@@ -51,6 +52,7 @@ class User extends Authenticatable
         'time_format',
         'palette',
         'custom_colors',
+        'notification_preferences',
         'invited_at',
     ];
 
@@ -79,6 +81,7 @@ class User extends Authenticatable
             'time_format' => TimeFormat::class,
             'palette' => Palette::class,
             'custom_colors' => 'array',
+            'notification_preferences' => 'array',
             'daily_capacity' => 'decimal:2',
             'invited_at' => 'datetime',
         ];
@@ -123,5 +126,20 @@ class User extends Authenticatable
     public function fullName(): string
     {
         return trim("{$this->name} {$this->surname}");
+    }
+
+    /**
+     * Se la persona vuole questo tipo di notifica nell'app (`app`) o per e-mail (`mail`): vale la sua scelta, altrimenti
+     * il default del tipo. Le richieste da approvare arrivano sempre nell'app.
+     */
+    public function wantsNotification(NotificationKind $kind, string $channel): bool
+    {
+        if ($channel === 'app' && $kind->isMandatoryInApp()) {
+            return true;
+        }
+
+        $default = $channel === 'app' ? $kind->defaultInApp() : $kind->defaultMail();
+
+        return (bool) ($this->notification_preferences[$kind->value][$channel] ?? $default);
     }
 }

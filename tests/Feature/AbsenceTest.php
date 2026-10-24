@@ -296,12 +296,12 @@ it('shows the boss the notification of an absence of hr and lets them mark it as
     $this->actingAs($hr)->post(route('absences.store'), absencePayload());
 
     $this->actingAs($boss)->get(route('absences.index'))
-        ->assertInertia(fn (Assert $page) => $page->has('notifications', 1)->where('absences.0.approver_label', 'Capo'));
+        ->assertInertia(fn (Assert $page) => $page->where('notifications.unread_count', 1)->where('absences.0.approver_label', 'Capo'));
 
-    $this->actingAs($boss)->post(route('absences.notifications.read'))->assertRedirect(route('absences.index'));
+    $this->actingAs($boss)->post(route('notifications.read-all'))->assertRedirect();
 
     $this->actingAs($boss->fresh())->get(route('absences.index'))
-        ->assertInertia(fn (Assert $page) => $page->has('notifications', 0));
+        ->assertInertia(fn (Assert $page) => $page->where('notifications.unread_count', 0));
 });
 
 it('lets the area head see the absences of their area, read-only, and not other areas\'', function (): void {

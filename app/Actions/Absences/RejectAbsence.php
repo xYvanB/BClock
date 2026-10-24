@@ -4,25 +4,38 @@ declare(strict_types=1);
 
 namespace App\Actions\Absences;
 
+use App\Actions\Notifications\NotifyUsers;
 use App\Enum\AbsenceStatus;
+use App\Enum\NotificationKind;
 use App\Models\Absence;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
 final class RejectAbsence
 {
+    public function __construct(private readonly NotifyUsers $notify) {}
+
     /**
-     * Rifiuta la richiesta con un motivo; non riduce la capacità.
+     * Rifiuta la richiesta con un motivo (che arriva alla persona); non riduce la capacità.
      *
      * @throws Throwable
      */
-    public function handle(Absence $absence, string $reason): Absence
+    public function handle(User $rejecter, Absence $absence, string $reason): Absence
     {
-        return DB::transaction(function () use ($absence, $reason): Absence {
+        return DB::transaction(function () use ($rejecter, $absence, $reason): Absence {
             $absence->update([
                 'status' => AbsenceStatus::Rejected,
                 'rejection_reason' => $reason,
             ]);
+
+            $this->notify->handle(
+                [$absence->user],
+                NotificationKind::AbsenceDecision,
+                "{$rejecter->fullName()} ha rifiutato la tua richiesta di {$absence->type->value} ({$absence->periodLabel()}): «{$reason}».",
+                route('absences.index'),
+                $rejecter,
+            );
 
             return $absence;
         });

@@ -12,6 +12,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GanttController;
 use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectTemplateController;
 use App\Http\Controllers\TimeEntryController;
@@ -69,11 +70,14 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('allocations/{allocation}/move', [ActivityAllocationController::class, 'move'])->name('allocations.move');
 
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('notifications/read', [NotificationController::class, 'readAll'])->name('notifications.read-all');
+    Route::post('notifications/{notification}/read', [NotificationController::class, 'read'])->name('notifications.read');
+
     Route::get('absences', [AbsenceController::class, 'index'])->name('absences.index');
     Route::post('absences', [AbsenceController::class, 'store'])->name('absences.store');
     Route::put('absences/{absence}', [AbsenceController::class, 'update'])->name('absences.update');
     Route::delete('absences/{absence}', [AbsenceController::class, 'destroy'])->name('absences.destroy');
-    Route::post('absences/notifications/read', [AbsenceController::class, 'readNotifications'])->name('absences.notifications.read');
     Route::post('absences/{absence}/approve', [AbsenceController::class, 'approve'])->name('absences.approve');
     Route::post('absences/{absence}/reject', [AbsenceController::class, 'reject'])->name('absences.reject');
     Route::post('absences/{absence}/confirm', [AbsenceController::class, 'confirm'])->name('absences.confirm');

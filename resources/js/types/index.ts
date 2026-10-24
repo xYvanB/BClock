@@ -38,6 +38,7 @@ export interface SharedData {
     flash: { success: string | null };
     timers: ActiveTimer[];
     timer_warning_minutes: number;
+    notifications: SharedNotifications | null;
     /** Ora del server (ISO 8601): corregge l'orologio del browser nel tempo trascorso. */
     server_now: string;
     /** Calendario aziendale: giorni lavorativi della settimana (1 = lunedì … 7 = domenica) e date di festività o chiusura. */
@@ -299,6 +300,24 @@ export interface Holiday {
 export interface AppNotification {
     id: string;
     message: string;
+    kind: string | null;
+    actor_name: string | null;
+    created_at: string;
+    is_read: boolean;
+}
+
+/** Notifiche condivise: non lette e ultime (campanello nella topbar). */
+export interface SharedNotifications {
+    unread_count: number;
+    items: AppNotification[];
+}
+
+export interface Paginated<T> {
+    data: T[];
+    current_page: number;
+    last_page: number;
+    prev_page_url: string | null;
+    next_page_url: string | null;
 }
 
 export type LoadLevel = 'sotto_capacita' | 'pieno' | 'sovraccarico';

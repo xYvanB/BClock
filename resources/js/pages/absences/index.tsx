@@ -1,13 +1,12 @@
 import { AbsenceFormSheet } from '@/components/absence-form-sheet';
 import { FlashMessage } from '@/components/flash-message';
 import InputError from '@/components/input-error';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { absenceTypeLabel } from '@/lib/schemas/absence';
 import { holidayKindLabels } from '@/lib/schemas/holiday';
-import { type Absence, type AppNotification, type BreadcrumbItem, type Holiday, type SharedData } from '@/types';
+import { type Absence, type BreadcrumbItem, type Holiday, type SharedData } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Check, Pencil, Plus, Settings, Trash2, X } from 'lucide-react';
 import { useState } from 'react';
@@ -16,7 +15,6 @@ interface AbsencesIndexProps {
     absences: Absence[];
     holidays: Holiday[];
     can_manage_holidays: boolean;
-    notifications: AppNotification[];
 }
 
 type Tab = 'absences' | 'holidays';
@@ -55,7 +53,7 @@ const statusLabel = { in_attesa: 'In attesa', confermata: 'Confermata', rifiutat
 const statusVariant = { in_attesa: 'secondary', confermata: 'default', rifiutata: 'destructive' } as const;
 
 /** Assenze (ognuno le proprie; il Capo area anche quelle della sua area, il Capo quelle dell'HR, l'HR tutte) e giorni non lavorativi. */
-export default function AbsencesIndex({ absences, holidays, can_manage_holidays, notifications }: AbsencesIndexProps) {
+export default function AbsencesIndex({ absences, holidays, can_manage_holidays }: AbsencesIndexProps) {
     const { auth } = usePage<SharedData>().props;
     const showPerson = auth.user.role !== 'dipendente';
     const title = 'Assenze';
@@ -110,8 +108,6 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays,
 
     const approveAbsence = (absence: Absence) => router.post(route('absences.approve', absence.id), {}, { preserveScroll: true });
 
-    const markNotificationsRead = () => router.post(route('absences.notifications.read'), {}, { preserveScroll: true });
-
     const remove = (key: string, url: string) =>
         router.delete(url, { preserveScroll: true, onFinish: () => setConfirmingDelete((current) => (current === key ? null : current)) });
 
@@ -138,21 +134,6 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays,
 
             <div className="flex flex-col gap-4 p-4">
                 <FlashMessage />
-
-                {notifications.length > 0 && (
-                    <Alert role="status">
-                        <AlertDescription className="flex flex-col gap-2">
-                            {notifications.map((notification) => (
-                                <p key={notification.id}>🔔 {notification.message}</p>
-                            ))}
-                            <div>
-                                <Button variant="outline" size="sm" onClick={markNotificationsRead}>
-                                    Segna come lette
-                                </Button>
-                            </div>
-                        </AlertDescription>
-                    </Alert>
-                )}
 
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-semibold">{title}</h1>

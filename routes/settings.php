@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Settings\CompanyCalendarController;
+use App\Http\Controllers\Settings\NotificationPreferencesController;
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\PreferencesController;
 use App\Http\Controllers\Settings\ProfileController;
@@ -21,6 +22,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('settings/preferences', [PreferencesController::class, 'edit'])->name('preferences.edit');
     Route::patch('settings/preferences', [PreferencesController::class, 'update'])->name('preferences.update');
+
+    Route::get('settings/notifications', [NotificationPreferencesController::class, 'edit'])->name('notification-preferences.edit');
+    Route::put('settings/notifications', [NotificationPreferencesController::class, 'update'])->name('notification-preferences.update');
 
     Route::get('settings/company-calendar', [CompanyCalendarController::class, 'edit'])->name('company-calendar.edit');
     Route::put('settings/company-calendar', [CompanyCalendarController::class, 'update'])->name('company-calendar.update');

@@ -5,16 +5,20 @@ declare(strict_types=1);
 namespace App\Actions\Absences;
 
 use App\Actions\Allocations\RegenerateAllocations;
+use App\Actions\Notifications\NotifyUsers;
 use App\Enum\AbsenceStatus;
+use App\Enum\NotificationKind;
 use App\Models\Absence;
 use App\Models\User;
-use App\Notifications\AbsenceRemovedByHr;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
 final class DeleteAbsence
 {
-    public function __construct(private readonly RegenerateAllocations $allocations) {}
+    public function __construct(
+        private readonly RegenerateAllocations $allocations,
+        private readonly NotifyUsers $notify,
+    ) {}
 
     /**
      * Elimina l'assenza. Se è confermata ed è l'HR a toglierla a un'altra persona, la persona riceve il motivo.
@@ -25,8 +29,13 @@ final class DeleteAbsence
     {
         DB::transaction(function () use ($user, $absence, $reason): void {
             if ($absence->status === AbsenceStatus::Confirmed && $absence->user_id !== $user->id && $reason !== null) {
-                $period = $absence->starts_on->format('d/m/Y').' – '.$absence->ends_on->format('d/m/Y');
-                $absence->user->notify(new AbsenceRemovedByHr($period, $reason));
+                $this->notify->handle(
+                    [$absence->user],
+                    NotificationKind::AbsenceDecision,
+                    "{$user->fullName()} ha eliminato la tua assenza confermata ({$absence->periodLabel()}): «{$reason}».",
+                    route('absences.index'),
+                    $user,
+                );
             }
 
             $wasConfirmed = $absence->status === AbsenceStatus::Confirmed;

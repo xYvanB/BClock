@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Http\Controllers\NotificationController;
 use App\Models\Holiday;
 use App\Models\Setting;
 use App\Models\Timer;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\DatabaseNotification;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -70,6 +72,13 @@ class HandleInertiaRequests extends Middleware
                     'started_at' => $timer->started_at->toIso8601String(),
                 ])
                 ->values(),
+            // Campanello: non lette e ultime notifiche della persona.
+            'notifications' => fn () => $request->user() === null ? null : [
+                'unread_count' => $request->user()->unreadNotifications()->count(),
+                'items' => $request->user()->notifications()->limit(10)->get()
+                    ->map(fn (DatabaseNotification $notification): array => NotificationController::present($notification))
+                    ->values(),
+            ],
             'timer_warning_minutes' => Timer::WARNING_AFTER_MINUTES,
             'server_now' => fn () => now()->toIso8601String(),
             'flash' => [

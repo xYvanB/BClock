@@ -83,9 +83,6 @@ class AbsenceController extends Controller
                     'kind' => $holiday->kind->value,
                 ]),
             'can_manage_holidays' => $user->can('create', Holiday::class),
-            'notifications' => $user->unreadNotifications
-                ->map(fn ($notification): array => ['id' => $notification->id, 'message' => $notification->data['message']])
-                ->values(),
         ]);
     }
 
@@ -150,15 +147,8 @@ class AbsenceController extends Controller
      */
     public function reject(RejectAbsenceRequest $request, Absence $absence, RejectAbsence $action): RedirectResponse
     {
-        $action->handle($absence, $request->reason());
+        $action->handle($request->user(), $absence, $request->reason());
 
         return to_route('absences.index')->with('success', 'Assenza rifiutata.');
-    }
-
-    public function readNotifications(Request $request): RedirectResponse
-    {
-        $request->user()->unreadNotifications->markAsRead();
-
-        return to_route('absences.index');
     }
 }

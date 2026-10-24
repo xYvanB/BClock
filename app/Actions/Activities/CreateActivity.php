@@ -5,23 +5,29 @@ declare(strict_types=1);
 namespace App\Actions\Activities;
 
 use App\Actions\Allocations\GenerateActivityAllocations;
+use App\Actions\Notifications\NotifyUsers;
 use App\DTO\ActivityData;
+use App\Enum\NotificationKind;
 use App\Models\Activity;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
 final class CreateActivity
 {
-    public function __construct(private readonly GenerateActivityAllocations $allocations) {}
+    public function __construct(
+        private readonly GenerateActivityAllocations $allocations,
+        private readonly NotifyUsers $notify,
+    ) {}
 
     /**
-     * Crea un'attività con i suoi assegnatari in transazione.
+     * Crea un'attività con i suoi assegnatari in transazione; gli assegnatari (tranne chi la crea) ricevono una notifica.
      *
      * @throws Throwable
      */
-    public function handle(ActivityData $data): Activity
+    public function handle(User $actor, ActivityData $data): Activity
     {
-        return DB::transaction(function () use ($data): Activity {
+        return DB::transaction(function () use ($actor, $data): Activity {
             $activity = Activity::create([
                 'project_id' => $data->projectId,
                 'name' => $data->name,
@@ -39,6 +45,14 @@ final class CreateActivity
             }
 
             $this->allocations->handle($activity);
+
+            $this->notify->handle(
+                User::whereIn('id', $data->assigneeIds)->get(),
+                NotificationKind::TaskAssigned,
+                "Ti è stato assegnato «{$activity->name}».",
+                route('activities.index'),
+                $actor,
+            );
 
             return $activity;
         });

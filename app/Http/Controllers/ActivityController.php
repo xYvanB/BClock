@@ -73,7 +73,7 @@ class ActivityController extends Controller
      */
     public function store(SaveActivityRequest $request, CreateActivity $action): RedirectResponse
     {
-        $action->handle($request->toDto());
+        $action->handle($request->user(), $request->toDto());
 
         return back()->with('success', 'Attività creata.');
     }
@@ -83,7 +83,7 @@ class ActivityController extends Controller
      */
     public function update(SaveActivityRequest $request, Activity $activity, UpdateActivity $action): RedirectResponse
     {
-        $action->handle($activity, $request->toDto());
+        $action->handle($request->user(), $activity, $request->toDto());
 
         return back()->with('success', 'Attività aggiornata.');
     }

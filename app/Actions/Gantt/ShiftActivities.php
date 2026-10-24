@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Actions\Gantt;
 
 use App\Actions\Allocations\GenerateActivityAllocations;
+use App\Actions\Notifications\NotifyUsers;
+use App\Enum\NotificationKind;
 use App\Models\Activity;
 use App\Models\ActivityAllocation;
 use App\Models\Project;
@@ -18,6 +20,7 @@ final class ShiftActivities
     public function __construct(
         private readonly PlanActivityShift $plan,
         private readonly GenerateActivityAllocations $allocations,
+        private readonly NotifyUsers $notify,
     ) {}
 
     /**
@@ -26,7 +29,8 @@ final class ShiftActivities
      *
      * Si sposta tutto o niente: con un blocco si rifiuta. Le scadenze dei progetti oltrepassate si estendono solo
      * con `$confirmProjects`. Le quote spostate a mano di un'attività che si sposta di N giorni lavorativi si
-     * spostano anch'esse di N giorni; poi le quote di ogni attività toccata si ricalcolano.
+     * spostano anch'esse di N giorni; poi le quote di ogni attività toccata si ricalcolano e i suoi assegnatari (tranne chi la sposta)
+     * ricevono una sola notifica per attività.
      *
      * @return list<array<string, mixed>> I cambi applicati
      *
@@ -63,6 +67,14 @@ final class ShiftActivities
                 }
 
                 $this->allocations->handle($moved->refresh());
+
+                $this->notify->handle(
+                    $moved->assignees,
+                    NotificationKind::ActivityMoved,
+                    "Date cambiate: «{$moved->name}» ora va dal {$moved->starts_on->format('d/m/Y')} al {$moved->due_on->format('d/m/Y')}.",
+                    route('gantt.index'),
+                    $user,
+                );
             }
 
             return $plan['changes'];

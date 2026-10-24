@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Actions\Absences;
 
 use App\Actions\Allocations\RegenerateAllocations;
+use App\Actions\Notifications\NotifyUsers;
 use App\DTO\AbsenceData;
 use App\Enum\AbsenceStatus;
+use App\Enum\NotificationKind;
 use App\Enum\Role;
 use App\Models\Absence;
 use App\Models\User;
-use App\Notifications\AbsenceRequested;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Notification;
 use Throwable;
 
 final class SaveAbsence
@@ -20,12 +20,16 @@ final class SaveAbsence
     /**
      * Crea un'assenza della persona (in attesa; quelle del Capo sono subito confermate, nessuno le approva) o aggiorna
      * quella indicata, in transazione. Modificarla azzera le approvazioni già date. Una nuova richiesta di un dipendente
-     * avvisa il suo Capo area, una dell'HR avvisa il Capo.
-     *
+     * avvisa il suo Capo area e l'HR, una dell'HR avvisa il Capo.
+     */
+    public function __construct(
+        private readonly RegenerateAllocations $allocations,
+        private readonly NotifyUsers $notify,
+    ) {}
+
+    /**
      * @throws Throwable
      */
-    public function __construct(private readonly RegenerateAllocations $allocations) {}
-
     public function handle(User $user, AbsenceData $data, ?Absence $absence = null): Absence
     {
         return DB::transaction(function () use ($user, $data, $absence): Absence {
@@ -65,17 +69,20 @@ final class SaveAbsence
 
             $absence = Absence::create($attributes + ['user_id' => $user->id, 'status' => AbsenceStatus::Pending]);
 
-            // chi deve approvare viene avvisato: il Capo area del dipendente e, per le assenze dell'HR, il Capo
+            // chi deve approvare viene avvisato: il Capo area del dipendente e chi dà la conferma finale (HR, o il Capo per l'HR)
+            $approvers = User::where('role', $absence->finalApproverRole())->get();
+
             if ($absence->requiresAreaHead()) {
-                Notification::send(
-                    User::where('role', Role::AreaHead)->where('area_id', $user->area_id)->get(),
-                    new AbsenceRequested($absence),
-                );
+                $approvers = $approvers->merge(User::where('role', Role::AreaHead)->where('area_id', $user->area_id)->get());
             }
 
-            if ($user->hasRole(Role::Hr)) {
-                Notification::send(User::where('role', Role::Boss)->get(), new AbsenceRequested($absence));
-            }
+            $this->notify->handle(
+                $approvers,
+                NotificationKind::AbsenceRequested,
+                "{$user->fullName()} ha chiesto {$absence->type->value} ({$absence->periodLabel()}): serve la tua approvazione.",
+                route('absences.index'),
+                $user,
+            );
 
             return $absence;
         });
