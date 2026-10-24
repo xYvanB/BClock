@@ -71,6 +71,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Local Timezone
+    |--------------------------------------------------------------------------
+    |
+    | Fuso orario in cui le persone digitano e leggono gli orari delle registrazioni
+    | ore. I timer salvano un istante (UTC) e allo stop lo convertono in questo fuso.
+    | Non esistono fusi per singolo utente.
+    |
+    */
+
+    'local_timezone' => env('APP_LOCAL_TIMEZONE', 'Europe/Rome'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Locale Configuration
     |--------------------------------------------------------------------------
     |

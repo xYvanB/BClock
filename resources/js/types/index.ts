@@ -21,11 +21,25 @@ export interface NavItem {
     isActive?: boolean;
 }
 
+export interface ActiveTimer {
+    id: number;
+    activity_id: number;
+    activity_name: string;
+    project_name: string;
+    description: string | null;
+    /** Istante di avvio, ISO 8601 con offset. */
+    started_at: string;
+}
+
 export interface SharedData {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
     flash: { success: string | null };
+    timers: ActiveTimer[];
+    timer_warning_minutes: number;
+    /** Ora del server (ISO 8601): corregge l'orologio del browser nel tempo trascorso. */
+    server_now: string;
     [key: string]: unknown;
 }
 

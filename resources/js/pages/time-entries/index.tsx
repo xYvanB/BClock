@@ -1,5 +1,6 @@
 import { FlashMessage } from '@/components/flash-message';
 import { TimeEntryFormSheet } from '@/components/time-entry-form-sheet';
+import { TimerStartSheet } from '@/components/timer-start-sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,7 +8,7 @@ import AppLayout from '@/layouts/app-layout';
 import { formatDay, formatMinutes, formatTime } from '@/lib/time';
 import { type ActivityOption, type BreadcrumbItem, type SharedData, type TimeEntryDay, type TimeEntryItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
+import { Play, Plus } from 'lucide-react';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Le mie ore', href: '/time-entries' }];
@@ -28,6 +29,7 @@ interface Props {
 export default function TimeEntriesIndex({ days, filters, activities }: Props) {
     const { auth } = usePage<SharedData>().props;
     const [sheetOpen, setSheetOpen] = useState(false);
+    const [timerOpen, setTimerOpen] = useState(false);
     const [editing, setEditing] = useState<(TimeEntryItem & { date: string }) | null>(null);
 
     const applyFilters = (next: Partial<Filters>) => {
@@ -53,9 +55,14 @@ export default function TimeEntriesIndex({ days, filters, activities }: Props) {
 
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-semibold">Le mie ore</h1>
-                    <Button onClick={openCreate}>
-                        <Plus /> Nuova registrazione
-                    </Button>
+                    <div className="flex gap-2">
+                        <Button variant="outline" onClick={() => setTimerOpen(true)}>
+                            <Play /> Avvia timer
+                        </Button>
+                        <Button onClick={openCreate}>
+                            <Plus /> Nuova registrazione
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="flex flex-wrap items-end gap-4">
@@ -107,7 +114,8 @@ export default function TimeEntriesIndex({ days, filters, activities }: Props) {
                                                 className="hover:bg-muted/40 flex w-full flex-wrap items-center gap-x-6 gap-y-1 px-4 py-3 text-left text-sm"
                                             >
                                                 <span className="w-40 shrink-0 tabular-nums">
-                                                    {formatTime(entry.started_at, auth.user.time_format)} – {formatTime(entry.ended_at, auth.user.time_format)}
+                                                    {formatTime(entry.started_at, auth.user.time_format)} –{' '}
+                                                    {formatTime(entry.ended_at, auth.user.time_format)}
                                                 </span>
                                                 <span className="min-w-48 flex-1 font-medium">
                                                     {entry.project_name} › {entry.activity_name}
@@ -124,7 +132,9 @@ export default function TimeEntriesIndex({ days, filters, activities }: Props) {
                                                 </span>
                                                 <span className="text-muted-foreground min-w-40 flex-1">{entry.description}</span>
                                                 <span className="w-16 text-right tabular-nums">{formatMinutes(entry.duration_minutes)}</span>
-                                                <span className="text-muted-foreground w-20 text-right">{entry.source === 'timer' ? '⏱ Timer' : '✎ Manuale'}</span>
+                                                <span className="text-muted-foreground w-20 text-right">
+                                                    {entry.source === 'timer' ? '⏱ Timer' : '✎ Manuale'}
+                                                </span>
                                             </button>
                                         </li>
                                     ))}
@@ -136,6 +146,7 @@ export default function TimeEntriesIndex({ days, filters, activities }: Props) {
             </div>
 
             <TimeEntryFormSheet open={sheetOpen} entry={editing} activities={activities} onClose={() => setSheetOpen(false)} />
+            <TimerStartSheet open={timerOpen} activities={activities} onClose={() => setTimerOpen(false)} />
         </AppLayout>
     );
 }

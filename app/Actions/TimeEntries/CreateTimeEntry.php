@@ -14,12 +14,12 @@ use Throwable;
 final class CreateTimeEntry
 {
     /**
-     * Registra ore manuali per l'utente, in transazione.
+     * Registra ore per l'utente, in transazione (manuali per impostazione predefinita, o dal timer).
      * Lo sforamento delle ore previste è solo un avviso e non blocca la registrazione.
      *
      * @throws Throwable
      */
-    public function handle(User $user, TimeEntryData $data): TimeEntry
+    public function handle(User $user, TimeEntryData $data, TimeEntrySource $source = TimeEntrySource::Manual): TimeEntry
     {
         return DB::transaction(fn (): TimeEntry => TimeEntry::create([
             'user_id' => $user->id,
@@ -29,7 +29,7 @@ final class CreateTimeEntry
             'ended_at' => $data->endedAt,
             'duration_minutes' => $data->durationMinutes(),
             'description' => $data->description,
-            'source' => TimeEntrySource::Manual,
+            'source' => $source,
         ]));
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Models\Timer;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -47,6 +48,23 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            // Timer attivi della persona (sempre visibili nella topbar); `server_now` corregge l'orologio del browser.
+            'timers' => fn () => $request->user() === null ? [] : Timer::query()
+                ->where('user_id', $request->user()->id)
+                ->with('activity.project:id,name')
+                ->orderBy('started_at')
+                ->get()
+                ->map(fn (Timer $timer) => [
+                    'id' => $timer->id,
+                    'activity_id' => $timer->activity_id,
+                    'activity_name' => $timer->activity->name,
+                    'project_name' => $timer->activity->project->name,
+                    'description' => $timer->description,
+                    'started_at' => $timer->started_at->toIso8601String(),
+                ])
+                ->values(),
+            'timer_warning_minutes' => Timer::WARNING_AFTER_MINUTES,
+            'server_now' => fn () => now()->toIso8601String(),
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
             ],

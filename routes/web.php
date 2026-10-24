@@ -9,6 +9,7 @@ use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectTemplateController;
 use App\Http\Controllers\TimeEntryController;
+use App\Http\Controllers\TimerController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -52,6 +53,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('clients', [ClientController::class, 'store'])->name('clients.store');
     Route::get('clients/{client}', [ClientController::class, 'show'])->name('clients.show');
     Route::put('clients/{client}', [ClientController::class, 'update'])->name('clients.update');
+
+    Route::post('timers', [TimerController::class, 'store'])->name('timers.store');
+    Route::post('timers/{timer}/stop', [TimerController::class, 'stop'])->name('timers.stop');
 
     Route::resource('time-entries', TimeEntryController::class)
         ->only(['index', 'store', 'update', 'destroy']);
