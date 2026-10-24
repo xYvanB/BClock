@@ -254,6 +254,12 @@ export interface Absence {
     type: AbsenceType;
     starts_on: string;
     ends_on: string;
+    starts_time: string | null;
+    ends_time: string | null;
+    hours: number | null;
+    needs_area_head: boolean;
+    hr_approved: boolean;
+    area_head_approved: boolean;
     note: string | null;
     rejection_reason: string | null;
     is_own: boolean;
@@ -261,6 +267,7 @@ export interface Absence {
     can_update: boolean;
     can_delete: boolean;
     can_confirm: boolean;
+    can_approve: boolean;
     can_reject: boolean;
 }
 

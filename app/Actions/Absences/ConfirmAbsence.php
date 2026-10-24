@@ -19,23 +19,30 @@ final class ConfirmAbsence
     public function __construct(private readonly RegenerateAllocations $allocations) {}
 
     /**
-     * Conferma la richiesta: da qui in poi riduce la capacità giornaliera della persona.
+     * Registra la conferma dell'HR o l'approvazione del Capo area. Quando ci sono tutte le approvazioni
+     * richieste l'assenza diventa confermata e da lì riduce la capacità della persona.
      * Se l'HR conferma una propria assenza, il Capo viene avvisato.
      *
      * @throws Throwable
      */
-    public function handle(User $hr, Absence $absence): Absence
+    public function handle(User $approver, Absence $absence): Absence
     {
-        return DB::transaction(function () use ($hr, $absence): Absence {
-            $absence->update([
-                'status' => AbsenceStatus::Confirmed,
-                'confirmed_by' => $hr->id,
-                'confirmed_at' => now(),
-            ]);
+        return DB::transaction(function () use ($approver, $absence): Absence {
+            if ($approver->hasRole(Role::Hr)) {
+                $absence->update(['confirmed_by' => $approver->id, 'confirmed_at' => now()]);
+            } else {
+                $absence->update(['area_head_confirmed_by' => $approver->id, 'area_head_confirmed_at' => now()]);
+            }
+
+            if (! $absence->isFullyApproved()) {
+                return $absence;
+            }
+
+            $absence->update(['status' => AbsenceStatus::Confirmed]);
 
             $this->allocations->handle($absence->starts_on->toDateString(), $absence->ends_on->toDateString(), [$absence->user_id]);
 
-            if ($absence->user_id === $hr->id) {
+            if ($absence->user_id === $approver->id) {
                 Notification::send(User::where('role', Role::Boss)->get(), new AbsenceConfirmedByHr($absence));
             }
 

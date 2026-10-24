@@ -10,7 +10,8 @@ use App\Models\Absence;
 use App\Models\User;
 
 /**
- * Ognuno inserisce le proprie assenze e le modifica finché sono in attesa; le conferma o rifiuta l'HR.
+ * Ognuno inserisce le proprie assenze e le modifica finché sono in attesa. Le conferma l'HR; per i dipendenti
+ * serve anche l'approvazione del loro Capo area. Entrambi possono rifiutare, con un motivo.
  */
 final class AbsencePolicy
 {
@@ -32,13 +33,36 @@ final class AbsencePolicy
         return $absence->user_id === $user->id && $absence->status !== AbsenceStatus::Confirmed;
     }
 
+    /**
+     * Conferma dell'HR.
+     */
     public function confirm(User $user, Absence $absence): bool
     {
-        return $user->hasRole(Role::Hr) && $absence->isPending();
+        return $user->hasRole(Role::Hr) && $absence->isPending() && ! $absence->isApprovedByHr();
+    }
+
+    /**
+     * Approvazione del Capo area dell'area del dipendente.
+     */
+    public function approve(User $user, Absence $absence): bool
+    {
+        return $this->isAreaHeadOf($user, $absence) && ! $absence->isApprovedByAreaHead();
     }
 
     public function reject(User $user, Absence $absence): bool
     {
-        return $this->confirm($user, $absence);
+        if (! $absence->isPending()) {
+            return false;
+        }
+
+        return $user->hasRole(Role::Hr) || $this->isAreaHeadOf($user, $absence);
+    }
+
+    private function isAreaHeadOf(User $user, Absence $absence): bool
+    {
+        return $user->hasRole(Role::AreaHead)
+            && $absence->isPending()
+            && $absence->requiresAreaHead()
+            && $absence->user->area_id === $user->area_id;
     }
 }

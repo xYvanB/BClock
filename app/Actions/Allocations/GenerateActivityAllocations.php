@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Actions\Allocations;
 
 use App\Enum\AbsenceStatus;
+use App\Enum\AbsenceType;
 use App\Enum\WorkStatus;
 use App\Models\Absence;
 use App\Models\Activity;
 use App\Models\ActivityAllocation;
 use App\Models\Holiday;
+use App\Models\User;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\DB;
@@ -20,11 +22,12 @@ final class GenerateActivityAllocations
     /**
      * Ricalcola le quote giornaliere di un'attività (le sostituisce tutte).
      *
-     * Le ore previste si dividono in parti uguali sulle coppie persona–giorno lavorativo disponibili:
-     * weekend e festivi sono esclusi, e una persona non ha quota nei giorni di un'assenza confermata.
-     * Il totale delle quote è sempre uguale alle ore previste. Se non resta nessun giorno lavorativo
-     * (periodo di soli weekend/festivi) o nessuna persona disponibile, si ripiega su tutti i giorni
-     * o su tutte le persone, così le ore non si perdono. Le attività archiviate non cambiano.
+     * Le ore previste si dividono sulle coppie persona–giorno lavorativo, ciascuna col suo peso:
+     * 1 per un giorno libero, 0 in weekend, festivi e giorni di ferie confermate, e ridotto in proporzione
+     * alle ore di permesso confermate (un permesso di 2 ore su 8 dà peso 0,75). Con pesi uguali la divisione
+     * è in parti uguali. Il totale delle quote è sempre uguale alle ore previste. Se non resta nessun giorno
+     * lavorativo (solo weekend/festivi) o nessun peso, si ripiega su tutti i giorni o su pesi uguali, così le
+     * ore non si perdono. Le attività archiviate non cambiano.
      *
      * @throws Throwable
      */
@@ -44,19 +47,21 @@ final class GenerateActivityAllocations
                 return;
             }
 
-            $units = $this->availableUnits($activity, $userIds);
-
-            $base = intdiv($totalCents, count($units));
-            $remainder = $totalCents % count($units);
+            $units = $this->weightedUnits($activity, $userIds);
+            $cents = $this->splitByWeight($totalCents, array_column($units, 2));
             $now = now();
 
             $rows = [];
             foreach ($units as $index => [$userId, $date]) {
+                if ($cents[$index] === 0) {
+                    continue;
+                }
+
                 $rows[] = [
                     'activity_id' => $activity->id,
                     'user_id' => $userId,
                     'date' => $date,
-                    'hours' => ($base + ($index < $remainder ? 1 : 0)) / 100,
+                    'hours' => $cents[$index] / 100,
                     'created_at' => $now,
                     'updated_at' => $now,
                 ];
@@ -67,12 +72,12 @@ final class GenerateActivityAllocations
     }
 
     /**
-     * Coppie [persona, data] su cui dividere le ore.
+     * Coppie [persona, data, peso] su cui dividere le ore.
      *
      * @param  list<int>  $userIds
-     * @return list<array{int, string}>
+     * @return list<array{int, string, float}>
      */
-    private function availableUnits(Activity $activity, array $userIds): array
+    private function weightedUnits(Activity $activity, array $userIds): array
     {
         $start = CarbonImmutable::parse($activity->starts_on)->startOfDay();
         $end = CarbonImmutable::parse($activity->due_on)->startOfDay();
@@ -92,6 +97,8 @@ final class GenerateActivityAllocations
             $workingDays = $allDays->values();
         }
 
+        $capacities = User::whereIn('id', $userIds)->pluck('daily_capacity', 'id');
+
         $absences = Absence::query()
             ->whereIn('user_id', $userIds)
             ->where('status', AbsenceStatus::Confirmed)
@@ -99,23 +106,65 @@ final class GenerateActivityAllocations
             ->whereDate('ends_on', '>=', $start->toDateString())
             ->get();
 
-        $isAbsent = fn (int $userId, string $day): bool => $absences->contains(
-            fn (Absence $absence): bool => $absence->user_id === $userId
-                && $absence->starts_on->toDateString() <= $day
-                && $absence->ends_on->toDateString() >= $day,
-        );
-
         $units = [];
-        $availableUnits = [];
         foreach ($workingDays as $day) {
             foreach ($userIds as $userId) {
-                $units[] = [$userId, $day];
-                if (! $isAbsent($userId, $day)) {
-                    $availableUnits[] = [$userId, $day];
-                }
+                $units[] = [$userId, $day, $this->weightOf($absences->where('user_id', $userId), $day, (float) ($capacities[$userId] ?? 8))];
             }
         }
 
-        return $availableUnits !== [] ? $availableUnits : $units;
+        if (array_sum(array_column($units, 2)) <= 0) {
+            return array_map(fn (array $unit): array => [$unit[0], $unit[1], 1.0], $units);
+        }
+
+        return $units;
+    }
+
+    /**
+     * Quota di giornata disponibile (da 0 a 1) di una persona, date le sue assenze confermate.
+     *
+     * @param  iterable<Absence>  $absences
+     */
+    private function weightOf(iterable $absences, string $day, float $capacity): float
+    {
+        $leaveHours = 0.0;
+
+        foreach ($absences as $absence) {
+            if ($absence->starts_on->toDateString() > $day || $absence->ends_on->toDateString() < $day) {
+                continue;
+            }
+
+            if ($absence->type === AbsenceType::Vacation) {
+                return 0.0;
+            }
+
+            $leaveHours += $absence->leaveHours() ?? 0.0;
+        }
+
+        return $capacity > 0 ? max(0.0, 1 - $leaveHours / $capacity) : 0.0;
+    }
+
+    /**
+     * Divide i centesimi in proporzione ai pesi; il resto va a chi ha la parte frazionaria maggiore
+     * (a parità, ai primi), così la somma è sempre esatta.
+     *
+     * @param  list<float>  $weights
+     * @return list<int>
+     */
+    private function splitByWeight(int $totalCents, array $weights): array
+    {
+        $sum = array_sum($weights);
+        $exact = array_map(fn (float $weight): float => $totalCents * $weight / $sum, $weights);
+        $cents = array_map(fn (float $value): int => (int) floor($value + 1e-9), $exact);
+
+        $leftover = $totalCents - array_sum($cents);
+        $order = array_keys($exact);
+        usort($order, fn (int $a, int $b): int => ($exact[$b] - $cents[$b]) <=> ($exact[$a] - $cents[$a]));
+
+        foreach (array_slice($order, 0, $leftover) as $index) {
+            $cents[$index]++;
+        }
+
+        return $cents;
     }
 }

@@ -25,11 +25,30 @@ class AbsenceFactory extends Factory
             'type' => AbsenceType::Vacation,
             'starts_on' => '2026-11-09',
             'ends_on' => '2026-11-10',
+            'starts_time' => null,
+            'ends_time' => null,
             'note' => null,
             'status' => AbsenceStatus::Pending,
         ];
     }
 
+    /**
+     * Permesso di poche ore nello stesso giorno.
+     */
+    public function leave(string $date = '2026-11-09', string $from = '09:00', string $to = '11:00'): static
+    {
+        return $this->state([
+            'type' => AbsenceType::Leave,
+            'starts_on' => $date,
+            'ends_on' => $date,
+            'starts_time' => $from,
+            'ends_time' => $to,
+        ]);
+    }
+
+    /**
+     * Confermata dall'HR (e, per i dipendenti di un'area, anche approvata dal Capo area).
+     */
     public function confirmed(?User $by = null): static
     {
         return $this->state(fn () => [

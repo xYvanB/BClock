@@ -100,11 +100,11 @@ it('lets the owner edit a pending absence without overlapping itself', function 
     $absence = Absence::factory()->for($user)->create(['starts_on' => '2026-11-09', 'ends_on' => '2026-11-11']);
 
     $this->actingAs($user)
-        ->put(route('absences.update', $absence), absencePayload(['type' => 'permesso', 'ends_on' => '2026-11-12']))
+        ->put(route('absences.update', $absence), absencePayload(['ends_on' => '2026-11-12']))
         ->assertRedirect(route('absences.index'))
         ->assertSessionHasNoErrors();
 
-    expect($absence->refresh()->type)->toBe(AbsenceType::Leave)
+    expect($absence->refresh()->type)->toBe(AbsenceType::Vacation)
         ->and($absence->ends_on->toDateString())->toBe('2026-11-12')
         ->and($absence->status)->toBe(AbsenceStatus::Pending);
 });

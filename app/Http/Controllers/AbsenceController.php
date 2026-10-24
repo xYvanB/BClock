@@ -32,7 +32,7 @@ class AbsenceController extends Controller
         $isHr = $user->hasRole(Role::Hr);
 
         $absences = Absence::query()
-            ->with('user:id,name,surname')
+            ->with('user')
             ->when(! $isHr, fn ($query) => $query->where(function ($query) use ($user): void {
                 $query->where('user_id', $user->id);
 
@@ -48,6 +48,12 @@ class AbsenceController extends Controller
                 'type' => $absence->type->value,
                 'starts_on' => $absence->starts_on->toDateString(),
                 'ends_on' => $absence->ends_on->toDateString(),
+                'starts_time' => $absence->timeLabel($absence->starts_time),
+                'ends_time' => $absence->timeLabel($absence->ends_time),
+                'hours' => $absence->leaveHours(),
+                'needs_area_head' => $absence->requiresAreaHead(),
+                'hr_approved' => $absence->isApprovedByHr(),
+                'area_head_approved' => $absence->isApprovedByAreaHead(),
                 'note' => $absence->note,
                 'rejection_reason' => $absence->rejection_reason,
                 'is_own' => $absence->user_id === $user->id,
@@ -55,6 +61,7 @@ class AbsenceController extends Controller
                 'can_update' => $user->can('update', $absence),
                 'can_delete' => $user->can('delete', $absence),
                 'can_confirm' => $user->can('confirm', $absence),
+                'can_approve' => $user->can('approve', $absence),
                 'can_reject' => $user->can('reject', $absence),
             ]);
 
@@ -114,7 +121,21 @@ class AbsenceController extends Controller
 
         $action->handle($request->user(), $absence);
 
-        return to_route('absences.index')->with('success', 'Assenza confermata.');
+        return to_route('absences.index')->with('success', 'Conferma registrata.');
+    }
+
+    /**
+     * Approvazione del Capo area per un'assenza di un dipendente della sua area.
+     *
+     * @throws Throwable
+     */
+    public function approve(Request $request, Absence $absence, ConfirmAbsence $action): RedirectResponse
+    {
+        $this->authorize('approve', $absence);
+
+        $action->handle($request->user(), $absence);
+
+        return to_route('absences.index')->with('success', 'Assenza approvata.');
     }
 
     /**

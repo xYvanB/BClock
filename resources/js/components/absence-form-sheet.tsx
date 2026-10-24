@@ -18,14 +18,18 @@ interface AbsenceFormSheetProps {
 const fieldClass =
     'border-input bg-background focus-visible:ring-ring h-9 w-full rounded-md border px-3 text-sm focus-visible:ring-1 focus-visible:outline-none';
 
-/** Drawer laterale per richiedere o modificare una propria assenza; resta in attesa finché l'HR non la conferma. */
+/** Drawer laterale per richiedere o modificare una propria assenza; resta in attesa finché non ha tutte le approvazioni. */
 export function AbsenceFormSheet({ open, absence, onClose }: AbsenceFormSheetProps) {
     const { data, setData, post, put, processing, errors, setError, clearErrors, reset } = useForm<AbsenceFormData>({
         type: 'ferie',
         starts_on: '',
         ends_on: '',
+        starts_time: '',
+        ends_time: '',
         note: '',
     });
+
+    const isLeave = data.type === 'permesso';
 
     useEffect(() => {
         if (open) {
@@ -34,11 +38,20 @@ export function AbsenceFormSheet({ open, absence, onClose }: AbsenceFormSheetPro
                 type: absence?.type ?? 'ferie',
                 starts_on: absence?.starts_on ?? '',
                 ends_on: absence?.ends_on ?? '',
+                starts_time: absence?.starts_time ?? '',
+                ends_time: absence?.ends_time ?? '',
                 note: absence?.note ?? '',
             });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open, absence]);
+
+    /** Un permesso è in un solo giorno: la data di fine segue quella di inizio. */
+    const changeStartDate = (value: string) =>
+        setData((current) => ({ ...current, starts_on: value, ends_on: current.type === 'permesso' ? value : current.ends_on }));
+
+    const changeType = (value: AbsenceFormData['type']) =>
+        setData((current) => ({ ...current, type: value, ends_on: value === 'permesso' ? current.starts_on : current.ends_on }));
 
     const submit: FormEventHandler = (event) => {
         event.preventDefault();
@@ -72,7 +85,9 @@ export function AbsenceFormSheet({ open, absence, onClose }: AbsenceFormSheetPro
                 <form onSubmit={submit} className="flex h-full flex-col gap-6" noValidate>
                     <SheetHeader>
                         <SheetTitle>{absence ? 'Modifica assenza' : 'Nuova assenza'}</SheetTitle>
-                        <SheetDescription>La richiesta va all'HR. Il tuo carico cambia solo dopo la conferma.</SheetDescription>
+                        <SheetDescription>
+                            La richiesta va all'HR (e al tuo Capo area, se sei un dipendente). Il tuo carico cambia solo dopo le conferme.
+                        </SheetDescription>
                     </SheetHeader>
 
                     <div className="flex flex-1 flex-col gap-4 px-4">
@@ -82,7 +97,7 @@ export function AbsenceFormSheet({ open, absence, onClose }: AbsenceFormSheetPro
                                 id="absence-type"
                                 className={fieldClass}
                                 value={data.type}
-                                onChange={(event) => setData('type', event.target.value as AbsenceFormData['type'])}
+                                onChange={(event) => changeType(event.target.value as AbsenceFormData['type'])}
                             >
                                 {absenceTypeOptions.map((option) => (
                                     <option key={option.value} value={option.value}>
@@ -93,28 +108,65 @@ export function AbsenceFormSheet({ open, absence, onClose }: AbsenceFormSheetPro
                             <InputError message={errors.type} />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="absence-start">Dal</Label>
-                                <Input
-                                    id="absence-start"
-                                    type="date"
-                                    value={data.starts_on}
-                                    onChange={(event) => setData('starts_on', event.target.value)}
-                                />
-                                <InputError message={errors.starts_on} />
+                        {isLeave ? (
+                            <>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="absence-start">Giorno</Label>
+                                    <Input
+                                        id="absence-start"
+                                        type="date"
+                                        value={data.starts_on}
+                                        onChange={(event) => changeStartDate(event.target.value)}
+                                    />
+                                    <InputError message={errors.starts_on ?? errors.ends_on} />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="absence-start-time">Dalle</Label>
+                                        <Input
+                                            id="absence-start-time"
+                                            type="time"
+                                            value={data.starts_time}
+                                            onChange={(event) => setData('starts_time', event.target.value)}
+                                        />
+                                        <InputError message={errors.starts_time} />
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="absence-end-time">Alle</Label>
+                                        <Input
+                                            id="absence-end-time"
+                                            type="time"
+                                            value={data.ends_time}
+                                            onChange={(event) => setData('ends_time', event.target.value)}
+                                        />
+                                        <InputError message={errors.ends_time} />
+                                    </div>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="absence-start">Dal</Label>
+                                    <Input
+                                        id="absence-start"
+                                        type="date"
+                                        value={data.starts_on}
+                                        onChange={(event) => changeStartDate(event.target.value)}
+                                    />
+                                    <InputError message={errors.starts_on} />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="absence-end">Al</Label>
+                                    <Input
+                                        id="absence-end"
+                                        type="date"
+                                        value={data.ends_on}
+                                        onChange={(event) => setData('ends_on', event.target.value)}
+                                    />
+                                    <InputError message={errors.ends_on} />
+                                </div>
                             </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="absence-end">Al</Label>
-                                <Input
-                                    id="absence-end"
-                                    type="date"
-                                    value={data.ends_on}
-                                    onChange={(event) => setData('ends_on', event.target.value)}
-                                />
-                                <InputError message={errors.ends_on} />
-                            </div>
-                        </div>
+                        )}
 
                         <div className="grid gap-2">
                             <Label htmlFor="absence-note">Note</Label>
@@ -134,7 +186,7 @@ export function AbsenceFormSheet({ open, absence, onClose }: AbsenceFormSheetPro
                             Annulla
                         </Button>
                         <Button type="submit" disabled={processing}>
-                            {absence ? 'Salva' : "Invia all'HR"}
+                            {absence ? 'Salva' : 'Invia la richiesta'}
                         </Button>
                     </SheetFooter>
                 </form>

@@ -7,7 +7,7 @@ namespace App\DTO;
 use App\Enum\AbsenceType;
 
 /**
- * Dati validati per creare o modificare un'assenza.
+ * Dati validati per creare o modificare un'assenza. Orari solo per i permessi.
  */
 final readonly class AbsenceData
 {
@@ -15,6 +15,8 @@ final readonly class AbsenceData
         public AbsenceType $type,
         public string $startsOn,
         public string $endsOn,
+        public ?string $startsTime,
+        public ?string $endsTime,
         public ?string $note,
     ) {}
 }

@@ -29,8 +29,26 @@ interface ReasonAction {
 
 const formatDate = (iso: string) => iso.split('-').reverse().join('/');
 
-const formatPeriod = (absence: Absence) =>
-    absence.starts_on === absence.ends_on ? formatDate(absence.starts_on) : `${formatDate(absence.starts_on)} – ${formatDate(absence.ends_on)}`;
+const formatPeriod = (absence: Absence) => {
+    if (absence.type === 'permesso') {
+        return `${formatDate(absence.starts_on)} ${absence.starts_time}–${absence.ends_time} (${absence.hours} h)`;
+    }
+
+    return absence.starts_on === absence.ends_on
+        ? formatDate(absence.starts_on)
+        : `${formatDate(absence.starts_on)} – ${formatDate(absence.ends_on)}`;
+};
+
+/** Chi ha già dato l'ok a una richiesta ancora in attesa (Capo area solo per i dipendenti). */
+const approvalProgress = (absence: Absence): string => {
+    const steps = [`HR: ${absence.hr_approved ? 'ok' : 'da fare'}`];
+
+    if (absence.needs_area_head) {
+        steps.unshift(`Capo area: ${absence.area_head_approved ? 'ok' : 'da fare'}`);
+    }
+
+    return steps.join(' · ');
+};
 
 const statusLabel = { in_attesa: 'In attesa', confermata: 'Confermata', rifiutata: 'Rifiutata' } as const;
 
@@ -97,6 +115,8 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays,
     };
 
     const confirmAbsence = (absence: Absence) => router.post(route('absences.confirm', absence.id), {}, { preserveScroll: true });
+
+    const approveAbsence = (absence: Absence) => router.post(route('absences.approve', absence.id), {}, { preserveScroll: true });
 
     const markNotificationsRead = () => router.post(route('absences.notifications.read'), {}, { preserveScroll: true });
 
@@ -236,6 +256,9 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays,
                                             <td className="text-muted-foreground px-4 py-3">{absence.note}</td>
                                             <td className="px-4 py-3">
                                                 <Badge variant={statusVariant[absence.status]}>{statusLabel[absence.status]}</Badge>
+                                                {absence.status === 'in_attesa' && (
+                                                    <p className="text-muted-foreground mt-1 text-xs">{approvalProgress(absence)}</p>
+                                                )}
                                                 {absence.rejection_reason && (
                                                     <p className="text-muted-foreground mt-1 text-xs">Motivo: {absence.rejection_reason}</p>
                                                 )}
@@ -249,6 +272,16 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays,
                                                         aria-label={`Conferma assenza di ${absence.user_name}`}
                                                     >
                                                         <Check /> Conferma
+                                                    </Button>
+                                                )}
+                                                {absence.can_approve && (
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => approveAbsence(absence)}
+                                                        aria-label={`Approva assenza di ${absence.user_name}`}
+                                                    >
+                                                        <Check /> Approva
                                                     </Button>
                                                 )}
                                                 {absence.can_reject && (

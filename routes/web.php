@@ -66,6 +66,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('absences/{absence}', [AbsenceController::class, 'update'])->name('absences.update');
     Route::delete('absences/{absence}', [AbsenceController::class, 'destroy'])->name('absences.destroy');
     Route::post('absences/notifications/read', [AbsenceController::class, 'readNotifications'])->name('absences.notifications.read');
+    Route::post('absences/{absence}/approve', [AbsenceController::class, 'approve'])->name('absences.approve');
     Route::post('absences/{absence}/reject', [AbsenceController::class, 'reject'])->name('absences.reject');
     Route::post('absences/{absence}/confirm', [AbsenceController::class, 'confirm'])->name('absences.confirm');
 

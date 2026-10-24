@@ -6,15 +6,19 @@ namespace App\Actions\Absences;
 
 use App\DTO\AbsenceData;
 use App\Enum\AbsenceStatus;
+use App\Enum\Role;
 use App\Models\Absence;
 use App\Models\User;
+use App\Notifications\AbsenceRequested;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Throwable;
 
 final class SaveAbsence
 {
     /**
      * Crea un'assenza della persona (sempre in attesa) o aggiorna quella indicata, in transazione.
+     * Modificarla azzera le approvazioni già date. Una nuova richiesta di un dipendente avvisa il suo Capo area.
      *
      * @throws Throwable
      */
@@ -25,14 +29,30 @@ final class SaveAbsence
                 'type' => $data->type,
                 'starts_on' => $data->startsOn,
                 'ends_on' => $data->endsOn,
+                'starts_time' => $data->startsTime,
+                'ends_time' => $data->endsTime,
                 'note' => $data->note,
             ];
 
-            if ($absence === null) {
-                return Absence::create($attributes + ['user_id' => $user->id, 'status' => AbsenceStatus::Pending]);
+            if ($absence !== null) {
+                $absence->update($attributes + [
+                    'confirmed_by' => null,
+                    'confirmed_at' => null,
+                    'area_head_confirmed_by' => null,
+                    'area_head_confirmed_at' => null,
+                ]);
+
+                return $absence;
             }
 
-            $absence->update($attributes);
+            $absence = Absence::create($attributes + ['user_id' => $user->id, 'status' => AbsenceStatus::Pending]);
+
+            if ($absence->requiresAreaHead()) {
+                Notification::send(
+                    User::where('role', Role::AreaHead)->where('area_id', $user->area_id)->get(),
+                    new AbsenceRequested($absence),
+                );
+            }
 
             return $absence;
         });
