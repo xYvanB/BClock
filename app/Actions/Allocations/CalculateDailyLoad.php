@@ -7,6 +7,7 @@ namespace App\Actions\Allocations;
 use App\Enum\LoadLevel;
 use App\Enum\WorkStatus;
 use App\Models\ActivityAllocation;
+use App\Models\Setting;
 
 final class CalculateDailyLoad
 {
@@ -17,7 +18,8 @@ final class CalculateDailyLoad
      * aperte), ore disponibili e livello. Le attività completate o archiviate non contano.
      *
      * Il livello confronta i due valori al centesimo di ora: meno è "sotto capacità", uguale "pieno", più
-     * "sovraccarico". Un giorno senza ore disponibili e senza quote (weekend, festivo, ferie) non ha livello (null);
+     * "sovraccarico". Se Capo o HR hanno attivato la tolleranza (impostazioni), "pieno" copre anche uno scarto
+     * fino a quelle ore, in più o in meno; non si applica ai giorni senza ore disponibili. Un giorno senza ore disponibili e senza quote (weekend, festivo, ferie) non ha livello (null);
      * con quote assegnate resta "sovraccarico".
      *
      * @param  list<int>  $userIds
@@ -36,6 +38,8 @@ final class CalculateDailyLoad
             ->groupBy(fn (ActivityAllocation $allocation): string => $allocation->user_id.'|'.$allocation->date->toDateString())
             ->map(fn ($group): float => (float) $group->sum('hours'));
 
+        $tolerance = Setting::loadToleranceHours();
+
         $result = [];
         foreach ($userIds as $userId) {
             foreach ($availability['days'] as $day) {
@@ -45,7 +49,7 @@ final class CalculateDailyLoad
                 $result[$userId][$day] = [
                     'capacity' => $capacity,
                     'load' => round($load, 2),
-                    'level' => $this->levelOf($load, $capacity),
+                    'level' => $this->levelOf($load, $capacity, $tolerance),
                 ];
             }
         }
@@ -53,7 +57,7 @@ final class CalculateDailyLoad
         return $result;
     }
 
-    private function levelOf(float $load, float $capacity): ?LoadLevel
+    private function levelOf(float $load, float $capacity, float $tolerance): ?LoadLevel
     {
         $loadCents = (int) round($load * 100);
         $capacityCents = (int) round($capacity * 100);
@@ -62,9 +66,11 @@ final class CalculateDailyLoad
             return null;
         }
 
+        $toleranceCents = $capacityCents > 0 ? (int) round($tolerance * 100) : 0;
+
         return match (true) {
-            $loadCents < $capacityCents => LoadLevel::Under,
-            $loadCents === $capacityCents => LoadLevel::Full,
+            $loadCents < $capacityCents - $toleranceCents => LoadLevel::Under,
+            $loadCents <= $capacityCents + $toleranceCents => LoadLevel::Full,
             default => LoadLevel::Over,
         };
     }
