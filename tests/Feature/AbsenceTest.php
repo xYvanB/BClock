@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Actions\Allocations\GenerateActivityAllocations;
 use App\Enum\AbsenceStatus;
 use App\Enum\AbsenceType;
 use App\Models\Absence;
+use App\Models\Activity;
 use App\Models\Area;
 use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -19,7 +21,7 @@ function absencePayload(array $overrides = []): array
     ], $overrides);
 }
 
-it('lets anyone request their own absence, which starts pending', function (User $user): void {
+it('lets everyone but the boss request their own absence, which starts pending', function (User $user): void {
     $this->actingAs($user)
         ->post(route('absences.store'), absencePayload(['note' => 'Viaggio']))
         ->assertRedirect(route('absences.index'))
@@ -32,7 +34,6 @@ it('lets anyone request their own absence, which starts pending', function (User
         ->and($absence->note)->toBe('Viaggio')
         ->and($absence->confirmed_by)->toBeNull();
 })->with([
-    'boss' => fn () => User::factory()->boss()->create(),
     'area head' => fn () => User::factory()->areaHead()->create(),
     'hr' => fn () => User::factory()->hr()->create(),
     'employee' => fn () => User::factory()->employee()->create(),
@@ -329,4 +330,54 @@ it('exposes per-row permissions to the page', function (): void {
             ->where('absences.0.can_confirm', true)
             ->where('absences.0.can_update', false)
             ->where('absences.0.can_delete', true));
+});
+
+it('confirms the absences of the boss on the spot, with nobody to approve them', function (): void {
+    $boss = User::factory()->boss()->create();
+    User::factory()->hr()->create();
+
+    $this->actingAs($boss)->post(route('absences.store'), absencePayload())->assertSessionHasNoErrors();
+
+    $absence = Absence::firstOrFail();
+    expect($absence->status)->toBe(AbsenceStatus::Confirmed)
+        ->and($absence->isFullyApproved())->toBeTrue()
+        ->and($boss->unreadNotifications()->count())->toBe(0);
+
+    $this->actingAs($boss)->get(route('absences.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('absences.0.can_confirm', false)
+            ->where('absences.0.can_approve', false)
+            ->where('absences.0.can_reject', false)
+            ->where('absences.0.can_update', true)
+            ->where('absences.0.can_delete', true));
+
+    $this->actingAs(User::factory()->hr()->create())->post(route('absences.confirm', $absence))->assertForbidden();
+});
+
+it('lets the boss edit and delete their own confirmed absence, which stays confirmed', function (): void {
+    $boss = User::factory()->boss()->create();
+    $this->actingAs($boss)->post(route('absences.store'), absencePayload());
+    $absence = Absence::firstOrFail();
+
+    $this->actingAs($boss)->put(route('absences.update', $absence), absencePayload(['ends_on' => '2026-11-12']))->assertSessionHasNoErrors();
+    expect($absence->refresh()->status)->toBe(AbsenceStatus::Confirmed)
+        ->and($absence->ends_on->toDateString())->toBe('2026-11-12')
+        ->and($absence->isFullyApproved())->toBeTrue();
+
+    $this->actingAs($boss)->delete(route('absences.destroy', $absence))->assertSessionHasNoErrors();
+    $this->assertDatabaseCount('absences', 0);
+});
+
+it('reduces the quotas of the boss as soon as the absence is saved, and gives them back when it is deleted', function (): void {
+    $boss = User::factory()->boss()->create();
+    $activity = Activity::factory()->create(['starts_on' => '2026-11-09', 'due_on' => '2026-11-13', 'planned_hours' => '10.00']);
+    $activity->assignees()->attach($boss);
+    app(GenerateActivityAllocations::class)->handle($activity);
+    expect($activity->allocations()->count())->toBe(5);
+
+    $this->actingAs($boss)->post(route('absences.store'), absencePayload(['starts_on' => '2026-11-09', 'ends_on' => '2026-11-10']));
+    expect($activity->allocations()->count())->toBe(3);
+
+    $this->actingAs($boss)->delete(route('absences.destroy', Absence::firstOrFail()));
+    expect($activity->allocations()->count())->toBe(5);
 });

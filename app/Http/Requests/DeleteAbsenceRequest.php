@@ -21,7 +21,7 @@ class DeleteAbsenceRequest extends FormRequest
     }
 
     /**
-     * Per eliminare un'assenza già confermata serve un motivo.
+     * Per eliminare un'assenza già confermata di un altro serve un motivo (chi toglie la propria non deve spiegare niente).
      *
      * @return array<string, array<int, mixed>>
      */
@@ -29,7 +29,7 @@ class DeleteAbsenceRequest extends FormRequest
     {
         /** @var Absence $absence */
         $absence = $this->route('absence');
-        $mustExplain = $absence->status === AbsenceStatus::Confirmed;
+        $mustExplain = $absence->status === AbsenceStatus::Confirmed && $absence->user_id !== $this->user()->id;
 
         return [
             'reason' => [$mustExplain ? 'required' : 'nullable', 'string', 'max:1000'],

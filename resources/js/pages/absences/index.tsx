@@ -299,7 +299,7 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays,
                                                     </Button>
                                                 )}
                                                 {absence.can_delete &&
-                                                    (absence.status === 'confermata' ? (
+                                                    (absence.status === 'confermata' && !absence.is_own ? (
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"

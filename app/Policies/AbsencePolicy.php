@@ -10,14 +10,15 @@ use App\Models\Absence;
 use App\Models\User;
 
 /**
- * Ognuno inserisce le proprie assenze e le modifica finché sono in attesa. Le conferma l'HR; per i dipendenti
+ * Ognuno inserisce le proprie assenze e le modifica finché sono in attesa; quelle del Capo non le approva nessuno
+ * e le gestisce lui. Le conferma l'HR; per i dipendenti
  * serve anche l'approvazione del loro Capo area. Entrambi possono rifiutare, con un motivo.
  */
 final class AbsencePolicy
 {
     public function update(User $user, Absence $absence): bool
     {
-        return $absence->user_id === $user->id && $absence->isPending();
+        return $absence->user_id === $user->id && ($absence->isPending() || $user->hasRole(Role::Boss));
     }
 
     /**
@@ -30,7 +31,7 @@ final class AbsencePolicy
             return true;
         }
 
-        return $absence->user_id === $user->id && $absence->status !== AbsenceStatus::Confirmed;
+        return $absence->user_id === $user->id && ($absence->status !== AbsenceStatus::Confirmed || $user->hasRole(Role::Boss));
     }
 
     /**
