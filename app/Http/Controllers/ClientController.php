@@ -71,7 +71,7 @@ class ClientController extends Controller
     {
         $action->handle($request->toDto());
 
-        return to_route('clients.index')->with('success', 'Cliente creato.');
+        return to_route('clients.index')->with('success', __('Cliente creato.'));
     }
 
     /**
@@ -81,7 +81,7 @@ class ClientController extends Controller
     {
         $action->handle($client, $request->toDto());
 
-        return back()->with('success', 'Cliente aggiornato.');
+        return back()->with('success', __('Cliente aggiornato.'));
     }
 
     /**

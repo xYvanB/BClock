@@ -15,6 +15,7 @@ use App\Models\Project;
 use App\Models\TimeEntry;
 use App\Models\Timer;
 use App\Models\User;
+use App\Notifications\AppNotification;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
@@ -87,7 +88,7 @@ it('tells who is taken off an activity', function (): void {
 });
 
 it('sends a real e-mail with the link, once the queue runs', function (): void {
-    $mail = new AppNotificationMail('Ti è stato assegnato «Sviluppo login».', 'http://localhost/calendar');
+    $mail = new AppNotificationMail('Ti è stato assegnato «:name».', ['name' => 'Sviluppo login'], 'http://localhost/calendar');
 
     $mail->assertSeeInHtml('Ti è stato assegnato');
     $mail->assertSeeInHtml('http://localhost/calendar');
@@ -289,4 +290,34 @@ it('does not fail the action when the WebSocket server is down, and still saves 
         ->assertRedirect();
 
     expect(Activity::count())->toBe(1)->and($person->unreadNotifications()->count())->toBe(1);
+});
+
+it('shows the notifications, the flash messages and the e-mail in the language of the person', function (): void {
+    $boss = User::factory()->boss()->create();
+    $english = User::factory()->employee()->create(['locale' => 'en']);
+    $project = notificationProject();
+
+    $this->actingAs($boss)->post(route('activities.store'), notificationActivityPayload($project, [$english->id]));
+
+    $this->actingAs($english)->get(route('dashboard'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('locale', 'en')
+            ->where('notifications.items.0.message', 'You have been assigned «Sviluppo login».'));
+
+    $this->actingAs($boss)->get(route('dashboard'))->assertInertia(fn (Assert $page) => $page->where('locale', 'it'));
+
+    $mail = new AppNotificationMail('Ti è stato assegnato «:name».', ['name' => 'Sviluppo login'], 'http://localhost/calendar');
+    $mail->locale('en');
+    $mail->assertSeeInHtml('You have been assigned');
+});
+
+it('words the flash message of an English user in English', function (): void {
+    $boss = User::factory()->boss()->create(['locale' => 'en']);
+
+    $this->actingAs($boss)->post(route('areas.store'), ['name' => 'Team A', 'description' => ''])->assertSessionHas('success', 'Area created.');
+});
+
+it('translates the absence type and the roles inside a notification', function (): void {
+    expect(AppNotification::render(':name (:role) ha approvato la tua richiesta di :type (:period): ora è confermata.', ['name' => 'Anna', 'role' => 'Capo area', 'type' => 'ferie', 'period' => '09/11/2026'], 'en'))
+        ->toBe('Anna (Area head) approved your request for vacation (09/11/2026): it is now confirmed.');
 });

@@ -34,7 +34,7 @@ class AreaController extends Controller
     {
         $action->handle($request->toDto());
 
-        return to_route('areas.index')->with('success', 'Area creata.');
+        return to_route('areas.index')->with('success', __('Area creata.'));
     }
 
     /**
@@ -44,6 +44,6 @@ class AreaController extends Controller
     {
         $action->handle($area, $request->toDto());
 
-        return to_route('areas.index')->with('success', 'Area aggiornata.');
+        return to_route('areas.index')->with('success', __('Area aggiornata.'));
     }
 }

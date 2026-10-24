@@ -17,13 +17,13 @@ class RegenerateAllocationsCommand extends Command
     /**
      * @var string
      */
-    protected $description = 'Ricalcola le quote giornaliere di tutte le attività aperte (festivi e assenze confermate compresi)';
+    protected $description = 'Recalculate the daily allocations of all open activities (holidays and confirmed absences included)';
 
     public function handle(RegenerateAllocations $action): int
     {
         $count = $action->handle();
 
-        $this->info("Quote ricalcolate per {$count} attività.");
+        $this->info("Allocations recalculated for {$count} activities.");
 
         return self::SUCCESS;
     }

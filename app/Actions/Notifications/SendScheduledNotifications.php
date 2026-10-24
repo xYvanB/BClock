@@ -48,7 +48,7 @@ final class SendScheduledNotifications
 
         foreach ($activities as $activity) {
             foreach ($activity->assignees as $user) {
-                $sent += $this->once($user, "due:{$activity->id}:{$activity->due_on->toDateString()}", NotificationKind::DueSoon, "Scadenza vicina: «{$activity->name}» ({$activity->due_on->format('d/m/Y')}).", route('calendar.index'));
+                $sent += $this->once($user, "due:{$activity->id}:{$activity->due_on->toDateString()}", NotificationKind::DueSoon, 'Scadenza vicina: «:name» (:date).', ['name' => $activity->name, 'date' => $activity->due_on->format('d/m/Y')], route('calendar.index'));
             }
         }
 
@@ -65,7 +65,7 @@ final class SendScheduledNotifications
             ->get();
 
         foreach ($timers as $timer) {
-            $sent += $this->once($timer->user, "timer:{$timer->id}", NotificationKind::TimerForgotten, "Timer attivo da oltre 8 ore: «{$timer->activity->name}». Ricordati di fermarlo.", route('time-entries.index'));
+            $sent += $this->once($timer->user, "timer:{$timer->id}", NotificationKind::TimerForgotten, 'Timer attivo da oltre 8 ore: «:name». Ricordati di fermarlo.', ['name' => $timer->activity->name], route('time-entries.index'));
         }
 
         return $sent;
@@ -91,10 +91,10 @@ final class SendScheduledNotifications
                 continue;
             }
 
-            $message = sprintf('Sforamento ore: «%s» %s / %s h.', $project->name, $this->hours($used / 60), $this->hours((float) $project->planned_hours));
+            $params = ['name' => $project->name, 'used' => $this->hours($used / 60), 'planned' => $this->hours((float) $project->planned_hours)];
 
             foreach ($project->members->merge(User::where('role', Role::Boss)->get())->unique('id') as $user) {
-                $sent += $this->once($user, "overrun:{$project->id}", NotificationKind::HoursOverrun, $message, route('projects.show', $project));
+                $sent += $this->once($user, "overrun:{$project->id}", NotificationKind::HoursOverrun, 'Sforamento ore: «:name» :used / :planned h.', $params, route('projects.show', $project));
             }
         }
 
@@ -102,9 +102,11 @@ final class SendScheduledNotifications
     }
 
     /**
+     * @param  array<string, string|int|float>  $params
+     *
      * Sends the reminder only if this person has not already received it with this key.
      */
-    private function once(User $user, string $key, NotificationKind $kind, string $message, string $url): int
+    private function once(User $user, string $key, NotificationKind $kind, string $messageKey, array $params, string $url): int
     {
         $inserted = DB::table('sent_reminders')->insertOrIgnore(['user_id' => $user->id, 'key' => $key, 'sent_at' => now()]);
 
@@ -112,7 +114,7 @@ final class SendScheduledNotifications
             return 0;
         }
 
-        $this->notify->handle([$user], $kind, $message, $url);
+        $this->notify->handle([$user], $kind, $messageKey, $params, $url);
 
         return 1;
     }

@@ -32,7 +32,8 @@ final class RejectAbsence
             $this->notify->handle(
                 [$absence->user],
                 NotificationKind::AbsenceDecision,
-                "{$rejecter->fullName()} ha rifiutato la tua richiesta di {$absence->type->value} ({$absence->periodLabel()}): «{$reason}».",
+                ':name ha rifiutato la tua richiesta di :type (:period): «:reason».',
+                ['name' => $rejecter->fullName(), 'type' => $absence->type->value, 'period' => $absence->periodLabel(), 'reason' => $reason],
                 route('absences.index'),
                 $rejecter,
             );

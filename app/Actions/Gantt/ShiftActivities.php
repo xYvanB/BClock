@@ -47,11 +47,11 @@ final class ShiftActivities
             }
 
             if ($plan['changes'] === []) {
-                throw ValidationException::withMessages(['activity' => 'Nessuna modifica da applicare.']);
+                throw ValidationException::withMessages(['activity' => __('Nessuna modifica da applicare.')]);
             }
 
             if ($plan['projects'] !== [] && ! $confirmProjects) {
-                throw ValidationException::withMessages(['confirm_projects' => 'Lo spostamento supera la scadenza di almeno un progetto: serve la conferma per estenderla.']);
+                throw ValidationException::withMessages(['confirm_projects' => __('Lo spostamento supera la scadenza di almeno un progetto: serve la conferma per estenderla.')]);
             }
 
             foreach ($plan['projects'] as $extension) {
@@ -71,7 +71,8 @@ final class ShiftActivities
                 $this->notify->handle(
                     $moved->assignees,
                     NotificationKind::ActivityMoved,
-                    "Date cambiate: «{$moved->name}» ora va dal {$moved->starts_on->format('d/m/Y')} al {$moved->due_on->format('d/m/Y')}.",
+                    'Date cambiate: «:name» ora va dal :from al :to.',
+                    ['name' => $moved->name, 'from' => $moved->starts_on->format('d/m/Y'), 'to' => $moved->due_on->format('d/m/Y')],
                     route('gantt.index'),
                     $user,
                 );

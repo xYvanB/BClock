@@ -60,7 +60,7 @@ class UserController extends Controller
     {
         $action->handle($request->toDto());
 
-        return to_route('users.index')->with('success', 'Invito inviato.');
+        return to_route('users.index')->with('success', __('Invito inviato.'));
     }
 
     /**
@@ -70,6 +70,6 @@ class UserController extends Controller
     {
         $action->handle($user, $request->toDto());
 
-        return to_route('users.index')->with('success', 'Utente aggiornato.');
+        return to_route('users.index')->with('success', __('Utente aggiornato.'));
     }
 }

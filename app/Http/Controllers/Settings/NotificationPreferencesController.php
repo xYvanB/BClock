@@ -41,6 +41,6 @@ class NotificationPreferencesController extends Controller
     {
         $action->handle($request->user(), $request->preferences());
 
-        return to_route('notification-preferences.edit')->with('success', 'Preferenze salvate.');
+        return to_route('notification-preferences.edit')->with('success', __('Preferenze salvate.'));
     }
 }

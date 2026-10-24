@@ -41,7 +41,7 @@ class StartTimerRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'activity_id.unique' => 'Hai già un timer attivo su questa attività.',
+            'activity_id.unique' => __('Hai già un timer attivo su questa attività.'),
         ];
     }
 

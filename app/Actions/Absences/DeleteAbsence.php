@@ -32,7 +32,8 @@ final class DeleteAbsence
                 $this->notify->handle(
                     [$absence->user],
                     NotificationKind::AbsenceDecision,
-                    "{$user->fullName()} ha eliminato la tua assenza confermata ({$absence->periodLabel()}): «{$reason}».",
+                    ':name ha eliminato la tua assenza confermata (:period): «:reason».',
+                    ['name' => $user->fullName(), 'period' => $absence->periodLabel(), 'reason' => $reason],
                     route('absences.index'),
                     $user,
                 );

@@ -28,6 +28,6 @@ class ActivityAllocationController extends Controller
             $request->hours(),
         );
 
-        return back()->with('success', 'Quota spostata.');
+        return back()->with('success', __('Quota spostata.'));
     }
 }

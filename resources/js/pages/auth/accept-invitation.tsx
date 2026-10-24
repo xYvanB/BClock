@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
+import { t } from '@/lib/i18n';
 import { formatTime } from '@/lib/time';
 import { type Locale, type TimeFormat } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
@@ -24,7 +25,8 @@ interface Props {
 const localeLabels: Record<Locale, string> = { it: 'Italiano (IT)', en: 'English (EN)' };
 const timeFormatLabels: Record<TimeFormat, string> = { '24h': '24 ore', '12h': '12 ore (AM/PM)' };
 
-const fieldClass = 'border-input bg-background focus-visible:ring-ring h-9 w-full rounded-md border px-3 text-sm focus-visible:ring-1 focus-visible:outline-none';
+const fieldClass =
+    'border-input bg-background focus-visible:ring-ring h-9 w-full rounded-md border px-3 text-sm focus-visible:ring-1 focus-visible:outline-none';
 
 /** First access from an invitation (F2): choice of the password and preferences. */
 export default function AcceptInvitation({ invitee, options }: Props) {
@@ -42,18 +44,18 @@ export default function AcceptInvitation({ invitee, options }: Props) {
     };
 
     return (
-        <AuthLayout title={`Benvenuto, ${invitee.name}`} description="Scegli la password e le tue preferenze per iniziare">
-            <Head title="Primo accesso" />
+        <AuthLayout title={`Benvenuto, ${invitee.name}`} description={t('Scegli la password e le tue preferenze per iniziare')}>
+            <Head title={t('Primo accesso')} />
 
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-6">
                     <div className="grid gap-2">
-                        <Label>Email</Label>
+                        <Label>{t('Email')}</Label>
                         <p className="text-muted-foreground text-sm">{invitee.email}</p>
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="password">Password</Label>
+                        <Label htmlFor="password">{t('Password')}</Label>
                         <Input
                             id="password"
                             type="password"
@@ -67,7 +69,7 @@ export default function AcceptInvitation({ invitee, options }: Props) {
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="password_confirmation">Conferma password</Label>
+                        <Label htmlFor="password_confirmation">{t('Conferma password')}</Label>
                         <Input
                             id="password_confirmation"
                             type="password"
@@ -79,11 +81,16 @@ export default function AcceptInvitation({ invitee, options }: Props) {
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="locale">Lingua</Label>
-                        <select id="locale" className={fieldClass} value={data.locale} onChange={(event) => setData('locale', event.target.value as Locale)}>
+                        <Label htmlFor="locale">{t('Lingua')}</Label>
+                        <select
+                            id="locale"
+                            className={fieldClass}
+                            value={data.locale}
+                            onChange={(event) => setData('locale', event.target.value as Locale)}
+                        >
                             {options.locales.map((locale) => (
                                 <option key={locale} value={locale}>
-                                    {localeLabels[locale]}
+                                    {t(localeLabels[locale])}
                                 </option>
                             ))}
                         </select>
@@ -91,7 +98,7 @@ export default function AcceptInvitation({ invitee, options }: Props) {
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="time_format">Formato orario</Label>
+                        <Label htmlFor="time_format">{t('Formato orario')}</Label>
                         <select
                             id="time_format"
                             className={fieldClass}
@@ -100,17 +107,17 @@ export default function AcceptInvitation({ invitee, options }: Props) {
                         >
                             {options.time_formats.map((format) => (
                                 <option key={format} value={format}>
-                                    {timeFormatLabels[format]}
+                                    {t(timeFormatLabels[format])}
                                 </option>
                             ))}
                         </select>
-                        <p className="text-muted-foreground text-sm">Anteprima: {formatTime('14:30', data.time_format)}</p>
+                        <p className="text-muted-foreground text-sm">{t('Anteprima: :value', { value: formatTime('14:30', data.time_format) })}</p>
                         <InputError message={errors.time_format} />
                     </div>
 
                     <Button type="submit" className="w-full" disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                        Inizia
+                        {t('Inizia')}
                     </Button>
                 </div>
             </form>

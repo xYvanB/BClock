@@ -4,6 +4,7 @@ import { HoursProgress } from '@/components/hours-progress';
 import { ProjectFormSheet } from '@/components/project-form-sheet';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
+import { t } from '@/lib/i18n';
 import { statusLabel } from '@/lib/status';
 import { formatDay, formatMinutes } from '@/lib/time';
 import {
@@ -82,16 +83,16 @@ export default function ProjectsShow({ project, activities, time_entries, client
                     </div>
                     <div className="flex flex-wrap gap-2">
                         <Button variant="outline" onClick={() => setEditOpen(true)}>
-                            <Pencil /> Modifica
+                            <Pencil /> {t('Modifica')}
                         </Button>
                         {!isArchived && (
                             <Button variant="outline" onClick={() => setConfirming('archive')}>
-                                <Archive /> Archivia
+                                <Archive /> {t('Archivia')}
                             </Button>
                         )}
                         {!hasHours && (
                             <Button variant="outline" onClick={() => setConfirming('delete')}>
-                                <Trash2 /> Elimina
+                                <Trash2 /> {t('Elimina')}
                             </Button>
                         )}
                     </div>
@@ -105,13 +106,15 @@ export default function ProjectsShow({ project, activities, time_entries, client
 
                 {confirming === 'archive' && (
                     <div role="alert" className="border-destructive/50 bg-destructive/10 grid gap-2 rounded-md border p-3 text-sm">
-                        <p>Archiviando il progetto vengono archiviate anche le sue attività e non si potranno più registrare ore su di esse.</p>
+                        <p>
+                            {t('Archiviando il progetto vengono archiviate anche le sue attività e non si potranno più registrare ore su di esse.')}
+                        </p>
                         <div className="flex justify-end gap-2">
                             <Button variant="outline" size="sm" onClick={() => setConfirming(null)}>
-                                Annulla
+                                {t('Annulla')}
                             </Button>
                             <Button variant="destructive" size="sm" onClick={() => router.post(route('projects.archive', project.id))}>
-                                Archivia
+                                {t('Archivia')}
                             </Button>
                         </div>
                     </div>
@@ -120,15 +123,18 @@ export default function ProjectsShow({ project, activities, time_entries, client
                 {confirming === 'delete' && (
                     <div role="alert" className="border-destructive/50 bg-destructive/10 grid gap-2 rounded-md border p-3 text-sm">
                         <p>
-                            Eliminare definitivamente il progetto{activities.length > 0 && ` e le sue ${activities.length} attività`}? L'operazione
-                            non si può annullare.
+                            {activities.length > 0
+                                ? t("Eliminare definitivamente il progetto e le sue :count attività? L'operazione non si può annullare.", {
+                                      count: activities.length,
+                                  })
+                                : t("Eliminare definitivamente il progetto? L'operazione non si può annullare.")}
                         </p>
                         <div className="flex justify-end gap-2">
                             <Button variant="outline" size="sm" onClick={() => setConfirming(null)}>
-                                Annulla
+                                {t('Annulla')}
                             </Button>
                             <Button variant="destructive" size="sm" onClick={() => router.delete(route('projects.destroy', project.id))}>
-                                Elimina
+                                {t('Elimina')}
                             </Button>
                         </div>
                     </div>
@@ -144,7 +150,7 @@ export default function ProjectsShow({ project, activities, time_entries, client
                             onClick={() => setTab(item.id)}
                             className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium ${tab === item.id ? 'border-primary' : 'text-muted-foreground border-transparent'}`}
                         >
-                            {item.label}
+                            {t(item.label)}
                         </button>
                     ))}
                 </div>
@@ -153,27 +159,27 @@ export default function ProjectsShow({ project, activities, time_entries, client
                     <section className="grid gap-6">
                         <dl className="grid gap-4 text-sm sm:grid-cols-2">
                             <div>
-                                <dt className="text-muted-foreground">Cliente</dt>
+                                <dt className="text-muted-foreground">{t('Cliente')}</dt>
                                 <dd className="font-medium">{project.client_name}</dd>
                             </div>
                             {project.template_name && (
                                 <div>
-                                    <dt className="text-muted-foreground">Template di origine</dt>
+                                    <dt className="text-muted-foreground">{t('Template di origine')}</dt>
                                     <dd className="font-medium">{project.template_name}</dd>
                                 </div>
                             )}
                             <div>
-                                <dt className="text-muted-foreground">Date</dt>
+                                <dt className="text-muted-foreground">{t('Date')}</dt>
                                 <dd className="font-medium">
                                     {formatDay(project.starts_on)} → {formatDay(project.due_on)}
                                 </dd>
                             </div>
                             <div className="sm:col-span-2">
-                                <dt className="text-muted-foreground">Descrizione</dt>
+                                <dt className="text-muted-foreground">{t('Descrizione')}</dt>
                                 <dd>{project.description ?? '—'}</dd>
                             </div>
                             <div>
-                                <dt className="text-muted-foreground">Avanzamento ore</dt>
+                                <dt className="text-muted-foreground">{t('Avanzamento ore')}</dt>
                                 <dd>
                                     <HoursProgress usedMinutes={project.used_minutes} plannedHours={project.planned_hours} />
                                 </dd>
@@ -181,9 +187,9 @@ export default function ProjectsShow({ project, activities, time_entries, client
                         </dl>
 
                         <div className="flex flex-col gap-2">
-                            <h2 className="text-lg font-medium">Referenti</h2>
+                            <h2 className="text-lg font-medium">{t('Referenti')}</h2>
                             {project.contacts.length === 0 ? (
-                                <p className="text-muted-foreground text-sm">Nessun referente scelto.</p>
+                                <p className="text-muted-foreground text-sm">{t('Nessun referente scelto.')}</p>
                             ) : (
                                 <ul className="border-sidebar-border/70 divide-sidebar-border/70 divide-y rounded-xl border text-sm">
                                     {project.contacts.map((contact) => (
@@ -205,22 +211,22 @@ export default function ProjectsShow({ project, activities, time_entries, client
                         {can_create_activity && !isArchived && (
                             <div className="flex justify-end">
                                 <Button onClick={openNewActivity}>
-                                    <Plus /> Nuova attività
+                                    <Plus /> {t('Nuova attività')}
                                 </Button>
                             </div>
                         )}
                         {activities.length === 0 ? (
-                            <p className="text-muted-foreground text-sm">Nessuna attività in questo progetto.</p>
+                            <p className="text-muted-foreground text-sm">{t('Nessuna attività in questo progetto.')}</p>
                         ) : (
                             <div className="border-sidebar-border/70 overflow-x-auto rounded-xl border">
                                 <table className="w-full text-sm">
                                     <thead className="bg-muted/50 text-left">
                                         <tr>
-                                            <th className="px-4 py-3 font-medium">Nome</th>
-                                            <th className="px-4 py-3 font-medium">Assegnatari</th>
-                                            <th className="px-4 py-3 font-medium">Date</th>
-                                            <th className="px-4 py-3 font-medium">Ore</th>
-                                            <th className="px-4 py-3 font-medium">Stato</th>
+                                            <th className="px-4 py-3 font-medium">{t('Nome')}</th>
+                                            <th className="px-4 py-3 font-medium">{t('Assegnatari')}</th>
+                                            <th className="px-4 py-3 font-medium">{t('Date')}</th>
+                                            <th className="px-4 py-3 font-medium">{t('Ore')}</th>
+                                            <th className="px-4 py-3 font-medium">{t('Stato')}</th>
                                             <th className="px-4 py-3" />
                                         </tr>
                                     </thead>
@@ -242,9 +248,9 @@ export default function ProjectsShow({ project, activities, time_entries, client
                                                             variant="ghost"
                                                             size="sm"
                                                             onClick={() => openEditActivity(activity)}
-                                                            aria-label={`Modifica ${activity.name}`}
+                                                            aria-label={t('Modifica :name', { name: activity.name })}
                                                         >
-                                                            <Pencil /> Modifica
+                                                            <Pencil /> {t('Modifica')}
                                                         </Button>
                                                     )}
                                                 </td>
@@ -260,7 +266,7 @@ export default function ProjectsShow({ project, activities, time_entries, client
                 {tab === 'members' && (
                     <section>
                         {project.members.length === 0 ? (
-                            <p className="text-muted-foreground text-sm">Nessun membro.</p>
+                            <p className="text-muted-foreground text-sm">{t('Nessun membro.')}</p>
                         ) : (
                             <ul className="border-sidebar-border/70 divide-sidebar-border/70 divide-y rounded-xl border text-sm">
                                 {project.members.map((member) => (
@@ -276,16 +282,16 @@ export default function ProjectsShow({ project, activities, time_entries, client
                 {tab === 'hours' && (
                     <section>
                         {time_entries.length === 0 ? (
-                            <p className="text-muted-foreground text-sm">Nessuna ora registrata.</p>
+                            <p className="text-muted-foreground text-sm">{t('Nessuna ora registrata.')}</p>
                         ) : (
                             <div className="border-sidebar-border/70 overflow-x-auto rounded-xl border">
                                 <table className="w-full text-sm">
                                     <thead className="bg-muted/50 text-left">
                                         <tr>
-                                            <th className="px-4 py-3 font-medium">Data</th>
-                                            <th className="px-4 py-3 font-medium">Persona</th>
-                                            <th className="px-4 py-3 font-medium">Attività</th>
-                                            <th className="px-4 py-3 font-medium">Durata</th>
+                                            <th className="px-4 py-3 font-medium">{t('Data')}</th>
+                                            <th className="px-4 py-3 font-medium">{t('Persona')}</th>
+                                            <th className="px-4 py-3 font-medium">{t('Attività')}</th>
+                                            <th className="px-4 py-3 font-medium">{t('Durata')}</th>
                                         </tr>
                                     </thead>
                                     <tbody>

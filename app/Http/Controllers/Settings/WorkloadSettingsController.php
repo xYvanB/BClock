@@ -35,6 +35,6 @@ class WorkloadSettingsController extends Controller
     {
         $action->handle($request->toDto());
 
-        return to_route('workload.edit')->with('success', 'Impostazioni salvate.');
+        return to_route('workload.edit')->with('success', __('Impostazioni salvate.'));
     }
 }

@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { t } from '@/lib/i18n';
 import { activitySchema, type ActivityFormData } from '@/lib/schemas/activity';
 import { statusOptions } from '@/lib/status';
 import { flattenZodErrors } from '@/lib/zod-errors';
@@ -89,7 +90,7 @@ export function ActivityFormSheet({
             onSuccess: () => onClose(),
             onError: (serverErrors: Record<string, string>) => {
                 setConfirming(null);
-                setActionError(serverErrors.activity ?? 'Operazione non riuscita.');
+                setActionError(serverErrors.activity ?? t('Operazione non riuscita.'));
             },
         };
 
@@ -124,7 +125,7 @@ export function ActivityFormSheet({
             : flattenZodErrors<keyof ActivityFormData>(result.error);
 
         if (!fieldErrors.due_on && project && data.due_on > project.due_on) {
-            fieldErrors.due_on = `La scadenza non può superare quella del progetto (${formatDate(project.due_on)}).`;
+            fieldErrors.due_on = t('La scadenza non può superare quella del progetto (:date).', { date: formatDate(project.due_on) });
         }
 
         if (Object.keys(fieldErrors).length > 0) {
@@ -153,13 +154,13 @@ export function ActivityFormSheet({
             <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-lg">
                 <form onSubmit={submit} className="flex h-full flex-col gap-6" noValidate>
                     <SheetHeader>
-                        <SheetTitle>{activity ? 'Modifica attività' : 'Nuova attività'}</SheetTitle>
-                        <SheetDescription>Un'attività appartiene a un progetto e ha una o più persone assegnate.</SheetDescription>
+                        <SheetTitle>{activity ? t('Modifica attività') : t('Nuova attività')}</SheetTitle>
+                        <SheetDescription>{t("Un'attività appartiene a un progetto e ha una o più persone assegnate.")}</SheetDescription>
                     </SheetHeader>
 
                     <div className="flex flex-1 flex-col gap-4 px-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="activity-project">Progetto</Label>
+                            <Label htmlFor="activity-project">{t('Progetto')}</Label>
                             <select
                                 id="activity-project"
                                 className={fieldClass}
@@ -167,19 +168,23 @@ export function ActivityFormSheet({
                                 disabled={activity !== null}
                                 onChange={(event) => setData('project_id', event.target.value)}
                             >
-                                <option value="">Scegli un progetto</option>
+                                <option value="">{t('Scegli un progetto')}</option>
                                 {projects.map((candidate) => (
                                     <option key={candidate.id} value={candidate.id}>
                                         {candidate.name} – {candidate.client_name}
                                     </option>
                                 ))}
                             </select>
-                            {project && <p className="text-muted-foreground text-sm">Scadenza del progetto: {formatDate(project.due_on)}</p>}
+                            {project && (
+                                <p className="text-muted-foreground text-sm">
+                                    {t('Scadenza del progetto: :date', { date: formatDate(project.due_on) })}
+                                </p>
+                            )}
                             <InputError message={errors.project_id} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="activity-name">Nome</Label>
+                            <Label htmlFor="activity-name">{t('Nome')}</Label>
                             <Input
                                 id="activity-name"
                                 value={data.name}
@@ -190,7 +195,7 @@ export function ActivityFormSheet({
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="activity-description">Descrizione</Label>
+                            <Label htmlFor="activity-description">{t('Descrizione')}</Label>
                             <textarea
                                 id="activity-description"
                                 value={data.description}
@@ -203,7 +208,7 @@ export function ActivityFormSheet({
 
                         <div className="grid gap-4 sm:grid-cols-2">
                             <div className="grid gap-2">
-                                <Label htmlFor="activity-starts-on">Inizio</Label>
+                                <Label htmlFor="activity-starts-on">{t('Inizio')}</Label>
                                 <Input
                                     id="activity-starts-on"
                                     type="date"
@@ -214,7 +219,7 @@ export function ActivityFormSheet({
                                 <InputError message={errors.starts_on} />
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="activity-due-on">Scadenza</Label>
+                                <Label htmlFor="activity-due-on">{t('Scadenza')}</Label>
                                 <Input
                                     id="activity-due-on"
                                     type="date"
@@ -228,7 +233,7 @@ export function ActivityFormSheet({
 
                         <div className="grid gap-4 sm:grid-cols-2">
                             <div className="grid gap-2">
-                                <Label htmlFor="activity-hours">Ore previste</Label>
+                                <Label htmlFor="activity-hours">{t('Ore previste')}</Label>
                                 <Input
                                     id="activity-hours"
                                     type="number"
@@ -241,7 +246,7 @@ export function ActivityFormSheet({
                                 <InputError message={errors.planned_hours} />
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="activity-status">Stato</Label>
+                                <Label htmlFor="activity-status">{t('Stato')}</Label>
                                 <select
                                     id="activity-status"
                                     className={fieldClass}
@@ -250,7 +255,7 @@ export function ActivityFormSheet({
                                 >
                                     {statusOptions.map((option) => (
                                         <option key={option.value} value={option.value}>
-                                            {option.label}
+                                            {t(option.label)}
                                         </option>
                                     ))}
                                 </select>
@@ -259,7 +264,7 @@ export function ActivityFormSheet({
                         </div>
 
                         <fieldset className="grid gap-2">
-                            <legend className="text-sm leading-none font-medium">Assegnatari</legend>
+                            <legend className="text-sm leading-none font-medium">{t('Assegnatari')}</legend>
                             <div className="border-sidebar-border/70 grid max-h-48 gap-1 overflow-y-auto rounded-md border p-2">
                                 {assignees.map((person) => (
                                     <label key={person.id} className="flex items-center gap-2 text-sm">
@@ -277,8 +282,10 @@ export function ActivityFormSheet({
 
                         {projectDependencyOptions.length > 0 && (
                             <fieldset className="grid gap-2">
-                                <legend className="text-sm leading-none font-medium">Dipende da</legend>
-                                <p className="text-muted-foreground text-sm">Se queste attività si spostano nel Gantt, questa si sposta con loro.</p>
+                                <legend className="text-sm leading-none font-medium">{t('Dipende da')}</legend>
+                                <p className="text-muted-foreground text-sm">
+                                    {t('Se queste attività si spostano nel Gantt, questa si sposta con loro.')}
+                                </p>
                                 <div className="border-sidebar-border/70 grid max-h-40 gap-1 overflow-y-auto rounded-md border p-2">
                                     {projectDependencyOptions.map((option) => (
                                         <label key={option.id} className="flex items-center gap-2 text-sm">
@@ -297,7 +304,7 @@ export function ActivityFormSheet({
 
                         {activity && (
                             <div className="border-sidebar-border/70 grid gap-3 border-t pt-4">
-                                <p className="text-sm font-medium">Azioni</p>
+                                <p className="text-sm font-medium">{t('Azioni')}</p>
 
                                 {actionError && (
                                     <div role="alert" className="border-destructive/50 bg-destructive/10 rounded-md border p-3 text-sm">
@@ -308,32 +315,32 @@ export function ActivityFormSheet({
                                 <div className="flex flex-wrap gap-2">
                                     {activity.status !== 'archiviato' && (
                                         <Button type="button" variant="outline" size="sm" onClick={() => setConfirming('archive')}>
-                                            <Archive /> Archivia
+                                            <Archive /> {t('Archivia')}
                                         </Button>
                                     )}
                                     {activity.used_minutes === 0 && (
                                         <Button type="button" variant="outline" size="sm" onClick={() => setConfirming('delete')}>
-                                            <Trash2 /> Elimina
+                                            <Trash2 /> {t('Elimina')}
                                         </Button>
                                     )}
                                 </div>
                                 {activity.used_minutes > 0 && (
-                                    <p className="text-muted-foreground text-sm">Ha ore registrate: non si può eliminare, solo archiviare.</p>
+                                    <p className="text-muted-foreground text-sm">{t('Ha ore registrate: non si può eliminare, solo archiviare.')}</p>
                                 )}
 
                                 {confirming && (
                                     <div role="alert" className="border-destructive/50 bg-destructive/10 grid gap-2 rounded-md border p-3 text-sm">
                                         <p>
                                             {confirming === 'archive'
-                                                ? "Archiviando l'attività non si potranno più registrare ore né avviare timer su di essa."
-                                                : "Eliminare definitivamente l'attività? L'operazione non si può annullare."}
+                                                ? t("Archiviando l'attività non si potranno più registrare ore né avviare timer su di essa.")
+                                                : t("Eliminare definitivamente l'attività? L'operazione non si può annullare.")}
                                         </p>
                                         <div className="flex justify-end gap-2">
                                             <Button type="button" variant="outline" size="sm" onClick={() => setConfirming(null)}>
-                                                Annulla
+                                                {t('Annulla')}
                                             </Button>
                                             <Button type="button" variant="destructive" size="sm" onClick={() => runAction(confirming)}>
-                                                {confirming === 'archive' ? 'Archivia' : 'Elimina'}
+                                                {confirming === 'archive' ? t('Archivia') : t('Elimina')}
                                             </Button>
                                         </div>
                                     </div>
@@ -344,10 +351,10 @@ export function ActivityFormSheet({
 
                     <SheetFooter className="flex-row justify-end gap-2">
                         <Button type="button" variant="outline" onClick={onClose}>
-                            Annulla
+                            {t('Annulla')}
                         </Button>
                         <Button type="submit" disabled={processing}>
-                            Salva
+                            {t('Salva')}
                         </Button>
                     </SheetFooter>
                 </form>

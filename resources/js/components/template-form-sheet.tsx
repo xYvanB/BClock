@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { roleLabels } from '@/components/user-form-sheet';
+import { t } from '@/lib/i18n';
 import { templateSchema, type TemplateActivityFormData, type TemplateFormData } from '@/lib/schemas/template';
 import { flattenZodErrors } from '@/lib/zod-errors';
 import { type AreaOption, type TemplateListItem } from '@/types';
@@ -120,15 +121,15 @@ export function TemplateFormSheet({ open, template, areas, onClose }: TemplateFo
             <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-2xl">
                 <form onSubmit={submit} className="flex h-full flex-col gap-6" noValidate>
                     <SheetHeader>
-                        <SheetTitle>{template ? 'Modifica template' : 'Nuovo template'}</SheetTitle>
+                        <SheetTitle>{template ? t('Modifica template') : t('Nuovo template')}</SheetTitle>
                         <SheetDescription>
-                            Le attività usano giorni lavorativi (lun–ven) dall'inizio del progetto: il giorno 1 è la data di inizio.
+                            {t("Le attività usano giorni lavorativi (lun–ven) dall'inizio del progetto: il giorno 1 è la data di inizio.")}
                         </SheetDescription>
                     </SheetHeader>
 
                     <div className="flex flex-1 flex-col gap-4 px-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="template-name">Nome</Label>
+                            <Label htmlFor="template-name">{t('Nome')}</Label>
                             <Input
                                 id="template-name"
                                 value={data.name}
@@ -141,24 +142,24 @@ export function TemplateFormSheet({ open, template, areas, onClose }: TemplateFo
 
                         <div className="grid gap-3">
                             <div className="flex items-center justify-between">
-                                <Label>Attività</Label>
+                                <Label>{t('Attività')}</Label>
                                 <Button
                                     type="button"
                                     variant="outline"
                                     size="sm"
                                     onClick={() => setData('activities', [...data.activities, emptyActivity()])}
                                 >
-                                    <Plus /> Aggiungi attività
+                                    <Plus /> {t('Aggiungi attività')}
                                 </Button>
                             </div>
                             <InputError message={fieldErrors.activities} />
 
                             {data.activities.map((activity, index) => (
                                 <fieldset key={index} className="border-sidebar-border/70 grid gap-3 rounded-lg border p-3">
-                                    <legend className="px-1 text-sm font-medium">Attività {index + 1}</legend>
+                                    <legend className="px-1 text-sm font-medium">{t('Attività :number', { number: index + 1 })}</legend>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor={`template-activity-name-${index}`}>Nome</Label>
+                                        <Label htmlFor={`template-activity-name-${index}`}>{t('Nome')}</Label>
                                         <Input
                                             id={`template-activity-name-${index}`}
                                             value={activity.name}
@@ -169,7 +170,7 @@ export function TemplateFormSheet({ open, template, areas, onClose }: TemplateFo
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor={`template-activity-description-${index}`}>Descrizione</Label>
+                                        <Label htmlFor={`template-activity-description-${index}`}>{t('Descrizione')}</Label>
                                         <textarea
                                             id={`template-activity-description-${index}`}
                                             value={activity.description}
@@ -182,7 +183,7 @@ export function TemplateFormSheet({ open, template, areas, onClose }: TemplateFo
 
                                     <div className="grid gap-3 sm:grid-cols-3">
                                         <div className="grid gap-2">
-                                            <Label htmlFor={`template-activity-hours-${index}`}>Ore previste</Label>
+                                            <Label htmlFor={`template-activity-hours-${index}`}>{t('Ore previste')}</Label>
                                             <Input
                                                 id={`template-activity-hours-${index}`}
                                                 type="number"
@@ -195,7 +196,7 @@ export function TemplateFormSheet({ open, template, areas, onClose }: TemplateFo
                                             <InputError message={fieldErrors[`activities.${index}.planned_hours`]} />
                                         </div>
                                         <div className="grid gap-2">
-                                            <Label htmlFor={`template-activity-start-${index}`}>Dal giorno</Label>
+                                            <Label htmlFor={`template-activity-start-${index}`}>{t('Dal giorno')}</Label>
                                             <Input
                                                 id={`template-activity-start-${index}`}
                                                 type="number"
@@ -207,7 +208,7 @@ export function TemplateFormSheet({ open, template, areas, onClose }: TemplateFo
                                             <InputError message={fieldErrors[`activities.${index}.start_day`]} />
                                         </div>
                                         <div className="grid gap-2">
-                                            <Label htmlFor={`template-activity-end-${index}`}>Al giorno</Label>
+                                            <Label htmlFor={`template-activity-end-${index}`}>{t('Al giorno')}</Label>
                                             <Input
                                                 id={`template-activity-end-${index}`}
                                                 type="number"
@@ -222,14 +223,14 @@ export function TemplateFormSheet({ open, template, areas, onClose }: TemplateFo
 
                                     <div className="grid gap-3 sm:grid-cols-2">
                                         <div className="grid gap-2">
-                                            <Label htmlFor={`template-activity-area-${index}`}>Area suggerita</Label>
+                                            <Label htmlFor={`template-activity-area-${index}`}>{t('Area suggerita')}</Label>
                                             <select
                                                 id={`template-activity-area-${index}`}
                                                 className={fieldClass}
                                                 value={activity.suggested_area_id}
                                                 onChange={(event) => updateActivity(index, { suggested_area_id: event.target.value })}
                                             >
-                                                <option value="">Nessuna</option>
+                                                <option value="">{t('Nessuna')}</option>
                                                 {areas.map((area) => (
                                                     <option key={area.id} value={area.id}>
                                                         {area.name}
@@ -239,14 +240,14 @@ export function TemplateFormSheet({ open, template, areas, onClose }: TemplateFo
                                             <InputError message={fieldErrors[`activities.${index}.suggested_area_id`]} />
                                         </div>
                                         <div className="grid gap-2">
-                                            <Label htmlFor={`template-activity-role-${index}`}>Ruolo suggerito</Label>
+                                            <Label htmlFor={`template-activity-role-${index}`}>{t('Ruolo suggerito')}</Label>
                                             <select
                                                 id={`template-activity-role-${index}`}
                                                 className={fieldClass}
                                                 value={activity.suggested_role}
                                                 onChange={(event) => updateActivity(index, { suggested_role: event.target.value })}
                                             >
-                                                <option value="">Nessuno</option>
+                                                <option value="">{t('Nessuno')}</option>
                                                 {Object.entries(roleLabels).map(([value, label]) => (
                                                     <option key={value} value={value}>
                                                         {label}
@@ -264,7 +265,7 @@ export function TemplateFormSheet({ open, template, areas, onClose }: TemplateFo
                                             size="sm"
                                             onClick={() => moveActivity(index, -1)}
                                             disabled={index === 0}
-                                            aria-label={`Sposta su l'attività ${index + 1}`}
+                                            aria-label={t("Sposta su l'attività :number", { number: index + 1 })}
                                         >
                                             <ArrowUp />
                                         </Button>
@@ -274,7 +275,7 @@ export function TemplateFormSheet({ open, template, areas, onClose }: TemplateFo
                                             size="sm"
                                             onClick={() => moveActivity(index, 1)}
                                             disabled={index === data.activities.length - 1}
-                                            aria-label={`Sposta giù l'attività ${index + 1}`}
+                                            aria-label={t("Sposta giù l'attività :number", { number: index + 1 })}
                                         >
                                             <ArrowDown />
                                         </Button>
@@ -283,9 +284,9 @@ export function TemplateFormSheet({ open, template, areas, onClose }: TemplateFo
                                             variant="ghost"
                                             size="sm"
                                             onClick={() => removeActivity(index)}
-                                            aria-label={`Rimuovi l'attività ${index + 1}`}
+                                            aria-label={t("Rimuovi l'attività :number", { number: index + 1 })}
                                         >
-                                            <Trash2 /> Rimuovi
+                                            <Trash2 /> {t('Rimuovi')}
                                         </Button>
                                     </div>
                                 </fieldset>
@@ -295,10 +296,10 @@ export function TemplateFormSheet({ open, template, areas, onClose }: TemplateFo
 
                     <SheetFooter className="flex-row justify-end gap-2">
                         <Button type="button" variant="outline" onClick={onClose}>
-                            Annulla
+                            {t('Annulla')}
                         </Button>
                         <Button type="submit" disabled={processing}>
-                            Salva
+                            {t('Salva')}
                         </Button>
                     </SheetFooter>
                 </form>

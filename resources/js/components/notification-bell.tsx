@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { getEcho } from '@/lib/echo';
+import { t } from '@/lib/i18n';
 import { formatNotificationDate } from '@/lib/notifications';
 import { type SharedData } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
@@ -40,7 +41,7 @@ export function NotificationBell() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="relative gap-1" aria-label={`Notifiche: ${unread} non lette`}>
+                <Button variant="ghost" size="sm" className="relative gap-1" aria-label={t('Notifiche: :count non lette', { count: unread })}>
                     <Bell className="size-4" />
                     {unread > 0 && (
                         <span className="bg-primary text-primary-foreground inline-flex min-w-5 items-center justify-center rounded-full px-1.5 text-xs">
@@ -51,16 +52,16 @@ export function NotificationBell() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-96 max-w-[calc(100vw-2rem)] p-2">
                 <div className="flex items-center justify-between">
-                    <DropdownMenuLabel>Notifiche</DropdownMenuLabel>
+                    <DropdownMenuLabel>{t('Notifiche')}</DropdownMenuLabel>
                     {unread > 0 && (
                         <Button variant="link" size="sm" onClick={() => router.post(route('notifications.read-all'), {}, { preserveScroll: true })}>
-                            Segna tutte come lette
+                            {t('Segna tutte come lette')}
                         </Button>
                     )}
                 </div>
                 <DropdownMenuSeparator />
                 {notifications.items.length === 0 ? (
-                    <p className="text-muted-foreground px-2 py-3 text-sm">Nessuna notifica.</p>
+                    <p className="text-muted-foreground px-2 py-3 text-sm">{t('Nessuna notifica.')}</p>
                 ) : (
                     <ul className="grid gap-2">
                         {notifications.items.map((notification) => (
@@ -71,7 +72,7 @@ export function NotificationBell() {
                                     className={`border-sidebar-border/70 w-full rounded-md border p-2 text-left ${notification.is_read ? 'opacity-70' : 'bg-accent/40'}`}
                                 >
                                     <p className={`text-sm ${notification.is_read ? '' : 'font-medium'}`}>
-                                        {!notification.is_read && <span aria-label="Non letta">● </span>}
+                                        {!notification.is_read && <span aria-label={t('Non letta')}>● </span>}
                                         {notification.message}
                                     </p>
                                     <p className="text-muted-foreground text-xs">
@@ -85,7 +86,7 @@ export function NotificationBell() {
                 )}
                 <DropdownMenuSeparator />
                 <Link href={route('notifications.index')} className="text-primary block px-2 py-2 text-sm underline-offset-4 hover:underline">
-                    Vedi tutte le notifiche
+                    {t('Vedi tutte le notifiche')}
                 </Link>
             </DropdownMenuContent>
         </DropdownMenu>

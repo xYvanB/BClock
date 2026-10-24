@@ -4,6 +4,7 @@ import InputError from '@/components/input-error';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
+import { t } from '@/lib/i18n';
 import { absenceTypeLabel } from '@/lib/schemas/absence';
 import { holidayKindLabels } from '@/lib/schemas/holiday';
 import { type Absence, type BreadcrumbItem, type Holiday, type SharedData } from '@/types';
@@ -56,7 +57,7 @@ const statusVariant = { in_attesa: 'secondary', confermata: 'default', rifiutata
 export default function AbsencesIndex({ absences, holidays, can_manage_holidays }: AbsencesIndexProps) {
     const { auth } = usePage<SharedData>().props;
     const showPerson = auth.user.role !== 'dipendente';
-    const title = 'Assenze';
+    const title = t('Assenze');
     const breadcrumbs: BreadcrumbItem[] = [{ title, href: '/absences' }];
 
     const [tab, setTab] = useState<Tab>('absences');
@@ -86,7 +87,7 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays 
         }
 
         if (reason.trim() === '') {
-            setReasonError('Il motivo è obbligatorio.');
+            setReasonError(t('Il motivo è obbligatorio.'));
 
             return;
         }
@@ -114,17 +115,17 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays 
     const deleteControls = (key: string, url: string, label: string) =>
         confirmingDelete === key ? (
             <span className="inline-flex items-center gap-1">
-                <span className="text-sm">Eliminare?</span>
+                <span className="text-sm">{t('Eliminare?')}</span>
                 <Button variant="destructive" size="sm" onClick={() => remove(key, url)}>
-                    Elimina
+                    {t('Elimina')}
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => setConfirmingDelete(null)}>
-                    Annulla
+                    {t('Annulla')}
                 </Button>
             </span>
         ) : (
-            <Button variant="ghost" size="sm" onClick={() => setConfirmingDelete(key)} aria-label={`Elimina ${label}`}>
-                <Trash2 /> Elimina
+            <Button variant="ghost" size="sm" onClick={() => setConfirmingDelete(key)} aria-label={t('Elimina :label', { label })}>
+                <Trash2 /> {t('Elimina')}
             </Button>
         );
 
@@ -139,13 +140,13 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays 
                     <h1 className="text-2xl font-semibold">{title}</h1>
                     {tab === 'absences' ? (
                         <Button onClick={() => openAbsence(null)}>
-                            <Plus /> Nuova assenza
+                            <Plus /> {t('Nuova assenza')}
                         </Button>
                     ) : (
                         can_manage_holidays && (
                             <Button variant="outline" asChild>
                                 <Link href={route('company-calendar.edit')}>
-                                    <Settings /> Gestisci nelle impostazioni
+                                    <Settings /> {t('Gestisci nelle impostazioni')}
                                 </Link>
                             </Button>
                         )
@@ -160,7 +161,7 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays 
                         size="sm"
                         onClick={() => setTab('absences')}
                     >
-                        Assenze
+                        {t('Assenze')}
                     </Button>
                     <Button
                         role="tab"
@@ -169,7 +170,7 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays 
                         size="sm"
                         onClick={() => setTab('holidays')}
                     >
-                        Giorni non lavorativi
+                        {t('Giorni non lavorativi')}
                     </Button>
                 </div>
 
@@ -177,11 +178,17 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays 
                     <div role="alert" className="border-destructive/50 bg-destructive/10 grid gap-2 rounded-md border p-3 text-sm">
                         <p>
                             {reasonAction.kind === 'reject'
-                                ? `Rifiuti l'assenza di ${reasonAction.absence.user_name} (${formatPeriod(reasonAction.absence)}). Scrivi il motivo: lo vedrà la persona.`
-                                : `Elimini l'assenza già confermata di ${reasonAction.absence.user_name} (${formatPeriod(reasonAction.absence)}). Scrivi il motivo: la persona lo riceverà come notifica.`}
+                                ? t("Rifiuti l'assenza di :name (:period). Scrivi il motivo: lo vedrà la persona.", {
+                                      name: reasonAction.absence.user_name,
+                                      period: formatPeriod(reasonAction.absence),
+                                  })
+                                : t("Elimini l'assenza già confermata di :name (:period). Scrivi il motivo: la persona lo riceverà come notifica.", {
+                                      name: reasonAction.absence.user_name,
+                                      period: formatPeriod(reasonAction.absence),
+                                  })}
                         </p>
                         <textarea
-                            aria-label="Motivo"
+                            aria-label={t('Motivo')}
                             value={reason}
                             onChange={(event) => setReason(event.target.value)}
                             rows={2}
@@ -190,10 +197,10 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays 
                         <InputError message={reasonError} />
                         <div className="flex justify-end gap-2">
                             <Button variant="outline" size="sm" onClick={closeReasonAction}>
-                                Annulla
+                                {t('Annulla')}
                             </Button>
                             <Button variant="destructive" size="sm" onClick={submitReason}>
-                                {reasonAction.kind === 'reject' ? 'Rifiuta' : 'Elimina'}
+                                {reasonAction.kind === 'reject' ? t('Rifiuta') : t('Elimina')}
                             </Button>
                         </div>
                     </div>
@@ -202,19 +209,19 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays 
                 {tab === 'absences' &&
                     (absences.length === 0 ? (
                         <div className="border-sidebar-border/70 flex flex-col items-center gap-3 rounded-xl border border-dashed p-12 text-center">
-                            <p className="text-muted-foreground">{showPerson ? 'Nessuna assenza richiesta' : 'Non hai richiesto assenze'}</p>
-                            <Button onClick={() => openAbsence(null)}>Richiedi un&apos;assenza</Button>
+                            <p className="text-muted-foreground">{showPerson ? t('Nessuna assenza richiesta') : t('Non hai richiesto assenze')}</p>
+                            <Button onClick={() => openAbsence(null)}>{t("Richiedi un'assenza")}</Button>
                         </div>
                     ) : (
                         <div className="border-sidebar-border/70 overflow-x-auto rounded-xl border">
                             <table className="w-full text-sm">
                                 <thead className="bg-muted/50 text-left">
                                     <tr>
-                                        {showPerson && <th className="px-4 py-3 font-medium">Persona</th>}
-                                        <th className="px-4 py-3 font-medium">Tipo</th>
-                                        <th className="px-4 py-3 font-medium">Periodo</th>
-                                        <th className="px-4 py-3 font-medium">Note</th>
-                                        <th className="px-4 py-3 font-medium">Stato</th>
+                                        {showPerson && <th className="px-4 py-3 font-medium">{t('Persona')}</th>}
+                                        <th className="px-4 py-3 font-medium">{t('Tipo')}</th>
+                                        <th className="px-4 py-3 font-medium">{t('Periodo')}</th>
+                                        <th className="px-4 py-3 font-medium">{t('Note')}</th>
+                                        <th className="px-4 py-3 font-medium">{t('Stato')}</th>
                                         <th className="px-4 py-3" />
                                     </tr>
                                 </thead>
@@ -230,12 +237,14 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays 
                                             <td className="px-4 py-3 whitespace-nowrap">{formatPeriod(absence)}</td>
                                             <td className="text-muted-foreground px-4 py-3">{absence.note}</td>
                                             <td className="px-4 py-3">
-                                                <Badge variant={statusVariant[absence.status]}>{statusLabel[absence.status]}</Badge>
+                                                <Badge variant={statusVariant[absence.status]}>{t(statusLabel[absence.status])}</Badge>
                                                 {absence.status === 'in_attesa' && (
                                                     <p className="text-muted-foreground mt-1 text-xs">{approvalProgress(absence)}</p>
                                                 )}
                                                 {absence.rejection_reason && (
-                                                    <p className="text-muted-foreground mt-1 text-xs">Motivo: {absence.rejection_reason}</p>
+                                                    <p className="text-muted-foreground mt-1 text-xs">
+                                                        {t('Motivo: :reason', { reason: absence.rejection_reason })}
+                                                    </p>
                                                 )}
                                             </td>
                                             <td className="px-4 py-3 text-right whitespace-nowrap">
@@ -244,9 +253,9 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays 
                                                         variant="outline"
                                                         size="sm"
                                                         onClick={() => confirmAbsence(absence)}
-                                                        aria-label={`Conferma assenza di ${absence.user_name}`}
+                                                        aria-label={t('Conferma assenza di :name', { name: absence.user_name })}
                                                     >
-                                                        <Check /> Conferma
+                                                        <Check /> {t('Conferma')}
                                                     </Button>
                                                 )}
                                                 {absence.can_approve && (
@@ -254,9 +263,9 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays 
                                                         variant="outline"
                                                         size="sm"
                                                         onClick={() => approveAbsence(absence)}
-                                                        aria-label={`Approva assenza di ${absence.user_name}`}
+                                                        aria-label={t('Approva assenza di :name', { name: absence.user_name })}
                                                     >
-                                                        <Check /> Approva
+                                                        <Check /> {t('Approva')}
                                                     </Button>
                                                 )}
                                                 {absence.can_reject && (
@@ -264,9 +273,9 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays 
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => startReasonAction('reject', absence)}
-                                                        aria-label={`Rifiuta assenza di ${absence.user_name}`}
+                                                        aria-label={t('Rifiuta assenza di :name', { name: absence.user_name })}
                                                     >
-                                                        <X /> Rifiuta
+                                                        <X /> {t('Rifiuta')}
                                                     </Button>
                                                 )}
                                                 {absence.can_update && (
@@ -274,9 +283,9 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays 
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => openAbsence(absence)}
-                                                        aria-label="Modifica assenza"
+                                                        aria-label={t('Modifica assenza')}
                                                     >
-                                                        <Pencil /> Modifica
+                                                        <Pencil /> {t('Modifica')}
                                                     </Button>
                                                 )}
                                                 {absence.can_delete &&
@@ -285,9 +294,9 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays 
                                                             variant="ghost"
                                                             size="sm"
                                                             onClick={() => startReasonAction('delete', absence)}
-                                                            aria-label={`Elimina assenza di ${absence.user_name}`}
+                                                            aria-label={t('Elimina assenza di :name', { name: absence.user_name })}
                                                         >
-                                                            <Trash2 /> Elimina
+                                                            <Trash2 /> {t('Elimina')}
                                                         </Button>
                                                     ) : (
                                                         deleteControls(`absence-${absence.id}`, route('absences.destroy', absence.id), 'assenza')
@@ -303,16 +312,16 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays 
                 {tab === 'holidays' &&
                     (holidays.length === 0 ? (
                         <div className="border-sidebar-border/70 flex flex-col items-center gap-3 rounded-xl border border-dashed p-12 text-center">
-                            <p className="text-muted-foreground">Nessuna festività o chiusura inserita</p>
+                            <p className="text-muted-foreground">{t('Nessuna festività o chiusura inserita')}</p>
                         </div>
                     ) : (
                         <div className="border-sidebar-border/70 overflow-x-auto rounded-xl border">
                             <table className="w-full text-sm">
                                 <thead className="bg-muted/50 text-left">
                                     <tr>
-                                        <th className="px-4 py-3 font-medium">Data</th>
-                                        <th className="px-4 py-3 font-medium">Nome</th>
-                                        <th className="px-4 py-3 font-medium">Tipo</th>
+                                        <th className="px-4 py-3 font-medium">{t('Data')}</th>
+                                        <th className="px-4 py-3 font-medium">{t('Nome')}</th>
+                                        <th className="px-4 py-3 font-medium">{t('Tipo')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -322,7 +331,7 @@ export default function AbsencesIndex({ absences, holidays, can_manage_holidays 
                                             <td className="px-4 py-3 font-medium">{holiday.name}</td>
                                             <td className="px-4 py-3">
                                                 <Badge variant={holiday.kind === 'chiusura' ? 'secondary' : 'outline'}>
-                                                    {holidayKindLabels[holiday.kind]}
+                                                    {t(holidayKindLabels[holiday.kind])}
                                                 </Badge>
                                             </td>
                                         </tr>

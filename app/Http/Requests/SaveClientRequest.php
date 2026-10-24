@@ -61,7 +61,7 @@ class SaveClientRequest extends FormRequest
                     ->count();
 
                 if ($primaries > 1) {
-                    $validator->errors()->add('contacts', 'Può esserci un solo referente principale.');
+                    $validator->errors()->add('contacts', __('Può esserci un solo referente principale.'));
                 }
             },
         ];

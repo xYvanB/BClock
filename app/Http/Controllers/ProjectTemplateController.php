@@ -50,7 +50,7 @@ class ProjectTemplateController extends Controller
     {
         $action->handle($request->toDto());
 
-        return to_route('templates.index')->with('success', 'Template creato.');
+        return to_route('templates.index')->with('success', __('Template creato.'));
     }
 
     /**
@@ -60,6 +60,6 @@ class ProjectTemplateController extends Controller
     {
         $action->handle($projectTemplate, $request->toDto());
 
-        return to_route('templates.index')->with('success', 'Template aggiornato.');
+        return to_route('templates.index')->with('success', __('Template aggiornato.'));
     }
 }

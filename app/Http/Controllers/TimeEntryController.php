@@ -92,7 +92,7 @@ class TimeEntryController extends Controller
     {
         $action->handle($request->user(), $request->toDto());
 
-        return back()->with('success', 'Registrazione salvata.');
+        return back()->with('success', __('Registrazione salvata.'));
     }
 
     /**
@@ -102,7 +102,7 @@ class TimeEntryController extends Controller
     {
         $action->handle($timeEntry, $request->toDto());
 
-        return back()->with('success', 'Registrazione aggiornata.');
+        return back()->with('success', __('Registrazione aggiornata.'));
     }
 
     /**
@@ -114,7 +114,7 @@ class TimeEntryController extends Controller
 
         $action->handle($timeEntry);
 
-        return back()->with('success', 'Registrazione eliminata.');
+        return back()->with('success', __('Registrazione eliminata.'));
     }
 
     /**

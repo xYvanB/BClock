@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { t } from '@/lib/i18n';
 import { areaSchema, type AreaFormData } from '@/lib/schemas/area';
 import { flattenZodErrors } from '@/lib/zod-errors';
 import { type Area } from '@/types';
@@ -61,13 +62,13 @@ export function AreaFormSheet({ open, area, onClose }: AreaFormSheetProps) {
             <SheetContent side="right" className="w-full sm:max-w-md">
                 <form onSubmit={submit} className="flex h-full flex-col gap-6" noValidate>
                     <SheetHeader>
-                        <SheetTitle>{area ? 'Modifica area' : 'Nuova area'}</SheetTitle>
-                        <SheetDescription>Un'area raggruppa le persone di un team.</SheetDescription>
+                        <SheetTitle>{area ? t('Modifica area') : t('Nuova area')}</SheetTitle>
+                        <SheetDescription>{t("Un'area raggruppa le persone di un team.")}</SheetDescription>
                     </SheetHeader>
 
                     <div className="flex flex-1 flex-col gap-4 px-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="area-name">Nome</Label>
+                            <Label htmlFor="area-name">{t('Nome')}</Label>
                             <Input
                                 id="area-name"
                                 value={data.name}
@@ -79,7 +80,7 @@ export function AreaFormSheet({ open, area, onClose }: AreaFormSheetProps) {
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="area-description">Descrizione</Label>
+                            <Label htmlFor="area-description">{t('Descrizione')}</Label>
                             <textarea
                                 id="area-description"
                                 value={data.description}
@@ -93,10 +94,10 @@ export function AreaFormSheet({ open, area, onClose }: AreaFormSheetProps) {
 
                     <SheetFooter className="flex-row justify-end gap-2">
                         <Button type="button" variant="outline" onClick={onClose}>
-                            Annulla
+                            {t('Annulla')}
                         </Button>
                         <Button type="submit" disabled={processing}>
-                            Salva
+                            {t('Salva')}
                         </Button>
                     </SheetFooter>
                 </form>

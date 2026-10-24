@@ -34,8 +34,8 @@ class WorkingWeekdaysRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'weekdays.required' => 'Scegli almeno un giorno lavorativo.',
-            'weekdays.min' => 'Scegli almeno un giorno lavorativo.',
+            'weekdays.required' => __('Scegli almeno un giorno lavorativo.'),
+            'weekdays.min' => __('Scegli almeno un giorno lavorativo.'),
         ];
     }
 

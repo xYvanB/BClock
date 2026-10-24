@@ -36,17 +36,21 @@ final class ConfirmAbsence
                 $absence->update(['confirmed_by' => $approver->id, 'confirmed_at' => now()]);
             }
 
-            $role = $approver->hasRole(Role::AreaHead) ? 'Capo area' : ($approver->hasRole(Role::Boss) ? 'Capo' : 'HR');
-            $what = "{$absence->type->value} ({$absence->periodLabel()})";
+            $params = [
+                'name' => $approver->fullName(),
+                'role' => $approver->hasRole(Role::AreaHead) ? 'Capo area' : ($approver->hasRole(Role::Boss) ? 'Capo' : 'HR'),
+                'type' => $absence->type->value,
+                'period' => $absence->periodLabel(),
+            ];
 
             if (! $absence->isFullyApproved()) {
-                $this->notify->handle([$absence->user], NotificationKind::AbsenceDecision, "{$approver->fullName()} ({$role}) ha approvato la tua richiesta di {$what}: manca ancora una conferma.", route('absences.index'), $approver);
+                $this->notify->handle([$absence->user], NotificationKind::AbsenceDecision, ':name (:role) ha approvato la tua richiesta di :type (:period): manca ancora una conferma.', $params, route('absences.index'), $approver);
 
                 return $absence;
             }
 
             $absence->update(['status' => AbsenceStatus::Confirmed]);
-            $this->notify->handle([$absence->user], NotificationKind::AbsenceDecision, "{$approver->fullName()} ({$role}) ha approvato la tua richiesta di {$what}: ora è confermata.", route('absences.index'), $approver);
+            $this->notify->handle([$absence->user], NotificationKind::AbsenceDecision, ':name (:role) ha approvato la tua richiesta di :type (:period): ora è confermata.', $params, route('absences.index'), $approver);
 
             $this->allocations->handle($absence->starts_on->toDateString(), $absence->ends_on->toDateString(), [$absence->user_id]);
 

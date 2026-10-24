@@ -188,7 +188,7 @@ it('rebuilds the quotas of the open activities with the artisan command', functi
     $activity = allocatedActivity([User::factory()->employee()->create()]);
     ActivityAllocation::query()->delete();
 
-    $this->artisan('allocations:regenerate')->expectsOutput('Quote ricalcolate per 1 attività.')->assertSuccessful();
+    $this->artisan('allocations:regenerate')->expectsOutput('Allocations recalculated for 1 activities.')->assertSuccessful();
 
     expect($activity->allocations()->count())->toBe(5);
 });

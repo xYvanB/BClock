@@ -81,7 +81,7 @@ class SaveProjectRequest extends FormRequest
                 $end = TemplateActivity::dateOfWorkingDay(CarbonImmutable::parse($this->input('starts_on')), $lastDay, Setting::workingWeekdays(), Holiday::closedDates());
 
                 if ($end->toDateString() > $this->input('due_on')) {
-                    $validator->errors()->add('template_id', "Le attività del template finiscono il {$end->format('d/m/Y')}, oltre la scadenza del progetto: allunga la scadenza o scegli un altro template.");
+                    $validator->errors()->add('template_id', __('Le attività del template finiscono il :date, oltre la scadenza del progetto: allunga la scadenza o scegli un altro template.', ['date' => $end->format('d/m/Y')]));
                 }
             },
             function (Validator $validator): void {
@@ -94,7 +94,7 @@ class SaveProjectRequest extends FormRequest
                 $lastActivityDue = $project->activities()->max('due_on');
 
                 if ($lastActivityDue !== null && $this->input('due_on') < substr((string) $lastActivityDue, 0, 10)) {
-                    $validator->errors()->add('due_on', 'La scadenza non può precedere quella delle sue attività ('.date('d/m/Y', (int) strtotime((string) $lastActivityDue)).').');
+                    $validator->errors()->add('due_on', __('La scadenza non può precedere quella delle sue attività (:date).', ['date' => date('d/m/Y', (int) strtotime((string) $lastActivityDue))]));
                 }
             },
         ];

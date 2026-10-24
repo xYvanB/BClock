@@ -79,6 +79,7 @@ class HandleInertiaRequests extends Middleware
                     ->map(fn (DatabaseNotification $notification): array => NotificationController::present($notification))
                     ->values(),
             ],
+            'locale' => fn () => app()->getLocale(),
             'timer_warning_minutes' => Timer::WARNING_AFTER_MINUTES,
             'server_now' => fn () => now()->toIso8601String(),
             'flash' => [

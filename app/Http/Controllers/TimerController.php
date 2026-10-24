@@ -20,7 +20,7 @@ class TimerController extends Controller
     {
         $action->handle($request->user(), $request->toDto());
 
-        return back()->with('success', 'Timer avviato.');
+        return back()->with('success', __('Timer avviato.'));
     }
 
     /**
@@ -33,10 +33,10 @@ class TimerController extends Controller
         $created = $action->handle($timer);
 
         return back()->with('success', match (true) {
-            $created === null => 'Il timer era già stato fermato.',
-            $created === 0 => 'Timer fermato: durata inferiore a un minuto, nessuna registrazione creata.',
-            $created === 1 => 'Timer fermato: registrazione creata.',
-            default => "Timer fermato: il timer attraversava la mezzanotte, create $created registrazioni (una per giorno). Controllale.",
+            $created === null => __('Il timer era già stato fermato.'),
+            $created === 0 => __('Timer fermato: durata inferiore a un minuto, nessuna registrazione creata.'),
+            $created === 1 => __('Timer fermato: registrazione creata.'),
+            default => __('Timer fermato: il timer attraversava la mezzanotte, create :count registrazioni (una per giorno). Controllale.', ['count' => $created]),
         });
     }
 }

@@ -28,7 +28,7 @@ final class DeleteActivity
 
             if ($activity->timers()->exists()) {
                 throw ValidationException::withMessages([
-                    'activity' => 'Ci sono timer attivi su questa attività: fermali prima di eliminarla, oppure archiviala.',
+                    'activity' => __('Ci sono timer attivi su questa attività: fermali prima di eliminarla, oppure archiviala.'),
                 ]);
             }
 

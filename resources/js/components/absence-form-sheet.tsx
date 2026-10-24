@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { t } from '@/lib/i18n';
 import { absenceSchema, absenceTypeOptions, type AbsenceFormData } from '@/lib/schemas/absence';
 import { flattenZodErrors } from '@/lib/zod-errors';
 import { type Absence } from '@/types';
@@ -84,15 +85,15 @@ export function AbsenceFormSheet({ open, absence, onClose }: AbsenceFormSheetPro
             <SheetContent side="right" className="w-full sm:max-w-md">
                 <form onSubmit={submit} className="flex h-full flex-col gap-6" noValidate>
                     <SheetHeader>
-                        <SheetTitle>{absence ? 'Modifica assenza' : 'Nuova assenza'}</SheetTitle>
+                        <SheetTitle>{absence ? t('Modifica assenza') : t('Nuova assenza')}</SheetTitle>
                         <SheetDescription>
-                            La richiesta va all'HR (e al tuo Capo area, se sei un dipendente). Il tuo carico cambia solo dopo le conferme.
+                            {t("La richiesta va all'HR (e al tuo Capo area, se sei un dipendente). Il tuo carico cambia solo dopo le conferme.")}
                         </SheetDescription>
                     </SheetHeader>
 
                     <div className="flex flex-1 flex-col gap-4 px-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="absence-type">Tipo</Label>
+                            <Label htmlFor="absence-type">{t('Tipo')}</Label>
                             <select
                                 id="absence-type"
                                 className={fieldClass}
@@ -101,7 +102,7 @@ export function AbsenceFormSheet({ open, absence, onClose }: AbsenceFormSheetPro
                             >
                                 {absenceTypeOptions.map((option) => (
                                     <option key={option.value} value={option.value}>
-                                        {option.label}
+                                        {t(option.label)}
                                     </option>
                                 ))}
                             </select>
@@ -111,7 +112,7 @@ export function AbsenceFormSheet({ open, absence, onClose }: AbsenceFormSheetPro
                         {isLeave ? (
                             <>
                                 <div className="grid gap-2">
-                                    <Label htmlFor="absence-start">Giorno</Label>
+                                    <Label htmlFor="absence-start">{t('Giorno')}</Label>
                                     <Input
                                         id="absence-start"
                                         type="date"
@@ -122,7 +123,7 @@ export function AbsenceFormSheet({ open, absence, onClose }: AbsenceFormSheetPro
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="grid gap-2">
-                                        <Label htmlFor="absence-start-time">Dalle</Label>
+                                        <Label htmlFor="absence-start-time">{t('Dalle')}</Label>
                                         <Input
                                             id="absence-start-time"
                                             type="time"
@@ -132,7 +133,7 @@ export function AbsenceFormSheet({ open, absence, onClose }: AbsenceFormSheetPro
                                         <InputError message={errors.starts_time} />
                                     </div>
                                     <div className="grid gap-2">
-                                        <Label htmlFor="absence-end-time">Alle</Label>
+                                        <Label htmlFor="absence-end-time">{t('Alle')}</Label>
                                         <Input
                                             id="absence-end-time"
                                             type="time"
@@ -146,7 +147,7 @@ export function AbsenceFormSheet({ open, absence, onClose }: AbsenceFormSheetPro
                         ) : (
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="grid gap-2">
-                                    <Label htmlFor="absence-start">Dal</Label>
+                                    <Label htmlFor="absence-start">{t('Dal')}</Label>
                                     <Input
                                         id="absence-start"
                                         type="date"
@@ -156,7 +157,7 @@ export function AbsenceFormSheet({ open, absence, onClose }: AbsenceFormSheetPro
                                     <InputError message={errors.starts_on} />
                                 </div>
                                 <div className="grid gap-2">
-                                    <Label htmlFor="absence-end">Al</Label>
+                                    <Label htmlFor="absence-end">{t('Al')}</Label>
                                     <Input
                                         id="absence-end"
                                         type="date"
@@ -169,7 +170,7 @@ export function AbsenceFormSheet({ open, absence, onClose }: AbsenceFormSheetPro
                         )}
 
                         <div className="grid gap-2">
-                            <Label htmlFor="absence-note">Note</Label>
+                            <Label htmlFor="absence-note">{t('Note')}</Label>
                             <textarea
                                 id="absence-note"
                                 value={data.note}
@@ -183,10 +184,10 @@ export function AbsenceFormSheet({ open, absence, onClose }: AbsenceFormSheetPro
 
                     <SheetFooter className="flex-row justify-end gap-2">
                         <Button type="button" variant="outline" onClick={onClose}>
-                            Annulla
+                            {t('Annulla')}
                         </Button>
                         <Button type="submit" disabled={processing}>
-                            {absence ? 'Salva' : 'Invia la richiesta'}
+                            {absence ? t('Salva') : t('Invia la richiesta')}
                         </Button>
                     </SheetFooter>
                 </form>

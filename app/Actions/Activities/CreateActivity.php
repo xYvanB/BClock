@@ -49,7 +49,8 @@ final class CreateActivity
             $this->notify->handle(
                 User::whereIn('id', $data->assigneeIds)->get(),
                 NotificationKind::TaskAssigned,
-                "Ti è stato assegnato «{$activity->name}».",
+                'Ti è stato assegnato «:name».',
+                ['name' => $activity->name],
                 route('calendar.index'),
                 $actor,
             );

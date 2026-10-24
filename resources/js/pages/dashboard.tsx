@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
+import { decimalSeparator, t } from '@/lib/i18n';
 import { formatMinutes } from '@/lib/time';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type DashboardFilters, type DayHours, type ProjectHours, type WorkedHours } from '@/types';
@@ -23,7 +24,7 @@ const fieldClass =
 
 const formatDate = (iso: string) => iso.split('-').reverse().join('/');
 
-const formatHours = (hours: number) => `${String(Number(hours.toFixed(2))).replace('.', ',')} h`;
+const formatHours = (hours: number) => `${String(Number(hours.toFixed(2))).replace('.', decimalSeparator())} h`;
 
 function Card({ title, description, children }: { title: string; description?: string; children: ReactNode }) {
     return (
@@ -75,11 +76,11 @@ export default function Dashboard({ filters, project_hours, day_hours, worked_ho
     const period = (
         <div className="flex flex-wrap items-end gap-2">
             <label className="grid gap-1 text-sm">
-                <span className="text-muted-foreground">Dal</span>
+                <span className="text-muted-foreground">{t('Dal')}</span>
                 <Input type="date" value={form.from} onChange={(event) => setForm({ ...form, from: event.target.value })} />
             </label>
             <label className="grid gap-1 text-sm">
-                <span className="text-muted-foreground">Al</span>
+                <span className="text-muted-foreground">{t('Al')}</span>
                 <Input type="date" value={form.to} onChange={(event) => setForm({ ...form, to: event.target.value })} />
             </label>
         </div>
@@ -89,32 +90,35 @@ export default function Dashboard({ filters, project_hours, day_hours, worked_ho
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Dashboard" />
+            <Head title={t('Dashboard')} />
 
             <div className="flex flex-col gap-6 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                    <h1 className="text-2xl font-semibold">Dashboard</h1>
+                    <h1 className="text-2xl font-semibold">{t('Dashboard')}</h1>
                     {can_export && (
                         <Button variant="outline" asChild>
                             <a href={route('dashboard.export', params())}>
-                                <Download /> Esporta CSV
+                                <Download /> {t('Esporta CSV')}
                             </a>
                         </Button>
                     )}
                 </div>
 
                 {project_hours && (
-                    <Card title="Ore per progetto" description="Ore registrate nel periodo, e quelle utilizzate in totale rispetto alle previste.">
+                    <Card
+                        title={t('Ore per progetto')}
+                        description={t('Ore registrate nel periodo, e quelle utilizzate in totale rispetto alle previste.')}
+                    >
                         <div className="flex flex-wrap items-end gap-2">
                             {period}
                             <label className="grid gap-1 text-sm">
-                                <span className="text-muted-foreground">Progetto</span>
+                                <span className="text-muted-foreground">{t('Progetto')}</span>
                                 <select
                                     className={fieldClass}
                                     value={form.project_id}
                                     onChange={(event) => setForm({ ...form, project_id: event.target.value })}
                                 >
-                                    <option value="">Tutti</option>
+                                    <option value="">{t('Tutti')}</option>
                                     {project_hours.options.map((option) => (
                                         <option key={option.id} value={option.id}>
                                             {option.name}
@@ -122,15 +126,15 @@ export default function Dashboard({ filters, project_hours, day_hours, worked_ho
                                     ))}
                                 </select>
                             </label>
-                            <Button onClick={apply}>Applica</Button>
+                            <Button onClick={apply}>{t('Applica')}</Button>
                         </div>
 
                         {project_hours.projects.length === 0 ? (
-                            <Empty>Nessuna ora registrata nel periodo</Empty>
+                            <Empty>{t('Nessuna ora registrata nel periodo')}</Empty>
                         ) : (
                             <>
                                 <p className="text-sm">
-                                    Totale nel periodo: <strong>{formatHours(project_hours.total_hours)}</strong>
+                                    {t('Totale nel periodo:')} <strong>{formatHours(project_hours.total_hours)}</strong>
                                 </p>
                                 <ul className="grid gap-3">
                                     {project_hours.projects.map((project) => (
@@ -140,14 +144,21 @@ export default function Dashboard({ filters, project_hours, day_hours, worked_ho
                                                     {project.name} <span className="text-muted-foreground font-normal">– {project.client}</span>
                                                 </span>
                                                 <span className="text-muted-foreground">
-                                                    nel periodo {formatHours(project.period_hours)} · utilizzate {formatHours(project.total_hours)} su{' '}
-                                                    {formatHours(project.planned_hours)} previste
+                                                    {t('nel periodo :period · utilizzate :used su :planned previste', {
+                                                        period: formatHours(project.period_hours),
+                                                        used: formatHours(project.total_hours),
+                                                        planned: formatHours(project.planned_hours),
+                                                    })}
                                                 </span>
                                             </div>
                                             <Bar
                                                 value={project.total_hours}
                                                 max={project.planned_hours}
-                                                label={`${project.name}: ${formatHours(project.total_hours)} su ${formatHours(project.planned_hours)} previste`}
+                                                label={t(':name: :used su :planned previste', {
+                                                    name: project.name,
+                                                    used: formatHours(project.total_hours),
+                                                    planned: formatHours(project.planned_hours),
+                                                })}
                                             />
                                         </li>
                                     ))}
@@ -156,13 +167,13 @@ export default function Dashboard({ filters, project_hours, day_hours, worked_ho
                                 {project_hours.selected && (
                                     <div className="grid gap-4 md:grid-cols-2">
                                         <div>
-                                            <h3 className="mb-1 text-sm font-medium">Per attività</h3>
+                                            <h3 className="mb-1 text-sm font-medium">{t('Per attività')}</h3>
                                             <table className="w-full text-sm">
                                                 <thead className="text-muted-foreground text-left">
                                                     <tr>
-                                                        <th className="py-1 font-medium">Attività</th>
-                                                        <th className="py-1 text-right font-medium">Periodo</th>
-                                                        <th className="py-1 text-right font-medium">Previste</th>
+                                                        <th className="py-1 font-medium">{t('Attività')}</th>
+                                                        <th className="py-1 text-right font-medium">{t('Periodo')}</th>
+                                                        <th className="py-1 text-right font-medium">{t('Previste')}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -177,7 +188,7 @@ export default function Dashboard({ filters, project_hours, day_hours, worked_ho
                                             </table>
                                         </div>
                                         <div>
-                                            <h3 className="mb-1 text-sm font-medium">Per persona</h3>
+                                            <h3 className="mb-1 text-sm font-medium">{t('Per persona')}</h3>
                                             <ul className="grid gap-2 text-sm">
                                                 {project_hours.selected.people.map((person) => (
                                                     <li key={person.id} className="grid gap-1">
@@ -202,15 +213,18 @@ export default function Dashboard({ filters, project_hours, day_hours, worked_ho
                 )}
 
                 {day_hours && (
-                    <Card title="Ore per persona in una giornata" description="Le registrazioni del giorno e il totale rispetto alla capacità.">
+                    <Card
+                        title={t('Ore per persona in una giornata')}
+                        description={t('Le registrazioni del giorno e il totale rispetto alla capacità.')}
+                    >
                         <div className="flex flex-wrap items-end gap-3">
                             <label className="grid gap-1 text-sm">
-                                <span className="text-muted-foreground">Giorno</span>
+                                <span className="text-muted-foreground">{t('Giorno')}</span>
                                 <Input type="date" value={form.day} onChange={(event) => setForm({ ...form, day: event.target.value })} />
                             </label>
                             {day_hours.options.length > 1 && (
                                 <fieldset className="grid gap-1 text-sm">
-                                    <legend className="text-muted-foreground">Persone (nessuna = chi ha registrato)</legend>
+                                    <legend className="text-muted-foreground">{t('Persone (nessuna = chi ha registrato)')}</legend>
                                     <div className="border-sidebar-border/70 flex max-h-28 flex-wrap gap-x-4 gap-y-1 overflow-y-auto rounded-md border p-2">
                                         {day_hours.options.map((option) => (
                                             <label key={option.id} className="flex items-center gap-1.5">
@@ -225,11 +239,11 @@ export default function Dashboard({ filters, project_hours, day_hours, worked_ho
                                     </div>
                                 </fieldset>
                             )}
-                            <Button onClick={apply}>Applica</Button>
+                            <Button onClick={apply}>{t('Applica')}</Button>
                         </div>
 
                         {day_hours.people.length === 0 ? (
-                            <Empty>Nessuna registrazione il {formatDate(day_hours.day)}</Empty>
+                            <Empty>{t('Nessuna registrazione il :date', { date: formatDate(day_hours.day) })}</Empty>
                         ) : (
                             <div className="grid gap-4 md:grid-cols-2">
                                 {day_hours.people.map((person) => (
@@ -241,16 +255,23 @@ export default function Dashboard({ filters, project_hours, day_hours, worked_ho
                                                     person.total_minutes / 60 > person.capacity_hours && 'font-medium text-red-600 dark:text-red-400',
                                                 )}
                                             >
-                                                {formatMinutes(person.total_minutes)} su {formatHours(person.capacity_hours)}
+                                                {t(':worked su :capacity', {
+                                                    worked: formatMinutes(person.total_minutes),
+                                                    capacity: formatHours(person.capacity_hours),
+                                                })}
                                             </span>
                                         </div>
                                         <Bar
                                             value={person.total_minutes / 60}
                                             max={person.capacity_hours}
-                                            label={`${person.name}: ${formatMinutes(person.total_minutes)} su ${formatHours(person.capacity_hours)}`}
+                                            label={t(':name: :worked su :capacity', {
+                                                name: person.name,
+                                                worked: formatMinutes(person.total_minutes),
+                                                capacity: formatHours(person.capacity_hours),
+                                            })}
                                         />
                                         {person.entries.length === 0 ? (
-                                            <p className="text-muted-foreground mt-2 text-sm">Nessuna registrazione.</p>
+                                            <p className="text-muted-foreground mt-2 text-sm">{t('Nessuna registrazione.')}</p>
                                         ) : (
                                             <ul className="mt-2 divide-y text-sm">
                                                 {person.entries.map((entry) => (
@@ -274,30 +295,30 @@ export default function Dashboard({ filters, project_hours, day_hours, worked_ho
                     </Card>
                 )}
 
-                <Card title="Ore lavorate" description="Persone per periodo, con i totali.">
+                <Card title={t('Ore lavorate')} description={t('Persone per periodo, con i totali.')}>
                     <div className="flex flex-wrap items-end gap-2">
                         {period}
                         <label className="grid gap-1 text-sm">
-                            <span className="text-muted-foreground">Raggruppa per</span>
+                            <span className="text-muted-foreground">{t('Raggruppa per')}</span>
                             <select
                                 className={fieldClass}
                                 value={form.granularity}
                                 onChange={(event) => setForm({ ...form, granularity: event.target.value as DashboardFilters['granularity'] })}
                             >
-                                <option value="day">Giorno</option>
-                                <option value="week">Settimana</option>
-                                <option value="month">Mese</option>
+                                <option value="day">{t('Giorno')}</option>
+                                <option value="week">{t('Settimana')}</option>
+                                <option value="month">{t('Mese')}</option>
                             </select>
                         </label>
                         {worked_hours.people.length > 1 && (
                             <label className="grid gap-1 text-sm">
-                                <span className="text-muted-foreground">Persona</span>
+                                <span className="text-muted-foreground">{t('Persona')}</span>
                                 <select
                                     className={fieldClass}
                                     value={form.user_id}
                                     onChange={(event) => setForm({ ...form, user_id: event.target.value })}
                                 >
-                                    <option value="">Tutte</option>
+                                    <option value="">{t('Tutte')}</option>
                                     {worked_hours.people.map((person) => (
                                         <option key={person.id} value={person.id}>
                                             {person.name}
@@ -308,13 +329,13 @@ export default function Dashboard({ filters, project_hours, day_hours, worked_ho
                         )}
                         {worked_hours.areas.length > 0 && (
                             <label className="grid gap-1 text-sm">
-                                <span className="text-muted-foreground">Area</span>
+                                <span className="text-muted-foreground">{t('Area')}</span>
                                 <select
                                     className={fieldClass}
                                     value={form.area_id}
                                     onChange={(event) => setForm({ ...form, area_id: event.target.value })}
                                 >
-                                    <option value="">Tutte</option>
+                                    <option value="">{t('Tutte')}</option>
                                     {worked_hours.areas.map((area) => (
                                         <option key={area.id} value={area.id}>
                                             {area.name}
@@ -323,23 +344,23 @@ export default function Dashboard({ filters, project_hours, day_hours, worked_ho
                                 </select>
                             </label>
                         )}
-                        <Button onClick={apply}>Applica</Button>
+                        <Button onClick={apply}>{t('Applica')}</Button>
                     </div>
 
                     {worked_hours.rows.length === 0 ? (
-                        <Empty>Nessuna ora lavorata nel periodo</Empty>
+                        <Empty>{t('Nessuna ora lavorata nel periodo')}</Empty>
                     ) : (
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="text-muted-foreground text-left">
-                                        <th className="bg-background sticky left-0 py-2 pr-3 font-medium">Persona</th>
+                                        <th className="bg-background sticky left-0 py-2 pr-3 font-medium">{t('Persona')}</th>
                                         {worked_hours.buckets.map((bucket) => (
                                             <th key={bucket.from} className="px-2 py-2 text-right font-medium whitespace-nowrap">
-                                                {bucket.label}
+                                                {t(bucket.label)}
                                             </th>
                                         ))}
-                                        <th className="py-2 pl-3 text-right font-medium">Totale</th>
+                                        <th className="py-2 pl-3 text-right font-medium">{t('Totale')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -363,7 +384,7 @@ export default function Dashboard({ filters, project_hours, day_hours, worked_ho
                                 <tfoot>
                                     <tr className="border-t-2 font-semibold">
                                         <th scope="row" className="bg-background sticky left-0 py-2 pr-3 text-left">
-                                            Totale
+                                            {t('Totale')}
                                         </th>
                                         {worked_hours.column_totals.map((minutes, index) => (
                                             <td key={index} className="px-2 py-2 text-right">
@@ -376,8 +397,8 @@ export default function Dashboard({ filters, project_hours, day_hours, worked_ho
                             </table>
                             {maxMinutes > 0 && worked_hours.buckets.length > 1 && (
                                 <figure className="mt-6">
-                                    <figcaption className="mb-2 text-sm font-medium">Ore totali per periodo</figcaption>
-                                    <div className="flex items-end gap-1" role="img" aria-label="Ore totali per periodo">
+                                    <figcaption className="mb-2 text-sm font-medium">{t('Ore totali per periodo')}</figcaption>
+                                    <div className="flex items-end gap-1" role="img" aria-label={t('Ore totali per periodo')}>
                                         {worked_hours.column_totals.map((minutes, index) => (
                                             <div
                                                 key={worked_hours.buckets[index].from}
@@ -393,7 +414,7 @@ export default function Dashboard({ filters, project_hours, day_hours, worked_ho
                                                 />
                                                 {worked_hours.buckets.length <= 14 && (
                                                     <span className="text-muted-foreground w-full truncate text-center text-xs">
-                                                        {worked_hours.buckets[index].label}
+                                                        {t(worked_hours.buckets[index].label)}
                                                     </span>
                                                 )}
                                             </div>

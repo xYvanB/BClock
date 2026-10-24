@@ -41,6 +41,6 @@ class CompanyCalendarController extends Controller
     {
         $action->handle($request->weekdays());
 
-        return to_route('company-calendar.edit')->with('success', 'Giorni lavorativi salvati.');
+        return to_route('company-calendar.edit')->with('success', __('Giorni lavorativi salvati.'));
     }
 }

@@ -67,7 +67,7 @@ class SaveActivityRequest extends FormRequest
                 $ids = array_map('intval', (array) $this->input('dependency_ids', []));
 
                 if ($activity instanceof Activity && $ids !== [] && ! $validator->errors()->has('dependency_ids.*') && Activity::wouldCreateCycle($activity->id, $ids)) {
-                    $validator->errors()->add('dependency_ids', 'Le dipendenze formerebbero un ciclo.');
+                    $validator->errors()->add('dependency_ids', __('Le dipendenze formerebbero un ciclo.'));
                 }
             },
             function (Validator $validator): void {
@@ -78,7 +78,7 @@ class SaveActivityRequest extends FormRequest
                 }
 
                 if ($this->input('due_on') > $project->due_on->toDateString()) {
-                    $validator->errors()->add('due_on', "La scadenza non può superare quella del progetto ({$project->due_on->format('d/m/Y')}).");
+                    $validator->errors()->add('due_on', __('La scadenza non può superare quella del progetto (:date).', ['date' => $project->due_on->format('d/m/Y')]));
                 }
             },
         ];

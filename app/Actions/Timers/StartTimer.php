@@ -30,7 +30,7 @@ final class StartTimer
                 'started_at' => now(),
             ]));
         } catch (UniqueConstraintViolationException) {
-            throw ValidationException::withMessages(['activity_id' => 'Hai già un timer attivo su questa attività.']);
+            throw ValidationException::withMessages(['activity_id' => __('Hai già un timer attivo su questa attività.')]);
         }
     }
 }

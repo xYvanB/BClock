@@ -2,6 +2,7 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { t } from '@/lib/i18n';
 import { type ActivityOption } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { FormEventHandler, useEffect } from 'react';
@@ -31,7 +32,7 @@ export function TimerStartSheet({ open, activities, onClose }: TimerStartSheetPr
         event.preventDefault();
 
         if (data.activity_id === '') {
-            setError('activity_id', "Scegli un'attività");
+            setError('activity_id', t("Scegli un'attività"));
 
             return;
         }
@@ -50,15 +51,15 @@ export function TimerStartSheet({ open, activities, onClose }: TimerStartSheetPr
             <SheetContent side="right" className="w-full sm:max-w-md">
                 <form onSubmit={submit} className="flex h-full flex-col gap-6" noValidate>
                     <SheetHeader>
-                        <SheetTitle>Avvia timer</SheetTitle>
+                        <SheetTitle>{t('Avvia timer')}</SheetTitle>
                         <SheetDescription>
-                            Puoi avere più timer attivi, uno per attività. Allo stop diventa una registrazione che puoi modificare.
+                            {t('Puoi avere più timer attivi, uno per attività. Allo stop diventa una registrazione che puoi modificare.')}
                         </SheetDescription>
                     </SheetHeader>
 
                     <div className="flex flex-1 flex-col gap-4 px-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="timer-activity">Attività</Label>
+                            <Label htmlFor="timer-activity">{t('Attività')}</Label>
                             <select
                                 id="timer-activity"
                                 className={fieldClass}
@@ -66,7 +67,7 @@ export function TimerStartSheet({ open, activities, onClose }: TimerStartSheetPr
                                 onChange={(event) => setData('activity_id', event.target.value)}
                                 aria-invalid={Boolean(errors.activity_id)}
                             >
-                                <option value="">Scegli un'attività…</option>
+                                <option value="">{t("Scegli un'attività…")}</option>
                                 {activities.map((activity) => (
                                     <option key={activity.id} value={activity.id}>
                                         {activity.project_name} › {activity.name}
@@ -77,7 +78,7 @@ export function TimerStartSheet({ open, activities, onClose }: TimerStartSheetPr
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="timer-description">Descrizione (facoltativa)</Label>
+                            <Label htmlFor="timer-description">{t('Descrizione (facoltativa)')}</Label>
                             <textarea
                                 id="timer-description"
                                 value={data.description}
@@ -91,10 +92,10 @@ export function TimerStartSheet({ open, activities, onClose }: TimerStartSheetPr
 
                     <SheetFooter className="flex-row justify-end gap-2">
                         <Button type="button" variant="outline" onClick={onClose}>
-                            Annulla
+                            {t('Annulla')}
                         </Button>
                         <Button type="submit" disabled={processing}>
-                            Avvia
+                            {t('Avvia')}
                         </Button>
                     </SheetFooter>
                 </form>

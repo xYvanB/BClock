@@ -52,7 +52,8 @@ final class UpdateActivity
             $this->notify->handle(
                 User::whereIn('id', $changes['attached'])->get(),
                 NotificationKind::TaskAssigned,
-                "Ti è stato assegnato «{$activity->name}».",
+                'Ti è stato assegnato «:name».',
+                ['name' => $activity->name],
                 route('calendar.index'),
                 $actor,
             );
@@ -60,7 +61,8 @@ final class UpdateActivity
             $this->notify->handle(
                 User::whereIn('id', $changes['detached'])->get(),
                 NotificationKind::TaskAssigned,
-                "Non sei più assegnato a «{$activity->name}».",
+                'Non sei più assegnato a «:name».',
+                ['name' => $activity->name],
                 route('calendar.index'),
                 $actor,
             );
@@ -71,7 +73,14 @@ final class UpdateActivity
                 $this->notify->handle(
                     User::whereIn('id', $data->assigneeIds)->whereNotIn('id', $changes['attached'])->get(),
                     NotificationKind::ActivityMoved,
-                    "Date cambiate: «{$activity->name}» ora va dal {$activity->starts_on->format('d/m/Y')} al {$activity->due_on->format('d/m/Y')} (era dal {$this->format($before[0])} al {$this->format($before[1])}).",
+                    'Date cambiate: «:name» ora va dal :from al :to (era dal :oldFrom al :oldTo).',
+                    [
+                        'name' => $activity->name,
+                        'from' => $activity->starts_on->format('d/m/Y'),
+                        'to' => $activity->due_on->format('d/m/Y'),
+                        'oldFrom' => $this->format($before[0]),
+                        'oldTo' => $this->format($before[1]),
+                    ],
                     route('calendar.index'),
                     $actor,
                 );

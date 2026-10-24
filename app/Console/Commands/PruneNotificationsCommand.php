@@ -15,7 +15,7 @@ class PruneNotificationsCommand extends Command
 
     protected $signature = 'notifications:prune';
 
-    protected $description = 'Cancella le notifiche più vecchie di 90 giorni';
+    protected $description = 'Delete the notifications older than 90 days';
 
     public function handle(): int
     {
@@ -24,7 +24,7 @@ class PruneNotificationsCommand extends Command
         // sent reminders only matter while the event is current
         DB::table('sent_reminders')->where('sent_at', '<', now()->subDays(self::KEEP_DAYS * 2))->delete();
 
-        $this->info("Notifiche cancellate: {$deleted}.");
+        $this->info("Notifications deleted: {$deleted}.");
 
         return self::SUCCESS;
     }

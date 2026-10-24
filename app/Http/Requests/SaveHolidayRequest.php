@@ -48,9 +48,9 @@ class SaveHolidayRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'date.unique' => 'Esiste già un giorno non lavorativo in questa data.',
-            'until.after' => 'La fine del periodo deve essere dopo il primo giorno.',
-            'until.prohibited' => 'Il periodo si può indicare solo creando una chiusura.',
+            'date.unique' => __('Esiste già un giorno non lavorativo in questa data.'),
+            'until.after' => __('La fine del periodo deve essere dopo il primo giorno.'),
+            'until.prohibited' => __('Il periodo si può indicare solo creando una chiusura.'),
         ];
     }
 
@@ -66,7 +66,7 @@ class SaveHolidayRequest extends FormRequest
                 }
 
                 if (CarbonImmutable::parse($this->string('date')->toString())->addDays(92)->toDateString() < $this->string('until')->toString()) {
-                    $validator->errors()->add('until', 'Un periodo può durare al massimo tre mesi.');
+                    $validator->errors()->add('until', __('Un periodo può durare al massimo tre mesi.'));
                 }
             },
         ];

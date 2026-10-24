@@ -12,14 +12,14 @@ class SendScheduledNotificationsCommand extends Command
 {
     protected $signature = 'notifications:remind';
 
-    protected $description = 'Manda i promemoria programmati: scadenze vicine, timer dimenticati, ore di progetto sforate';
+    protected $description = 'Send the scheduled reminders: near due dates, forgotten timers, projects over their hours';
 
     /**
      * @throws Throwable
      */
     public function handle(SendScheduledNotifications $action): int
     {
-        $this->info('Promemoria mandati: '.$action->handle().'.');
+        $this->info('Reminders sent: '.$action->handle().'.');
 
         return self::SUCCESS;
     }

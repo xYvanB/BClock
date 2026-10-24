@@ -20,7 +20,7 @@ class HolidayController extends Controller
     {
         $action->handle($request->toDto());
 
-        return back()->with('success', 'Giorno non lavorativo aggiunto.');
+        return back()->with('success', __('Giorno non lavorativo aggiunto.'));
     }
 
     /**
@@ -30,7 +30,7 @@ class HolidayController extends Controller
     {
         $action->handle($request->toDto(), $holiday);
 
-        return back()->with('success', 'Giorno non lavorativo aggiornato.');
+        return back()->with('success', __('Giorno non lavorativo aggiornato.'));
     }
 
     /**
@@ -42,6 +42,6 @@ class HolidayController extends Controller
 
         $action->handle($holiday);
 
-        return back()->with('success', 'Giorno non lavorativo eliminato.');
+        return back()->with('success', __('Giorno non lavorativo eliminato.'));
     }
 }

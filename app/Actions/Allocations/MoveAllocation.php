@@ -40,34 +40,34 @@ final class MoveAllocation
             $project = $activity->project;
 
             if (in_array($activity->status, [WorkStatus::Done, WorkStatus::Archived], true)) {
-                throw ValidationException::withMessages(['date' => 'Un\'attività completata o archiviata non si può più spostare.']);
+                throw ValidationException::withMessages(['date' => __('Un\'attività completata o archiviata non si può più spostare.')]);
             }
 
             if ($toDate === $allocation->date->toDateString()) {
-                throw ValidationException::withMessages(['date' => 'La quota è già in questo giorno.']);
+                throw ValidationException::withMessages(['date' => __('La quota è già in questo giorno.')]);
             }
 
             if ((float) $allocation->hours <= 0) {
-                throw ValidationException::withMessages(['date' => 'In questo giorno non ci sono ore da spostare.']);
+                throw ValidationException::withMessages(['date' => __('In questo giorno non ci sono ore da spostare.')]);
             }
 
             if (! in_array($toDate, $this->availability->handle([$allocation->user_id], $toDate, $toDate)['working_days'], true)) {
-                throw ValidationException::withMessages(['date' => 'Il giorno scelto non è lavorativo (weekend o festivo).']);
+                throw ValidationException::withMessages(['date' => __('Il giorno scelto non è lavorativo (weekend o festivo).')]);
             }
 
             if ($toDate < $activity->starts_on->toDateString()) {
-                throw ValidationException::withMessages(['date' => 'Non puoi spostare la quota prima dell\'inizio dell\'attività.']);
+                throw ValidationException::withMessages(['date' => __('Non puoi spostare la quota prima dell\'inizio dell\'attività.')]);
             }
 
             $beyondActivity = $toDate > $activity->due_on->toDateString();
             $beyondProject = $toDate > $project->due_on->toDateString();
 
             if ($beyondActivity && ! $extendActivity) {
-                throw ValidationException::withMessages(['extend_activity' => 'Il giorno scelto è oltre la scadenza dell\'attività: serve la conferma per estenderla.']);
+                throw ValidationException::withMessages(['extend_activity' => __('Il giorno scelto è oltre la scadenza dell\'attività: serve la conferma per estenderla.')]);
             }
 
             if ($beyondProject && ! $extendProject) {
-                throw ValidationException::withMessages(['extend_project' => 'Il giorno scelto è oltre la scadenza del progetto: serve la conferma per estenderla.']);
+                throw ValidationException::withMessages(['extend_project' => __('Il giorno scelto è oltre la scadenza del progetto: serve la conferma per estenderla.')]);
             }
 
             if ($beyondActivity) {
@@ -82,7 +82,7 @@ final class MoveAllocation
             $moved = $hours === null ? $available : round($hours, 2);
 
             if ($moved <= 0 || $moved > $available) {
-                throw ValidationException::withMessages(['hours' => 'Indica da 0,01 a '.rtrim(rtrim(number_format($available, 2, ',', ''), '0'), ',').' ore.']);
+                throw ValidationException::withMessages(['hours' => __('Indica da 0,01 a :max ore.', ['max' => rtrim(rtrim(number_format($available, 2, ',', ''), '0'), ',')])]);
             }
 
             $target = ActivityAllocation::query()->firstOrNew([
@@ -100,7 +100,8 @@ final class MoveAllocation
             $this->notify->handle(
                 [$allocation->user],
                 NotificationKind::QuotaMoved,
-                "{$actor->fullName()} ha spostato le tue ore di «{$activity->name}» dal {$from} al ".$target->date->format('d/m/Y').'.',
+                ':name ha spostato le tue ore di «:activity» dal :from al :to.',
+                ['name' => $actor->fullName(), 'activity' => $activity->name, 'from' => $from, 'to' => $target->date->format('d/m/Y')],
                 route('calendar.index'),
                 $actor,
             );

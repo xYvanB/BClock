@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { t } from '@/lib/i18n';
 import { holidayKindLabels, holidaySchema, type HolidayFormData } from '@/lib/schemas/holiday';
 import { flattenZodErrors } from '@/lib/zod-errors';
 import { type Holiday } from '@/types';
@@ -70,13 +71,13 @@ export function HolidayFormSheet({ open, holiday, defaultKind = 'festivo', onClo
             <SheetContent side="right" className="w-full sm:max-w-md">
                 <form onSubmit={submit} className="flex h-full flex-col gap-6" noValidate>
                     <SheetHeader>
-                        <SheetTitle>{isNew ? 'Nuovo giorno non lavorativo' : 'Modifica giorno non lavorativo'}</SheetTitle>
-                        <SheetDescription>Nessuno lavora in questi giorni e non si possono chiedere assenze.</SheetDescription>
+                        <SheetTitle>{isNew ? t('Nuovo giorno non lavorativo') : t('Modifica giorno non lavorativo')}</SheetTitle>
+                        <SheetDescription>{t('Nessuno lavora in questi giorni e non si possono chiedere assenze.')}</SheetDescription>
                     </SheetHeader>
 
                     <div className="flex flex-1 flex-col gap-4 px-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="holiday-kind">Tipo</Label>
+                            <Label htmlFor="holiday-kind">{t('Tipo')}</Label>
                             <select
                                 id="holiday-kind"
                                 className={fieldClass}
@@ -85,37 +86,37 @@ export function HolidayFormSheet({ open, holiday, defaultKind = 'festivo', onClo
                             >
                                 {(Object.keys(holidayKindLabels) as (keyof typeof holidayKindLabels)[]).map((kind) => (
                                     <option key={kind} value={kind}>
-                                        {holidayKindLabels[kind]}
+                                        {t(holidayKindLabels[kind])}
                                     </option>
                                 ))}
                             </select>
                             <p className="text-muted-foreground text-sm">
                                 {data.kind === 'festivo'
-                                    ? 'Natale, Ognissanti… una festività del calendario.'
-                                    : "Un ponte o un'altra chiusura dell'azienda non legata a una festività."}
+                                    ? t('Natale, Ognissanti… una festività del calendario.')
+                                    : t("Un ponte o un'altra chiusura dell'azienda non legata a una festività.")}
                             </p>
                             <InputError message={errors.kind} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="holiday-date">{isNew ? 'Dal' : 'Data'}</Label>
+                            <Label htmlFor="holiday-date">{isNew ? t('Dal') : t('Data')}</Label>
                             <Input id="holiday-date" type="date" value={data.date} onChange={(event) => setData('date', event.target.value)} />
                             <InputError message={errors.date} />
                         </div>
 
                         {isNew && (
                             <div className="grid gap-2">
-                                <Label htmlFor="holiday-until">Fino al (facoltativo)</Label>
+                                <Label htmlFor="holiday-until">{t('Fino al (facoltativo)')}</Label>
                                 <Input id="holiday-until" type="date" value={data.until} onChange={(event) => setData('until', event.target.value)} />
                                 <p className="text-muted-foreground text-sm">
-                                    Per un periodo: ogni giorno lavorativo dal primo all'ultimo diventa non lavorativo.
+                                    {t("Per un periodo: ogni giorno lavorativo dal primo all'ultimo diventa non lavorativo.")}
                                 </p>
                                 <InputError message={errors.until} />
                             </div>
                         )}
 
                         <div className="grid gap-2">
-                            <Label htmlFor="holiday-name">Nome</Label>
+                            <Label htmlFor="holiday-name">{t('Nome')}</Label>
                             <Input
                                 id="holiday-name"
                                 value={data.name}
@@ -128,10 +129,10 @@ export function HolidayFormSheet({ open, holiday, defaultKind = 'festivo', onClo
 
                     <SheetFooter className="flex-row justify-end gap-2">
                         <Button type="button" variant="outline" onClick={onClose}>
-                            Annulla
+                            {t('Annulla')}
                         </Button>
                         <Button type="submit" disabled={processing}>
-                            Salva
+                            {t('Salva')}
                         </Button>
                     </SheetFooter>
                 </form>

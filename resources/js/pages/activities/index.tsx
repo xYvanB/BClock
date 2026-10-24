@@ -2,6 +2,7 @@ import { ActivityFormSheet } from '@/components/activity-form-sheet';
 import { FlashMessage } from '@/components/flash-message';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
+import { t } from '@/lib/i18n';
 import { statusLabel } from '@/lib/status';
 import { formatDay, formatMinutes } from '@/lib/time';
 import { type ActivityListItem, type BreadcrumbItem, type DependencyOption, type PersonOption, type ProjectOption } from '@/types';
@@ -35,37 +36,37 @@ export default function ActivitiesIndex({ activities, projects, assignees, depen
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Attività" />
+            <Head title={t('Attività')} />
 
             <div className="flex flex-col gap-4 p-4">
                 <FlashMessage />
 
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-semibold">Attività</h1>
+                    <h1 className="text-2xl font-semibold">{t('Attività')}</h1>
                     {can_create && (
                         <Button onClick={openCreate}>
-                            <Plus /> Nuova attività
+                            <Plus /> {t('Nuova attività')}
                         </Button>
                     )}
                 </div>
 
                 {activities.length === 0 ? (
                     <div className="border-sidebar-border/70 flex flex-col items-center gap-3 rounded-xl border border-dashed p-12 text-center">
-                        <p className="text-muted-foreground">Nessuna attività{can_create && ' – crea la prima'}</p>
-                        {can_create && <Button onClick={openCreate}>Crea attività</Button>}
+                        <p className="text-muted-foreground">{can_create ? t('Nessuna attività – crea la prima') : t('Nessuna attività')}</p>
+                        {can_create && <Button onClick={openCreate}>{t('Crea attività')}</Button>}
                     </div>
                 ) : (
                     <div className="border-sidebar-border/70 overflow-x-auto rounded-xl border">
                         <table className="w-full text-sm">
                             <thead className="bg-muted/50 text-left">
                                 <tr>
-                                    <th className="px-4 py-3 font-medium">Nome</th>
-                                    <th className="px-4 py-3 font-medium">Progetto</th>
-                                    <th className="px-4 py-3 font-medium">Cliente</th>
-                                    <th className="px-4 py-3 font-medium">Assegnatari</th>
-                                    <th className="px-4 py-3 font-medium">Date</th>
-                                    <th className="px-4 py-3 font-medium">Ore (usate / previste)</th>
-                                    <th className="px-4 py-3 font-medium">Stato</th>
+                                    <th className="px-4 py-3 font-medium">{t('Nome')}</th>
+                                    <th className="px-4 py-3 font-medium">{t('Progetto')}</th>
+                                    <th className="px-4 py-3 font-medium">{t('Cliente')}</th>
+                                    <th className="px-4 py-3 font-medium">{t('Assegnatari')}</th>
+                                    <th className="px-4 py-3 font-medium">{t('Date')}</th>
+                                    <th className="px-4 py-3 font-medium">{t('Ore (usate / previste)')}</th>
+                                    <th className="px-4 py-3 font-medium">{t('Stato')}</th>
                                     <th className="px-4 py-3" />
                                 </tr>
                             </thead>
@@ -88,7 +89,7 @@ export default function ActivitiesIndex({ activities, projects, assignees, depen
                                             </td>
                                             <td className="px-4 py-3 whitespace-nowrap">
                                                 <span className="inline-flex items-center gap-1">
-                                                    {overBudget && <AlertTriangle className="size-4" aria-label="Ore previste superate" />}
+                                                    {overBudget && <AlertTriangle className="size-4" aria-label={t('Ore previste superate')} />}
                                                     {formatMinutes(activity.used_minutes)} / {formatMinutes(activity.planned_hours * 60)}
                                                 </span>
                                             </td>
@@ -99,9 +100,9 @@ export default function ActivitiesIndex({ activities, projects, assignees, depen
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => openEdit(activity)}
-                                                        aria-label={`Modifica ${activity.name}`}
+                                                        aria-label={t('Modifica :name', { name: activity.name })}
                                                     >
-                                                        <Pencil /> Modifica
+                                                        <Pencil /> {t('Modifica')}
                                                     </Button>
                                                 )}
                                             </td>

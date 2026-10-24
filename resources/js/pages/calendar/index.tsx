@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
+import { decimalSeparator, intlLocale, t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import {
     type AreaOption,
@@ -57,15 +58,15 @@ const absenceLabels = { ferie: 'Ferie', permesso: 'Permesso' } as const;
 const fieldClass =
     'border-input bg-background focus-visible:ring-ring h-9 rounded-md border px-3 text-sm focus-visible:ring-1 focus-visible:outline-none';
 
-const formatHours = (hours: number) => String(Number(hours.toFixed(2))).replace('.', ',');
+const formatHours = (hours: number) => String(Number(hours.toFixed(2))).replace('.', decimalSeparator());
 
 const formatDate = (iso: string) => iso.split('-').reverse().join('/');
 
-const weekday = (iso: string) => new Date(`${iso}T00:00:00`).toLocaleDateString('it-IT', { weekday: 'short' });
+const weekday = (iso: string) => new Date(`${iso}T00:00:00`).toLocaleDateString(intlLocale(), { weekday: 'short' });
 
 const rangeTitle = (view: 'week' | 'month', from: string, to: string, date: string) =>
     view === 'month'
-        ? new Date(`${date}T00:00:00`).toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })
+        ? new Date(`${date}T00:00:00`).toLocaleDateString(intlLocale(), { month: 'long', year: 'numeric' })
         : `${formatDate(from)} – ${formatDate(to)}`;
 
 /** Workload calendar (F9): per person and day, the assigned hours against the available ones; allocations can be moved. */
@@ -105,7 +106,7 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
                 },
                 onError: (errors) => {
                     setPending(null);
-                    setMoveError(Object.values(errors)[0] ?? 'Spostamento non riuscito.');
+                    setMoveError(Object.values(errors)[0] ?? t('Spostamento non riuscito.'));
                 },
             },
         );
@@ -143,21 +144,21 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Calendario" />
+            <Head title={t('Calendario')} />
 
             <div className="flex flex-col gap-4 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                    <h1 className="text-2xl font-semibold">Calendario</h1>
+                    <h1 className="text-2xl font-semibold">{t('Calendario')}</h1>
 
                     <div className="flex flex-wrap items-center gap-2">
                         {areas.length > 0 && (
                             <select
-                                aria-label="Area"
+                                aria-label={t('Area')}
                                 className={fieldClass}
                                 value={area_id ?? ''}
                                 onChange={(event) => go({ area_id: event.target.value === '' ? null : Number(event.target.value) })}
                             >
-                                <option value="">Tutte le aree</option>
+                                <option value="">{t('Tutte le aree')}</option>
                                 {areas.map((area) => (
                                     <option key={area.id} value={area.id}>
                                         {area.name}
@@ -165,22 +166,22 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
                                 ))}
                             </select>
                         )}
-                        <div role="group" aria-label="Vista" className="flex gap-1">
+                        <div role="group" aria-label={t('Vista')} className="flex gap-1">
                             <Button size="sm" variant={view === 'week' ? 'default' : 'outline'} onClick={() => go({ view: 'week' })}>
-                                Settimana
+                                {t('Settimana')}
                             </Button>
                             <Button size="sm" variant={view === 'month' ? 'default' : 'outline'} onClick={() => go({ view: 'month' })}>
-                                Mese
+                                {t('Mese')}
                             </Button>
                         </div>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <Button size="icon" variant="outline" aria-label="Periodo precedente" onClick={() => go({ date: previous })}>
+                    <Button size="icon" variant="outline" aria-label={t('Periodo precedente')} onClick={() => go({ date: previous })}>
                         <ChevronLeft />
                     </Button>
-                    <Button size="icon" variant="outline" aria-label="Periodo successivo" onClick={() => go({ date: next })}>
+                    <Button size="icon" variant="outline" aria-label={t('Periodo successivo')} onClick={() => go({ date: next })}>
                         <ChevronRight />
                     </Button>
                     <Button
@@ -189,19 +190,19 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
                         disabled={today !== undefined}
                         onClick={() => router.get(route('calendar.index'), { view, area_id: area_id ?? undefined }, { preserveScroll: true })}
                     >
-                        Oggi
+                        {t('Oggi')}
                     </Button>
                     <p className="ml-2 font-medium capitalize">{rangeTitle(view, from, to, date)}</p>
                 </div>
 
-                <ul className="text-muted-foreground flex flex-wrap gap-4 text-sm" aria-label="Legenda">
+                <ul className="text-muted-foreground flex flex-wrap gap-4 text-sm" aria-label={t('Legenda')}>
                     {(Object.keys(levelLabels) as LoadLevel[]).map((level) => (
                         <li key={level} className="flex items-center gap-2">
-                            <span className={cn('inline-block size-3 rounded-sm', levelStyles[level])} aria-hidden /> {levelLabels[level]}
+                            <span className={cn('inline-block size-3 rounded-sm', levelStyles[level])} aria-hidden /> {t(levelLabels[level])}
                         </li>
                     ))}
                     <li className="flex items-center gap-2">
-                        <span className="bg-muted inline-block size-3 rounded-sm" aria-hidden /> Weekend, festivo o assenza
+                        <span className="bg-muted inline-block size-3 rounded-sm" aria-hidden /> {t('Weekend, festivo o assenza')}
                     </li>
                 </ul>
 
@@ -213,14 +214,14 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
 
                 {people.length === 0 ? (
                     <div className="border-sidebar-border/70 rounded-xl border border-dashed p-12 text-center">
-                        <p className="text-muted-foreground">Nessuna persona da mostrare</p>
+                        <p className="text-muted-foreground">{t('Nessuna persona da mostrare')}</p>
                     </div>
                 ) : (
                     <div className="border-sidebar-border/70 overflow-x-auto rounded-xl border">
                         <table className="w-full border-collapse text-sm">
                             <thead>
                                 <tr className="bg-muted/50">
-                                    <th className="bg-muted sticky left-0 z-10 min-w-40 px-3 py-2 text-left font-medium">Persona</th>
+                                    <th className="bg-muted sticky left-0 z-10 min-w-40 px-3 py-2 text-left font-medium">{t('Persona')}</th>
                                     {days.map((day) => (
                                         <th
                                             key={day.date}
@@ -233,7 +234,7 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
                                         >
                                             <span className="block text-xs capitalize">{weekday(day.date)}</span>
                                             {day.date.slice(8)}
-                                            {day.holiday && <span className="block text-xs font-normal">Festivo</span>}
+                                            {day.holiday && <span className="block text-xs font-normal">{t('Festivo')}</span>}
                                         </th>
                                     ))}
                                 </tr>
@@ -243,7 +244,7 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
                                     <tr key={person.id} className="border-sidebar-border/70 border-t">
                                         <th scope="row" className="bg-background sticky left-0 z-10 px-3 py-2 text-left font-medium">
                                             {person.name}
-                                            {person.is_self && <span className="text-muted-foreground font-normal"> (tu)</span>}
+                                            {person.is_self && <span className="text-muted-foreground font-normal"> {t('(tu)')}</span>}
                                             {person.area_name && (
                                                 <span className="text-muted-foreground block text-xs font-normal">{person.area_name}</span>
                                             )}
@@ -275,7 +276,7 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
                                                         type="button"
                                                         onClick={() => setSelected(isSelected ? null : { personId: person.id, date: day.date })}
                                                         aria-pressed={isSelected}
-                                                        aria-label={`${person.name}, ${formatDate(day.date)}: ${formatHours(cell.load)} ore su ${formatHours(cell.capacity)}${cell.level ? `, ${levelLabels[cell.level]}` : ''}`}
+                                                        aria-label={`${person.name}, ${formatDate(day.date)}: ${t(':load ore su :capacity', { load: formatHours(cell.load), capacity: formatHours(cell.capacity) })}${cell.level ? `, ${t(levelLabels[cell.level])}` : ''}`}
                                                         className={cn(
                                                             'focus-visible:ring-ring flex min-h-12 w-full flex-col items-center justify-center rounded-md px-1 py-1 text-xs focus-visible:ring-2 focus-visible:outline-none',
                                                             cell.level ? levelStyles[cell.level] : 'bg-muted text-muted-foreground',
@@ -283,7 +284,7 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
                                                             dropAllowed && 'outline-primary outline-dashed',
                                                         )}
                                                     >
-                                                        {cell.absence && <span className="font-medium">{absenceLabels[cell.absence]}</span>}
+                                                        {cell.absence && <span className="font-medium">{t(absenceLabels[cell.absence])}</span>}
                                                         {!(cell.level === null && cell.load === 0) && (
                                                             <span>
                                                                 {formatHours(cell.load)} / {formatHours(cell.capacity)}
@@ -301,7 +302,7 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
                                                                     setDragged({ item, personId: person.id, fromDate: day.date });
                                                                 }}
                                                                 onDragEnd={() => setDragged(null)}
-                                                                title={`${item.activity} – ${item.project}${item.can_move ? ' (trascina per spostare)' : ''}`}
+                                                                title={`${item.activity} – ${item.project}${item.can_move ? ` ${t('(trascina per spostare)')}` : ''}`}
                                                                 className={cn(
                                                                     'bg-background border-sidebar-border/70 mt-1 max-w-28 truncate rounded border px-1 py-0.5 text-xs',
                                                                     item.can_move && 'cursor-grab',
@@ -327,12 +328,15 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
                         </h2>
                         <p className="text-muted-foreground text-sm">
                             {selectedCell.level ? `${levelLabels[selectedCell.level]}: ` : ''}
-                            {formatHours(selectedCell.load)} ore assegnate su {formatHours(selectedCell.capacity)} disponibili
+                            {t(':load ore assegnate su :capacity disponibili', {
+                                load: formatHours(selectedCell.load),
+                                capacity: formatHours(selectedCell.capacity),
+                            })}
                             {selectedDay.holiday ? ` · ${selectedDay.holiday}` : ''}
                             {selectedCell.absence ? ` · ${absenceLabels[selectedCell.absence]}` : ''}
                         </p>
                         {selectedCell.items.length === 0 ? (
-                            <p className="mt-2 text-sm">Nessuna attività in questo giorno.</p>
+                            <p className="mt-2 text-sm">{t('Nessuna attività in questo giorno.')}</p>
                         ) : (
                             <ul className="mt-2 divide-y text-sm">
                                 {selectedCell.items.map((item) => (
@@ -345,7 +349,7 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
                                             {item.can_move && (
                                                 <>
                                                     <label className="sr-only" htmlFor={`move-${item.allocation_id}`}>
-                                                        Sposta {item.activity} al giorno
+                                                        {t('Sposta :activity al giorno', { activity: item.activity })}
                                                     </label>
                                                     <Input
                                                         id={`move-${item.allocation_id}`}
@@ -355,7 +359,7 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
                                                         onChange={(event) => setTargets({ ...targets, [item.allocation_id]: event.target.value })}
                                                     />
                                                     <label className="sr-only" htmlFor={`hours-${item.allocation_id}`}>
-                                                        Ore da spostare di {item.activity}
+                                                        {t('Ore da spostare di :activity', { activity: item.activity })}
                                                     </label>
                                                     <Input
                                                         id={`hours-${item.allocation_id}`}
@@ -363,7 +367,7 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
                                                         min="0.25"
                                                         max={item.hours}
                                                         step="0.25"
-                                                        placeholder="Tutte le ore"
+                                                        placeholder={t('Tutte le ore')}
                                                         className="h-8 w-28"
                                                         value={partialHours[item.allocation_id] ?? ''}
                                                         onChange={(event) =>
@@ -384,7 +388,7 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
                                                             )
                                                         }
                                                     >
-                                                        Sposta
+                                                        {t('Sposta')}
                                                     </Button>
                                                 </>
                                             )}
@@ -405,24 +409,35 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
                             <DialogHeader>
                                 <DialogTitle>
                                     {beyondProject
-                                        ? 'Sei sicuro?'
+                                        ? t('Sei sicuro?')
                                         : beyondActivity
-                                          ? "Estendere la data di fine dell'attività?"
-                                          : 'Quante ore spostare?'}
+                                          ? t("Estendere la data di fine dell'attività?")
+                                          : t('Quante ore spostare?')}
                                 </DialogTitle>
                                 <DialogDescription>
                                     {pending.merges &&
-                                        `Il ${formatDate(pending.toDate)} c'è già una quota di «${pending.item.activity}»: le ore spostate si sommano. `}
+                                        `${t("Il :date c'è già una quota di «:activity»: le ore spostate si sommano.", { date: formatDate(pending.toDate), activity: pending.item.activity })} `}
                                     {beyondProject &&
-                                        `Il ${formatDate(pending.toDate)} è oltre la scadenza del progetto (${formatDate(pending.item.project_due_on)}). Confermando si estendono a quella data sia la scadenza del progetto sia quella dell'attività «${pending.item.activity}».`}
+                                        t(
+                                            "Il :date è oltre la scadenza del progetto (:projectDue). Confermando si estendono a quella data sia la scadenza del progetto sia quella dell'attività «:activity».",
+                                            {
+                                                date: formatDate(pending.toDate),
+                                                projectDue: formatDate(pending.item.project_due_on),
+                                                activity: pending.item.activity,
+                                            },
+                                        )}
                                     {!beyondProject &&
                                         beyondActivity &&
-                                        `L'attività «${pending.item.activity}» finisce il ${formatDate(pending.item.activity_due_on)}. Confermando, la sua data di fine diventa il ${formatDate(pending.toDate)}.`}
+                                        t("L'attività «:activity» finisce il :activityDue. Confermando, la sua data di fine diventa il :date.", {
+                                            activity: pending.item.activity,
+                                            activityDue: formatDate(pending.item.activity_due_on),
+                                            date: formatDate(pending.toDate),
+                                        })}
                                 </DialogDescription>
                             </DialogHeader>
                             <div className="grid gap-2">
                                 <label htmlFor="move-hours" className="text-sm font-medium">
-                                    Ore da spostare (su {formatHours(pending.item.hours)} del giorno)
+                                    {t('Ore da spostare (su :hours del giorno)', { hours: formatHours(pending.item.hours) })}
                                 </label>
                                 <Input
                                     id="move-hours"
@@ -430,22 +445,22 @@ export default function CalendarIndex({ view, date, from, to, previous, next, ar
                                     min="0.25"
                                     max={pending.item.hours}
                                     step="0.25"
-                                    placeholder="Tutte"
+                                    placeholder={t('Tutte')}
                                     value={moveHours}
                                     onChange={(event) => setMoveHours(event.target.value)}
                                 />
-                                <p className="text-muted-foreground text-sm">Lascia vuoto per spostarle tutte.</p>
+                                <p className="text-muted-foreground text-sm">{t('Lascia vuoto per spostarle tutte.')}</p>
                             </div>
                             <DialogFooter>
                                 <Button variant="outline" onClick={() => setPending(null)}>
-                                    Annulla
+                                    {t('Annulla')}
                                 </Button>
                                 <Button
                                     onClick={() =>
                                         submitMove(pending.item, pending.toDate, beyondActivity || beyondProject, beyondProject, moveHours)
                                     }
                                 >
-                                    {beyondActivity || beyondProject ? 'Estendi e sposta' : 'Sposta'}
+                                    {beyondActivity || beyondProject ? t('Estendi e sposta') : t('Sposta')}
                                 </Button>
                             </DialogFooter>
                         </>

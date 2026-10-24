@@ -93,7 +93,7 @@ class AbsenceController extends Controller
     {
         $action->handle($request->user(), $request->toDto());
 
-        return to_route('absences.index')->with('success', 'Richiesta inviata.');
+        return to_route('absences.index')->with('success', __('Richiesta inviata.'));
     }
 
     /**
@@ -103,7 +103,7 @@ class AbsenceController extends Controller
     {
         $action->handle($request->user(), $request->toDto(), $absence);
 
-        return to_route('absences.index')->with('success', 'Assenza aggiornata.');
+        return to_route('absences.index')->with('success', __('Assenza aggiornata.'));
     }
 
     /**
@@ -113,7 +113,7 @@ class AbsenceController extends Controller
     {
         $action->handle($request->user(), $absence, $request->reason());
 
-        return to_route('absences.index')->with('success', 'Assenza eliminata.');
+        return to_route('absences.index')->with('success', __('Assenza eliminata.'));
     }
 
     /**
@@ -125,7 +125,7 @@ class AbsenceController extends Controller
 
         $action->handle($request->user(), $absence);
 
-        return to_route('absences.index')->with('success', 'Conferma registrata.');
+        return to_route('absences.index')->with('success', __('Conferma registrata.'));
     }
 
     /**
@@ -139,7 +139,7 @@ class AbsenceController extends Controller
 
         $action->handle($request->user(), $absence);
 
-        return to_route('absences.index')->with('success', 'Assenza approvata.');
+        return to_route('absences.index')->with('success', __('Assenza approvata.'));
     }
 
     /**
@@ -149,6 +149,6 @@ class AbsenceController extends Controller
     {
         $action->handle($request->user(), $absence, $request->reason());
 
-        return to_route('absences.index')->with('success', 'Assenza rifiutata.');
+        return to_route('absences.index')->with('success', __('Assenza rifiutata.'));
     }
 }

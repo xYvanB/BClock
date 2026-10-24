@@ -113,7 +113,7 @@ class GanttController extends Controller
             $request->boolean('confirm_projects'),
         );
 
-        return to_route('gantt.index', $request->view())->with('success', 'Attività spostate.');
+        return to_route('gantt.index', $request->view())->with('success', __('Attività spostate.'));
     }
 
     /**

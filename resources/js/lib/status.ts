@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 export const statusOptions: { value: string; label: string }[] = [
     { value: 'da_fare', label: 'Da fare' },
     { value: 'in_corso', label: 'In corso' },
@@ -6,4 +7,4 @@ export const statusOptions: { value: string; label: string }[] = [
     { value: 'archiviato', label: 'Archiviato' },
 ];
 
-export const statusLabel = (status: string): string => statusOptions.find((option) => option.value === status)?.label ?? status;
+export const statusLabel = (status: string): string => t(statusOptions.find((option) => option.value === status)?.label ?? status);

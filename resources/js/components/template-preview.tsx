@@ -1,4 +1,5 @@
 import InputError from '@/components/input-error';
+import { t } from '@/lib/i18n';
 import { dateOfWorkingDay } from '@/lib/template-days';
 import { formatDay } from '@/lib/time';
 import { type AssigneeOption, type TemplateOption, type WorkCalendar } from '@/types';
@@ -28,7 +29,7 @@ export function templateEndDate(template: TemplateOption, startsOn: string, cale
 /** Preview of the activities the template will create, with the computed dates and the required assignees. */
 export function TemplatePreview({ template, startsOn, dueOn, assignees, selected, onChange, errorFor, calendar }: TemplatePreviewProps) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(startsOn)) {
-        return <p className="text-muted-foreground text-sm">Imposta la data di inizio per vedere l'anteprima delle attività.</p>;
+        return <p className="text-muted-foreground text-sm">{t("Imposta la data di inizio per vedere l'anteprima delle attività.")}</p>;
     }
 
     const end = templateEndDate(template, startsOn);
@@ -42,11 +43,13 @@ export function TemplatePreview({ template, startsOn, dueOn, assignees, selected
 
     return (
         <div className="grid gap-3">
-            <p className="text-sm font-medium">Anteprima: {template.activities.length} attività</p>
+            <p className="text-sm font-medium">{t('Anteprima: :count attività', { count: template.activities.length })}</p>
 
             {exceedsDue && (
                 <div role="alert" className="border-destructive/50 bg-destructive/10 rounded-md border p-3 text-sm">
-                    Le attività finiscono il {formatDay(end)}, oltre la scadenza del progetto: allunga la scadenza o scegli un altro template.
+                    {t('Le attività finiscono il :date, oltre la scadenza del progetto: allunga la scadenza o scegli un altro template.', {
+                        date: formatDay(end),
+                    })}
                 </div>
             )}
 
@@ -67,7 +70,7 @@ export function TemplatePreview({ template, startsOn, dueOn, assignees, selected
                             {formatDay(dateOfWorkingDay(startsOn, activity.end_day, calendar ?? undefined))} · {activity.planned_hours} h
                         </p>
                         <div className="grid gap-1">
-                            <span className="text-sm">Assegnatari (almeno uno)</span>
+                            <span className="text-sm">{t('Assegnatari (almeno uno)')}</span>
                             <div className="border-sidebar-border/70 grid max-h-32 gap-1 overflow-y-auto rounded-md border p-2">
                                 {ordered.map((person) => (
                                     <label key={person.id} className="flex items-center gap-2 text-sm">

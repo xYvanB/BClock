@@ -27,10 +27,10 @@ class UserInvited extends Notification
         $url = URL::temporarySignedRoute('invitation.show', now()->addDays(7), ['user' => $notifiable->id]);
 
         return (new MailMessage)
-            ->subject('Sei stato invitato su '.config('app.name'))
-            ->greeting("Ciao {$notifiable->name},")
-            ->line('Ti hanno invitato a usare '.config('app.name').' per registrare le ore di lavoro.')
-            ->action('Imposta la password', $url)
-            ->line('Il link è valido per 7 giorni.');
+            ->subject(__('Sei stato invitato su :app', ['app' => config('app.name')]))
+            ->greeting(__('Ciao :name,', ['name' => $notifiable->name]))
+            ->line(__('Ti hanno invitato a usare :app per registrare le ore di lavoro.', ['app' => config('app.name')]))
+            ->action(__('Imposta la password'), $url)
+            ->line(__('Il link è valido per 7 giorni.'));
     }
 }

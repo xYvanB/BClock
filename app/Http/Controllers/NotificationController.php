@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Notifications\AppNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\DatabaseNotification;
@@ -58,7 +59,9 @@ class NotificationController extends Controller
     {
         return [
             'id' => $notification->id,
-            'message' => (string) ($notification->data['message'] ?? ''),
+            'message' => isset($notification->data['message_key'])
+                ? AppNotification::render($notification->data['message_key'], $notification->data['params'] ?? [])
+                : (string) ($notification->data['message'] ?? ''),
             'kind' => $notification->data['kind'] ?? null,
             'actor_name' => $notification->data['actor_name'] ?? null,
             'created_at' => $notification->created_at->toIso8601String(),

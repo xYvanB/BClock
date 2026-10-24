@@ -1,3 +1,4 @@
+import { intlLocale } from '@/lib/i18n';
 import { type TimeFormat } from '@/types';
 
 /** 210 → "3h 30m", 120 → "2h", 45 → "45m". */
@@ -26,7 +27,7 @@ export function formatTime(value: string, format: TimeFormat): string {
 }
 
 /** "2026-10-19" → "lunedì 19 ottobre" (Italian locale). */
-export function formatDay(date: string, locale = 'it-IT'): string {
+export function formatDay(date: string, locale = intlLocale()): string {
     return new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date(`${date}T00:00:00`));
 }
 

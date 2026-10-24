@@ -93,7 +93,7 @@ class DashboardController extends Controller
         return response()->streamDownload(function () use ($entries): void {
             $out = fopen('php://output', 'w');
             fwrite($out, "\xEF\xBB\xBF");
-            fputcsv($out, ['Data', 'Progetto', 'Cliente', 'Attività', 'Persona', 'Area', 'Inizio', 'Fine', 'Ore', 'Descrizione'], ';');
+            fputcsv($out, array_map(fn (string $header): string => __($header), ['Data', 'Progetto', 'Cliente', 'Attività', 'Persona', 'Area', 'Inizio', 'Fine', 'Ore', 'Descrizione']), ';');
 
             $safe = fn (?string $text): ?string => $text !== null && preg_match('/^[=+\-@\t\r]/', $text) === 1 ? "'".$text : $text;
 

@@ -58,7 +58,7 @@ final class SaveAbsence
                 }
 
                 if (! $user->hasRole(Role::Boss)) {
-                    $this->notifyApprovers($user, $absence, 'ha modificato la richiesta di');
+                    $this->notifyApprovers($user, $absence, true);
                 }
 
                 return $absence;
@@ -73,7 +73,7 @@ final class SaveAbsence
 
             $absence = Absence::create($attributes + ['user_id' => $user->id, 'status' => AbsenceStatus::Pending]);
 
-            $this->notifyApprovers($user, $absence, 'ha chiesto');
+            $this->notifyApprovers($user, $absence, false);
 
             return $absence;
         });
@@ -82,7 +82,7 @@ final class SaveAbsence
     /**
      * Notifies who has to approve: the employee's area head and whoever gives the final confirmation (HR, or the Boss for HR).
      */
-    private function notifyApprovers(User $user, Absence $absence, string $verb): void
+    private function notifyApprovers(User $user, Absence $absence, bool $edited): void
     {
         $approvers = User::where('role', $absence->finalApproverRole())->get();
 
@@ -93,7 +93,8 @@ final class SaveAbsence
         $this->notify->handle(
             $approvers,
             NotificationKind::AbsenceRequested,
-            "{$user->fullName()} {$verb} {$absence->type->value} ({$absence->periodLabel()}): serve la tua approvazione.",
+            $edited ? ':name ha modificato la richiesta di :type (:period): serve la tua approvazione.' : ':name ha chiesto :type (:period): serve la tua approvazione.',
+            ['name' => $user->fullName(), 'type' => $absence->type->value, 'period' => $absence->periodLabel()],
             route('absences.index'),
             $user,
         );

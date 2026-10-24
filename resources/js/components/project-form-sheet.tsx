@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { t } from '@/lib/i18n';
 import { projectSchema, type ProjectFormData } from '@/lib/schemas/project';
 import { statusOptions } from '@/lib/status';
 import { flattenZodErrors } from '@/lib/zod-errors';
@@ -82,13 +83,14 @@ export function ProjectFormSheet({ open, project, clients, users, templates = []
         if (template) {
             const end = templateEndDate(template, data.starts_on, calendar);
             if (end !== null && /^\d{4}-\d{2}-\d{2}$/.test(data.due_on) && end > data.due_on) {
-                fieldErrors.template_id =
-                    'Le attività del template finiscono oltre la scadenza del progetto: allunga la scadenza o scegli un altro template.';
+                fieldErrors.template_id = t(
+                    'Le attività del template finiscono oltre la scadenza del progetto: allunga la scadenza o scegli un altro template.',
+                );
             }
 
             template.activities.forEach((activity) => {
                 if ((data.template_assignees[String(activity.id)] ?? []).length === 0) {
-                    fieldErrors[`template_assignees.${activity.id}`] = 'Scegli almeno una persona';
+                    fieldErrors[`template_assignees.${activity.id}`] = t('Scegli almeno una persona');
                 }
             });
         }
@@ -119,13 +121,13 @@ export function ProjectFormSheet({ open, project, clients, users, templates = []
             <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-lg">
                 <form onSubmit={submit} className="flex h-full flex-col gap-6" noValidate>
                     <SheetHeader>
-                        <SheetTitle>{project ? 'Modifica progetto' : 'Nuovo progetto'}</SheetTitle>
-                        <SheetDescription>Un progetto appartiene a un cliente e raccoglie le attività.</SheetDescription>
+                        <SheetTitle>{project ? t('Modifica progetto') : t('Nuovo progetto')}</SheetTitle>
+                        <SheetDescription>{t('Un progetto appartiene a un cliente e raccoglie le attività.')}</SheetDescription>
                     </SheetHeader>
 
                     <div className="flex flex-1 flex-col gap-4 px-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="project-client">Cliente</Label>
+                            <Label htmlFor="project-client">{t('Cliente')}</Label>
                             <select
                                 id="project-client"
                                 className={fieldClass}
@@ -133,7 +135,7 @@ export function ProjectFormSheet({ open, project, clients, users, templates = []
                                 disabled={project !== null}
                                 onChange={(event) => changeClient(event.target.value)}
                             >
-                                <option value="">Scegli un cliente</option>
+                                <option value="">{t('Scegli un cliente')}</option>
                                 {clients.map((candidate) => (
                                     <option key={candidate.id} value={candidate.id}>
                                         {candidate.company_name}
@@ -144,7 +146,7 @@ export function ProjectFormSheet({ open, project, clients, users, templates = []
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="project-name">Nome</Label>
+                            <Label htmlFor="project-name">{t('Nome')}</Label>
                             <Input
                                 id="project-name"
                                 value={data.name}
@@ -155,7 +157,7 @@ export function ProjectFormSheet({ open, project, clients, users, templates = []
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="project-description">Descrizione</Label>
+                            <Label htmlFor="project-description">{t('Descrizione')}</Label>
                             <textarea
                                 id="project-description"
                                 value={data.description}
@@ -168,7 +170,7 @@ export function ProjectFormSheet({ open, project, clients, users, templates = []
 
                         <div className="grid gap-4 sm:grid-cols-2">
                             <div className="grid gap-2">
-                                <Label htmlFor="project-starts-on">Inizio</Label>
+                                <Label htmlFor="project-starts-on">{t('Inizio')}</Label>
                                 <Input
                                     id="project-starts-on"
                                     type="date"
@@ -179,7 +181,7 @@ export function ProjectFormSheet({ open, project, clients, users, templates = []
                                 <InputError message={errors.starts_on} />
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="project-due-on">Scadenza</Label>
+                                <Label htmlFor="project-due-on">{t('Scadenza')}</Label>
                                 <Input
                                     id="project-due-on"
                                     type="date"
@@ -193,7 +195,7 @@ export function ProjectFormSheet({ open, project, clients, users, templates = []
 
                         <div className="grid gap-4 sm:grid-cols-2">
                             <div className="grid gap-2">
-                                <Label htmlFor="project-hours">Ore previste</Label>
+                                <Label htmlFor="project-hours">{t('Ore previste')}</Label>
                                 <Input
                                     id="project-hours"
                                     type="number"
@@ -206,7 +208,7 @@ export function ProjectFormSheet({ open, project, clients, users, templates = []
                                 <InputError message={errors.planned_hours} />
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="project-status">Stato</Label>
+                                <Label htmlFor="project-status">{t('Stato')}</Label>
                                 <select
                                     id="project-status"
                                     className={fieldClass}
@@ -217,7 +219,7 @@ export function ProjectFormSheet({ open, project, clients, users, templates = []
                                         .filter((option) => option.value !== 'archiviato' || project?.status === 'archiviato')
                                         .map((option) => (
                                             <option key={option.value} value={option.value}>
-                                                {option.label}
+                                                {t(option.label)}
                                             </option>
                                         ))}
                                 </select>
@@ -228,7 +230,7 @@ export function ProjectFormSheet({ open, project, clients, users, templates = []
                         {project === null && templates.length > 0 && (
                             <div className="grid gap-3">
                                 <div className="grid gap-2">
-                                    <Label htmlFor="project-template">Template (facoltativo)</Label>
+                                    <Label htmlFor="project-template">{t('Template (facoltativo)')}</Label>
                                     <select
                                         id="project-template"
                                         className={fieldClass}
@@ -237,7 +239,7 @@ export function ProjectFormSheet({ open, project, clients, users, templates = []
                                             setData((current) => ({ ...current, template_id: event.target.value, template_assignees: {} }))
                                         }
                                     >
-                                        <option value="">Nessuno</option>
+                                        <option value="">{t('Nessuno')}</option>
                                         {templates.map((candidate) => (
                                             <option key={candidate.id} value={candidate.id}>
                                                 {candidate.name}
@@ -262,11 +264,11 @@ export function ProjectFormSheet({ open, project, clients, users, templates = []
                         )}
 
                         <fieldset className="grid gap-2">
-                            <legend className="text-sm leading-none font-medium">Referenti del cliente</legend>
+                            <legend className="text-sm leading-none font-medium">{t('Referenti del cliente')}</legend>
                             {!client ? (
-                                <p className="text-muted-foreground text-sm">Scegli prima un cliente.</p>
+                                <p className="text-muted-foreground text-sm">{t('Scegli prima un cliente.')}</p>
                             ) : client.contacts.length === 0 ? (
-                                <p className="text-muted-foreground text-sm">Il cliente non ha referenti.</p>
+                                <p className="text-muted-foreground text-sm">{t('Il cliente non ha referenti.')}</p>
                             ) : (
                                 <div className="border-sidebar-border/70 grid gap-1 rounded-md border p-2">
                                     {client.contacts.map((contact) => (
@@ -285,7 +287,7 @@ export function ProjectFormSheet({ open, project, clients, users, templates = []
                         </fieldset>
 
                         <fieldset className="grid gap-2">
-                            <legend className="text-sm leading-none font-medium">Membri</legend>
+                            <legend className="text-sm leading-none font-medium">{t('Membri')}</legend>
                             <div className="border-sidebar-border/70 grid max-h-48 gap-1 overflow-y-auto rounded-md border p-2">
                                 {users.map((person) => (
                                     <label key={person.id} className="flex items-center gap-2 text-sm">
@@ -304,10 +306,10 @@ export function ProjectFormSheet({ open, project, clients, users, templates = []
 
                     <SheetFooter className="flex-row justify-end gap-2">
                         <Button type="button" variant="outline" onClick={onClose}>
-                            Annulla
+                            {t('Annulla')}
                         </Button>
                         <Button type="submit" disabled={processing}>
-                            Salva
+                            {t('Salva')}
                         </Button>
                     </SheetFooter>
                 </form>

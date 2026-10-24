@@ -39,6 +39,6 @@ class PreferencesController extends Controller
     {
         $action->handle($request->user(), $request->toDto());
 
-        return to_route('preferences.edit')->with('success', 'Preferenze salvate.');
+        return to_route('preferences.edit')->with('success', __('Preferenze salvate.'));
     }
 }

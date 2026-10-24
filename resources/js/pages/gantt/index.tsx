@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
+import { intlLocale, t } from '@/lib/i18n';
 import { statusLabel, statusOptions } from '@/lib/status';
 import { cn } from '@/lib/utils';
 import {
@@ -63,7 +64,7 @@ const toUtc = (iso: string) => Date.UTC(Number(iso.slice(0, 4)), Number(iso.slic
 const diffDays = (from: string, to: string) => Math.round((toUtc(to) - toUtc(from)) / DAY_MS);
 const addDays = (iso: string, days: number) => new Date(toUtc(iso) + days * DAY_MS).toISOString().slice(0, 10);
 const formatDate = (iso: string) => iso.split('-').reverse().join('/');
-const monthName = (iso: string) => new Date(toUtc(iso)).toLocaleDateString('it-IT', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+const monthName = (iso: string) => new Date(toUtc(iso)).toLocaleDateString(intlLocale(), { month: 'long', year: 'numeric', timeZone: 'UTC' });
 /** Non-working day: a weekday that is not worked (settings) or a holiday or closure. */
 const isOffDay = (iso: string, calendar: WorkCalendar | null) => {
     const weekday = new Date(toUtc(iso)).getUTCDay() === 0 ? 7 : new Date(toUtc(iso)).getUTCDay();
@@ -153,7 +154,7 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
                 onSuccess: () => setRequest(null),
                 onError: (errors) => {
                     setRequest(null);
-                    setError(Object.values(errors)[0] ?? 'Spostamento non riuscito.');
+                    setError(Object.values(errors)[0] ?? t('Spostamento non riuscito.'));
                 },
             },
         );
@@ -216,20 +217,20 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Gantt" />
+            <Head title={t('Gantt')} />
 
             <div className="flex flex-col gap-4 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                    <h1 className="text-2xl font-semibold">Gantt</h1>
+                    <h1 className="text-2xl font-semibold">{t('Gantt')}</h1>
 
                     <div className="flex flex-wrap items-center gap-2">
                         <select
-                            aria-label="Progetto"
+                            aria-label={t('Progetto')}
                             className={fieldClass}
                             value={filters.project_id ?? ''}
                             onChange={(event) => navigate({ project_id: event.target.value || undefined })}
                         >
-                            <option value="">Tutti i progetti</option>
+                            <option value="">{t('Tutti i progetti')}</option>
                             {filter_options.projects.map((project) => (
                                 <option key={project.id} value={project.id}>
                                     {project.name}
@@ -238,12 +239,12 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
                         </select>
                         {filter_options.areas.length > 0 && (
                             <select
-                                aria-label="Area"
+                                aria-label={t('Area')}
                                 className={fieldClass}
                                 value={filters.area_id ?? ''}
                                 onChange={(event) => navigate({ area_id: event.target.value || undefined })}
                             >
-                                <option value="">Tutte le aree</option>
+                                <option value="">{t('Tutte le aree')}</option>
                                 {filter_options.areas.map((area) => (
                                     <option key={area.id} value={area.id}>
                                         {area.name}
@@ -253,12 +254,12 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
                         )}
                         {filter_options.people.length > 0 && (
                             <select
-                                aria-label="Persona"
+                                aria-label={t('Persona')}
                                 className={fieldClass}
                                 value={filters.user_id ?? ''}
                                 onChange={(event) => navigate({ user_id: event.target.value || undefined })}
                             >
-                                <option value="">Tutte le persone</option>
+                                <option value="">{t('Tutte le persone')}</option>
                                 {filter_options.people.map((person) => (
                                     <option key={person.id} value={person.id}>
                                         {person.name}
@@ -267,19 +268,19 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
                             </select>
                         )}
                         <select
-                            aria-label="Stato"
+                            aria-label={t('Stato')}
                             className={fieldClass}
                             value={filters.status ?? ''}
                             onChange={(event) => navigate({ status: event.target.value || undefined })}
                         >
-                            <option value="">Stati attivi</option>
+                            <option value="">{t('Stati attivi')}</option>
                             {statusOptions.map((option) => (
                                 <option key={option.value} value={option.value}>
-                                    {option.label}
+                                    {t(option.label)}
                                 </option>
                             ))}
                         </select>
-                        <div role="group" aria-label="Zoom" className="flex gap-1">
+                        <div role="group" aria-label={t('Zoom')} className="flex gap-1">
                             {(['day', 'week', 'month'] as Zoom[]).map((level) => (
                                 <Button
                                     key={level}
@@ -287,26 +288,26 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
                                     variant={zoom === level ? 'default' : 'outline'}
                                     onClick={() => navigate({ zoom: level })}
                                 >
-                                    {{ day: 'Giorno', week: 'Settimana', month: 'Mese' }[level]}
+                                    {t({ day: 'Giorno', week: 'Settimana', month: 'Mese' }[level])}
                                 </Button>
                             ))}
                         </div>
                     </div>
                 </div>
 
-                <ul className="text-muted-foreground flex flex-wrap gap-4 text-sm" aria-label="Legenda">
+                <ul className="text-muted-foreground flex flex-wrap gap-4 text-sm" aria-label={t('Legenda')}>
                     {statusOptions
                         .filter((option) => option.value !== 'archiviato')
                         .map((option) => (
                             <li key={option.value} className="flex items-center gap-2">
-                                <span className={cn('inline-block size-3 rounded-sm', statusColors[option.value])} aria-hidden /> {option.label}
+                                <span className={cn('inline-block size-3 rounded-sm', statusColors[option.value])} aria-hidden /> {t(option.label)}
                             </li>
                         ))}
                     <li className="flex items-center gap-2">
-                        <span className="bg-primary inline-block h-3 w-0.5" aria-hidden /> Oggi
+                        <span className="bg-primary inline-block h-3 w-0.5" aria-hidden /> {t('Oggi')}
                     </li>
                     <li className="flex items-center gap-2">
-                        <span className="inline-block h-3 w-0.5 bg-red-500" aria-hidden /> Scadenza del progetto
+                        <span className="inline-block h-3 w-0.5 bg-red-500" aria-hidden /> {t('Scadenza del progetto')}
                     </li>
                 </ul>
 
@@ -318,7 +319,7 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
 
                 {rows.length === 0 ? (
                     <div className="border-sidebar-border/70 rounded-xl border border-dashed p-12 text-center">
-                        <p className="text-muted-foreground">Nessuna attività da mostrare</p>
+                        <p className="text-muted-foreground">{t('Nessuna attività da mostrare')}</p>
                     </div>
                 ) : (
                     <div className="border-sidebar-border/70 max-h-[70vh] overflow-auto rounded-xl border">
@@ -328,7 +329,7 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
                                     className="bg-muted sticky left-0 z-40 flex shrink-0 items-center border-r px-3 text-sm font-medium"
                                     style={{ width: LABEL_WIDTH }}
                                 >
-                                    Progetto / attività
+                                    {t('Progetto / attività')}
                                 </div>
                                 <div className="relative flex-1" style={{ minWidth: timelineWidth }}>
                                     {months.map((month) => (
@@ -337,7 +338,7 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
                                             className="absolute top-0 truncate border-l px-2 py-1 text-xs font-medium capitalize"
                                             style={{ left: month.left, width: month.width, height: HEADER_HEIGHT / 2 }}
                                         >
-                                            {month.label}
+                                            {t(month.label)}
                                         </div>
                                     ))}
                                     {ticks.map((date) => (
@@ -369,7 +370,10 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
                                                 className="bg-background sticky left-0 z-20 flex shrink-0 items-center border-r px-3 text-sm font-semibold"
                                                 style={{ width: LABEL_WIDTH }}
                                             >
-                                                <span className="truncate" title={`${row.project.name} – scade il ${formatDate(row.project.due_on)}`}>
+                                                <span
+                                                    className="truncate"
+                                                    title={`${row.project.name} – ${t('scade il :date', { date: formatDate(row.project.due_on) })}`}
+                                                >
                                                     {row.project.name}
                                                 </span>
                                             </div>
@@ -409,7 +413,7 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
                                                         <div
                                                             role="button"
                                                             tabIndex={0}
-                                                            aria-label={`${row.activity.name}, dal ${formatDate(row.activity.starts_on)} al ${formatDate(row.activity.due_on)}, ${statusLabel(row.activity.status)}`}
+                                                            aria-label={`${row.activity.name}, ${t('dal :from al :to', { from: formatDate(row.activity.starts_on), to: formatDate(row.activity.due_on) })}, ${statusLabel(row.activity.status)}`}
                                                             onKeyDown={(event) => {
                                                                 if (event.key === 'Enter' || event.key === ' ') {
                                                                     event.preventDefault();
@@ -534,8 +538,8 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
                         <div>
                             <h2 className="font-semibold">{selectedActivity.name}</h2>
                             <p className="text-muted-foreground">
-                                {statusLabel(selectedActivity.status)} · dal {formatDate(selectedActivity.starts_on)} al{' '}
-                                {formatDate(selectedActivity.due_on)}
+                                {statusLabel(selectedActivity.status)} ·{' '}
+                                {t('dal :from al :to', { from: formatDate(selectedActivity.starts_on), to: formatDate(selectedActivity.due_on) })}
                                 {selectedActivity.assignees.length > 0 && ` · ${selectedActivity.assignees.join(', ')}`}
                             </p>
                         </div>
@@ -550,7 +554,7 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
                                 ).map((field) => (
                                     <div key={field.key} className="flex items-end gap-2">
                                         <label className="grid flex-1 gap-1">
-                                            <span className="text-muted-foreground">{field.label}</span>
+                                            <span className="text-muted-foreground">{t(field.label)}</span>
                                             <Input
                                                 type="date"
                                                 value={field.date}
@@ -569,13 +573,13 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
                                                 )
                                             }
                                         >
-                                            Anteprima
+                                            {t('Anteprima')}
                                         </Button>
                                     </div>
                                 ))}
                             </div>
                         ) : (
-                            <p className="text-muted-foreground">Non hai i permessi per spostare questa attività.</p>
+                            <p className="text-muted-foreground">{t('Non hai i permessi per spostare questa attività.')}</p>
                         )}
                     </section>
                 )}
@@ -584,15 +588,17 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
             <Dialog open={request !== null} onOpenChange={(open) => !open && closePreview()}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{previewReady && preview.projects.length > 0 ? 'Sei sicuro?' : 'Spostare le attività?'}</DialogTitle>
+                        <DialogTitle>{previewReady && preview.projects.length > 0 ? t('Sei sicuro?') : t('Spostare le attività?')}</DialogTitle>
                         <DialogDescription>
-                            {!previewReady && 'Calcolo delle attività coinvolte…'}
-                            {previewReady && preview.blockers.length > 0 && 'Lo spostamento non è possibile: non si sposta niente.'}
-                            {previewReady && preview.blockers.length === 0 && preview.changes.length === 0 && 'Questo non cambia nessuna data.'}
+                            {!previewReady && t('Calcolo delle attività coinvolte…')}
+                            {previewReady && preview.blockers.length > 0 && t('Lo spostamento non è possibile: non si sposta niente.')}
+                            {previewReady && preview.blockers.length === 0 && preview.changes.length === 0 && t('Questo non cambia nessuna data.')}
                             {previewReady &&
                                 preview.blockers.length === 0 &&
                                 preview.changes.length > 0 &&
-                                `Si ${preview.changes.length === 1 ? 'sposta 1 attività' : `spostano ${preview.changes.length} attività`}, a catena quelle che dipendono da questa.`}
+                                (preview.changes.length === 1
+                                    ? t('Si sposta 1 attività, a catena quelle che dipendono da questa.')
+                                    : t('Si spostano :count attività, a catena quelle che dipendono da questa.', { count: preview.changes.length }))}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -620,7 +626,7 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
                             )}
                             {preview.blockers.length === 0 && preview.projects.length > 0 && (
                                 <div className="rounded-md border border-amber-500/50 bg-amber-500/10 p-3">
-                                    <p className="font-medium">Confermando si estende la scadenza di:</p>
+                                    <p className="font-medium">{t('Confermando si estende la scadenza di:')}</p>
                                     <ul className="list-disc pl-5">
                                         {preview.projects.map((project) => (
                                             <li key={project.project_id}>
@@ -635,10 +641,10 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
 
                     <DialogFooter>
                         <Button variant="outline" onClick={closePreview}>
-                            {previewReady && preview.blockers.length > 0 ? 'Chiudi' : 'Annulla'}
+                            {previewReady && preview.blockers.length > 0 ? t('Chiudi') : t('Annulla')}
                         </Button>
                         {previewReady && preview.blockers.length === 0 && preview.changes.length > 0 && (
-                            <Button onClick={applyShift}>Conferma e sposta</Button>
+                            <Button onClick={applyShift}>{t('Conferma e sposta')}</Button>
                         )}
                     </DialogFooter>
                 </DialogContent>

@@ -54,9 +54,9 @@ class SaveAbsenceRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'ends_on.after_or_equal' => 'La fine non può essere prima dell\'inizio.',
-            'ends_on.same' => 'Un permesso è in un solo giorno.',
-            'ends_time.after' => 'L\'ora di fine deve essere successiva all\'inizio.',
+            'ends_on.after_or_equal' => __('La fine non può essere prima dell\'inizio.'),
+            'ends_on.same' => __('Un permesso è in un solo giorno.'),
+            'ends_time.after' => __('L\'ora di fine deve essere successiva all\'inizio.'),
         ];
     }
 
@@ -79,13 +79,13 @@ class SaveAbsenceRequest extends FormRequest
                     ->handle([$this->user()->id], $this->string('starts_on')->toString(), $this->string('ends_on')->toString())['working_days'];
 
                 if ($isLeave && $workingDays === []) {
-                    $validator->errors()->add('starts_on', 'Il '.CarbonImmutable::parse($this->string('starts_on')->toString())->format('d/m/Y').' non è un giorno lavorativo (weekend, festività o chiusura aziendale).');
+                    $validator->errors()->add('starts_on', __('Il :date non è un giorno lavorativo (weekend, festività o chiusura aziendale).', ['date' => CarbonImmutable::parse($this->string('starts_on')->toString())->format('d/m/Y')]));
 
                     return;
                 }
 
                 if (! $isLeave && $workingDays === []) {
-                    $validator->errors()->add('starts_on', 'Il periodo scelto non contiene giorni lavorativi (weekend, festività o chiusure aziendali).');
+                    $validator->errors()->add('starts_on', __('Il periodo scelto non contiene giorni lavorativi (weekend, festività o chiusure aziendali).'));
 
                     return;
                 }
@@ -98,7 +98,7 @@ class SaveAbsenceRequest extends FormRequest
                     $capacity = (float) $this->user()->daily_capacity;
 
                     if ($hours > $capacity) {
-                        $validator->errors()->add('ends_time', "Un permesso non può superare le ore di una giornata ({$capacity}).");
+                        $validator->errors()->add('ends_time', __('Un permesso non può superare le ore di una giornata (:capacity).', ['capacity' => $capacity]));
 
                         return;
                     }
@@ -120,7 +120,7 @@ class SaveAbsenceRequest extends FormRequest
                             && self::minutes((string) $other->timeLabel($other->starts_time)) < self::minutes($endsTime)));
 
                 if ($overlaps) {
-                    $validator->errors()->add('starts_on', 'Hai già un\'assenza che si sovrappone a questo periodo.');
+                    $validator->errors()->add('starts_on', __('Hai già un\'assenza che si sovrappone a questo periodo.'));
                 }
             },
         ];

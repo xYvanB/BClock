@@ -75,7 +75,7 @@ class ActivityController extends Controller
     {
         $action->handle($request->user(), $request->toDto());
 
-        return back()->with('success', 'Attività creata.');
+        return back()->with('success', __('Attività creata.'));
     }
 
     /**
@@ -85,7 +85,7 @@ class ActivityController extends Controller
     {
         $action->handle($request->user(), $activity, $request->toDto());
 
-        return back()->with('success', 'Attività aggiornata.');
+        return back()->with('success', __('Attività aggiornata.'));
     }
 
     /**
@@ -97,7 +97,7 @@ class ActivityController extends Controller
 
         $action->handle($activity);
 
-        return back()->with('success', 'Attività archiviata.');
+        return back()->with('success', __('Attività archiviata.'));
     }
 
     /**
@@ -109,6 +109,6 @@ class ActivityController extends Controller
 
         $action->handle($activity);
 
-        return back()->with('success', 'Attività eliminata.');
+        return back()->with('success', __('Attività eliminata.'));
     }
 }

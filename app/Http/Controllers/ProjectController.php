@@ -162,7 +162,7 @@ class ProjectController extends Controller
     {
         $project = $action->handle($request->toDto());
 
-        return to_route('projects.show', $project)->with('success', 'Progetto creato.');
+        return to_route('projects.show', $project)->with('success', __('Progetto creato.'));
     }
 
     /**
@@ -172,7 +172,7 @@ class ProjectController extends Controller
     {
         $action->handle($project, $request->toDto());
 
-        return back()->with('success', 'Progetto aggiornato.');
+        return back()->with('success', __('Progetto aggiornato.'));
     }
 
     /**
@@ -184,7 +184,7 @@ class ProjectController extends Controller
 
         $action->handle($project);
 
-        return to_route('projects.index')->with('success', 'Progetto archiviato.');
+        return to_route('projects.index')->with('success', __('Progetto archiviato.'));
     }
 
     /**
@@ -196,7 +196,7 @@ class ProjectController extends Controller
 
         $action->handle($project);
 
-        return to_route('projects.index')->with('success', 'Progetto eliminato.');
+        return to_route('projects.index')->with('success', __('Progetto eliminato.'));
     }
 
     /**

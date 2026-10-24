@@ -20,7 +20,7 @@ enum NotificationKind: string
 
     public function label(): string
     {
-        return match ($this) {
+        return __(match ($this) {
             self::TaskAssigned => 'Task assegnato a me',
             self::ActivityMoved => 'Date di un\'attività mia spostate',
             self::AbsenceDecision => 'Permesso approvato, rifiutato o eliminato',
@@ -29,7 +29,7 @@ enum NotificationKind: string
             self::DueSoon => 'Scadenza vicina',
             self::TimerForgotten => 'Timer attivo da oltre 8 ore',
             self::HoursOverrun => 'Sforamento ore del progetto',
-        };
+        });
     }
 
     /**

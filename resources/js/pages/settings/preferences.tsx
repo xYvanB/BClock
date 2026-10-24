@@ -3,6 +3,7 @@ import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import { t } from '@/lib/i18n';
 import { applyPalette, contrastRatio, customColorFields, type CustomColors } from '@/lib/palette';
 import { formatTime } from '@/lib/time';
 import { cn } from '@/lib/utils';
@@ -70,9 +71,9 @@ function OptionGroup<T extends string>({
                                 checked={value === option.value}
                                 onChange={() => onChange(option.value)}
                             />
-                            <span className="font-medium">{option.label}</span>
+                            <span className="font-medium">{t(option.label)}</span>
                         </span>
-                        {option.hint && <span className="text-muted-foreground">{option.hint}</span>}
+                        {option.hint && <span className="text-muted-foreground">{t(option.hint)}</span>}
                         {option.extra}
                     </label>
                 ))}
@@ -124,37 +125,35 @@ export default function Preferences({ options }: Props) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Preferenze" />
+            <Head title={t('Preferenze')} />
 
             <SettingsLayout>
                 <form onSubmit={submit} className="space-y-8">
-                    <HeadingSmall title="Preferenze" description="Lingua, formato degli orari e colori dell'interfaccia" />
+                    <HeadingSmall title={t('Preferenze')} description={t("Lingua, formato degli orari e colori dell'interfaccia")} />
                     <FlashMessage />
 
                     <OptionGroup
-                        legend="Lingua"
+                        legend={t('Lingua')}
                         name="locale"
                         value={data.locale}
                         options={options.locales.map((locale) => ({ value: locale, label: localeLabels[locale] }))}
                         onChange={(locale) => setData('locale', locale)}
                     >
-                        <p className="text-muted-foreground text-sm">
-                            La lingua si salva da subito; i testi inglesi arriveranno con la traduzione dell'interfaccia.
-                        </p>
+                        <p className="text-muted-foreground text-sm">{t('La lingua si applica subito.')}</p>
                     </OptionGroup>
 
                     <OptionGroup
-                        legend="Formato orario"
+                        legend={t('Formato orario')}
                         name="time_format"
                         value={data.time_format}
                         options={options.time_formats.map((format) => ({ value: format, label: timeFormatLabels[format] }))}
                         onChange={(format) => setData('time_format', format)}
                     >
-                        <p className="text-muted-foreground text-sm">Anteprima: {formatTime('14:30', data.time_format)}</p>
+                        <p className="text-muted-foreground text-sm">{t('Anteprima: :value', { value: formatTime('14:30', data.time_format) })}</p>
                     </OptionGroup>
 
                     <OptionGroup
-                        legend="Palette"
+                        legend={t('Palette')}
                         name="palette"
                         value={data.palette}
                         options={options.palettes.map((palette) => ({
@@ -171,12 +170,12 @@ export default function Preferences({ options }: Props) {
                         }))}
                         onChange={choosePalette}
                     >
-                        <p className="text-muted-foreground text-sm">L'anteprima è immediata; si conferma con Salva.</p>
+                        <p className="text-muted-foreground text-sm">{t("L'anteprima è immediata; si conferma con Salva.")}</p>
                     </OptionGroup>
 
                     {data.palette === 'personalizzata' && (
                         <fieldset className="space-y-3">
-                            <legend className="text-sm font-medium">Colori della palette personalizzata</legend>
+                            <legend className="text-sm font-medium">{t('Colori della palette personalizzata')}</legend>
                             <div className="grid gap-3 sm:grid-cols-2">
                                 {customColorFields.map((field) => (
                                     <label key={field.key} className="border-input flex items-center gap-3 rounded-lg border p-2 text-sm">
@@ -187,9 +186,9 @@ export default function Preferences({ options }: Props) {
                                             className="h-9 w-12 shrink-0 cursor-pointer rounded border-0 bg-transparent p-0"
                                         />
                                         <span className="grid">
-                                            <span className="font-medium">{field.label}</span>
+                                            <span className="font-medium">{t(field.label)}</span>
                                             <span className="text-muted-foreground">
-                                                {field.hint} · {data.custom_colors[field.key]}
+                                                {t(field.hint)} · {data.custom_colors[field.key]}
                                             </span>
                                         </span>
                                     </label>
@@ -197,12 +196,13 @@ export default function Preferences({ options }: Props) {
                             </div>
                             {textContrast < 4.5 && (
                                 <p role="alert" className="text-destructive text-sm">
-                                    Il testo e lo sfondo hanno poco contrasto ({textContrast.toFixed(1)}:1): il testo si leggerà male. Meglio almeno
-                                    4,5:1.
+                                    {t('Il testo e lo sfondo hanno poco contrasto (:ratio:1): il testo si leggerà male. Meglio almeno 4,5:1.', {
+                                        ratio: textContrast.toFixed(1),
+                                    })}
                                 </p>
                             )}
                             <Button type="button" variant="outline" size="sm" onClick={resetColors}>
-                                Ripristina i colori di partenza
+                                {t('Ripristina i colori di partenza')}
                             </Button>
                         </fieldset>
                     )}
@@ -214,7 +214,7 @@ export default function Preferences({ options }: Props) {
                     )}
 
                     <Button type="submit" disabled={processing}>
-                        Salva preferenze
+                        {t('Salva preferenze')}
                     </Button>
                 </form>
             </SettingsLayout>

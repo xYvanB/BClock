@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { t } from '@/lib/i18n';
 import { clientSchema, type ClientContactFormData, type ClientFormData } from '@/lib/schemas/client';
 import { flattenZodErrors } from '@/lib/zod-errors';
 import { type ClientContact } from '@/types';
@@ -107,13 +108,13 @@ export function ClientFormSheet({ open, client, onClose }: ClientFormSheetProps)
             <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-lg">
                 <form onSubmit={submit} className="flex h-full flex-col gap-6" noValidate>
                     <SheetHeader>
-                        <SheetTitle>{client ? 'Modifica cliente' : 'Nuovo cliente'}</SheetTitle>
-                        <SheetDescription>Ragione sociale e persone di riferimento del cliente.</SheetDescription>
+                        <SheetTitle>{client ? t('Modifica cliente') : t('Nuovo cliente')}</SheetTitle>
+                        <SheetDescription>{t('Ragione sociale e persone di riferimento del cliente.')}</SheetDescription>
                     </SheetHeader>
 
                     <div className="flex flex-1 flex-col gap-4 px-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="client-company-name">Ragione sociale</Label>
+                            <Label htmlFor="client-company-name">{t('Ragione sociale')}</Label>
                             <Input
                                 id="client-company-name"
                                 value={data.company_name}
@@ -126,21 +127,21 @@ export function ClientFormSheet({ open, client, onClose }: ClientFormSheetProps)
 
                         <div className="grid gap-3">
                             <div className="flex items-center justify-between">
-                                <Label>Referenti</Label>
+                                <Label>{t('Referenti')}</Label>
                                 <Button type="button" variant="outline" size="sm" onClick={addContact}>
-                                    <Plus /> Aggiungi referente
+                                    <Plus /> {t('Aggiungi referente')}
                                 </Button>
                             </div>
                             <InputError message={fieldErrors.contacts} />
 
-                            {data.contacts.length === 0 && <p className="text-muted-foreground text-sm">Nessun referente.</p>}
+                            {data.contacts.length === 0 && <p className="text-muted-foreground text-sm">{t('Nessun referente.')}</p>}
 
                             {data.contacts.map((contact, index) => (
                                 <fieldset key={contact.id ?? `new-${index}`} className="border-sidebar-border/70 grid gap-3 rounded-lg border p-3">
-                                    <legend className="sr-only">Referente {index + 1}</legend>
+                                    <legend className="sr-only">{t('Referente :number', { number: index + 1 })}</legend>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor={`contact-name-${index}`}>Nome</Label>
+                                        <Label htmlFor={`contact-name-${index}`}>{t('Nome')}</Label>
                                         <Input
                                             id={`contact-name-${index}`}
                                             value={contact.name}
@@ -152,7 +153,7 @@ export function ClientFormSheet({ open, client, onClose }: ClientFormSheetProps)
 
                                     <div className="grid gap-3 sm:grid-cols-2">
                                         <div className="grid gap-2">
-                                            <Label htmlFor={`contact-email-${index}`}>Email</Label>
+                                            <Label htmlFor={`contact-email-${index}`}>{t('Email')}</Label>
                                             <Input
                                                 id={`contact-email-${index}`}
                                                 type="email"
@@ -163,7 +164,7 @@ export function ClientFormSheet({ open, client, onClose }: ClientFormSheetProps)
                                             <InputError message={fieldErrors[`contacts.${index}.email`]} />
                                         </div>
                                         <div className="grid gap-2">
-                                            <Label htmlFor={`contact-phone-${index}`}>Telefono</Label>
+                                            <Label htmlFor={`contact-phone-${index}`}>{t('Telefono')}</Label>
                                             <Input
                                                 id={`contact-phone-${index}`}
                                                 value={contact.phone}
@@ -183,7 +184,8 @@ export function ClientFormSheet({ open, client, onClose }: ClientFormSheetProps)
                                                 checked={contact.is_primary}
                                                 onChange={() => makePrimary(index)}
                                             />
-                                            Referente principale
+
+                                            {t('Referente principale')}
                                         </label>
                                         <Button
                                             type="button"
@@ -192,7 +194,7 @@ export function ClientFormSheet({ open, client, onClose }: ClientFormSheetProps)
                                             onClick={() => (linkedProjects(contact.id) > 0 ? setConfirmingRemoval(index) : removeContact(index))}
                                             aria-label={`Rimuovi referente ${index + 1}`}
                                         >
-                                            <Trash2 /> Rimuovi
+                                            <Trash2 /> {t('Rimuovi')}
                                         </Button>
                                     </div>
 
@@ -202,16 +204,21 @@ export function ClientFormSheet({ open, client, onClose }: ClientFormSheetProps)
                                             className="border-destructive/50 bg-destructive/10 grid gap-2 rounded-md border p-3 text-sm"
                                         >
                                             <p>
-                                                {contact.name || 'Questo referente'} è collegato a {linkedProjects(contact.id)}{' '}
-                                                {linkedProjects(contact.id) === 1 ? 'progetto' : 'progetti'}. Rimuovendolo, il collegamento ai
-                                                progetti sparirà.
+                                                {linkedProjects(contact.id) === 1
+                                                    ? t(':name è collegato a 1 progetto. Rimuovendolo, il collegamento ai progetti sparirà.', {
+                                                          name: contact.name || t('Questo referente'),
+                                                      })
+                                                    : t(':name è collegato a :count progetti. Rimuovendolo, il collegamento ai progetti sparirà.', {
+                                                          name: contact.name || t('Questo referente'),
+                                                          count: linkedProjects(contact.id),
+                                                      })}
                                             </p>
                                             <div className="flex justify-end gap-2">
                                                 <Button type="button" variant="outline" size="sm" onClick={() => setConfirmingRemoval(null)}>
-                                                    Annulla
+                                                    {t('Annulla')}
                                                 </Button>
                                                 <Button type="button" variant="destructive" size="sm" onClick={() => removeContact(index)}>
-                                                    Rimuovi comunque
+                                                    {t('Rimuovi comunque')}
                                                 </Button>
                                             </div>
                                         </div>
@@ -223,10 +230,10 @@ export function ClientFormSheet({ open, client, onClose }: ClientFormSheetProps)
 
                     <SheetFooter className="flex-row justify-end gap-2">
                         <Button type="button" variant="outline" onClick={onClose}>
-                            Annulla
+                            {t('Annulla')}
                         </Button>
                         <Button type="submit" disabled={processing}>
-                            Salva
+                            {t('Salva')}
                         </Button>
                     </SheetFooter>
                 </form>

@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 import { formatMinutes } from '@/lib/time';
 import { AlertTriangle } from 'lucide-react';
 
@@ -15,7 +16,7 @@ export function HoursProgress({ usedMinutes, plannedHours }: HoursProgressProps)
     return (
         <div className="grid gap-1" style={{ minWidth: '9rem' }}>
             <span className="inline-flex items-center gap-1 whitespace-nowrap">
-                {overBudget && <AlertTriangle className="size-4" aria-label="Ore previste superate" />}
+                {overBudget && <AlertTriangle className="size-4" aria-label={t('Ore previste superate')} />}
                 {formatMinutes(usedMinutes)} / {formatMinutes(plannedMinutes)}
             </span>
             <div

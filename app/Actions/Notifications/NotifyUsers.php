@@ -18,9 +18,13 @@ final class NotifyUsers
      * in the app (always for approval requests, with a real-time alert to the browser) and/or by e-mail. Used inside the Actions' transactions:
      * the in-app notification follows their outcome, the e-mail is queued only after the commit.
      *
+     * The message is a translation key (the Italian text with `:placeholders`) and its parameters: every recipient
+     * sees it in their own language, in the app and in the e-mail.
+     *
      * @param  iterable<User>  $users
+     * @param  array<string, string|int|float>  $params
      */
-    public function handle(iterable $users, NotificationKind $kind, string $message, string $url, ?User $actor = null): void
+    public function handle(iterable $users, NotificationKind $kind, string $messageKey, array $params, string $url, ?User $actor = null): void
     {
         $recipients = [];
         foreach ($users as $user) {
@@ -31,12 +35,12 @@ final class NotifyUsers
 
         foreach ($recipients as $user) {
             if ($user->wantsNotification($kind, 'app')) {
-                $user->notify(new AppNotification($kind, $message, $url, $actor?->fullName()));
+                $user->notify(new AppNotification($kind, $messageKey, $params, $url, $actor?->fullName()));
                 NotificationsChanged::dispatch($user->id);
             }
 
             if ($user->wantsNotification($kind, 'mail')) {
-                Mail::to($user->email)->queue(new AppNotificationMail($message, $url));
+                Mail::to($user->email)->locale($user->locale->value)->queue(new AppNotificationMail($messageKey, $params, $url));
             }
         }
     }

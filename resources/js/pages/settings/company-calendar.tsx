@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import { t } from '@/lib/i18n';
 import { holidayKindLabels, type HolidayFormData } from '@/lib/schemas/holiday';
 import { type BreadcrumbItem, type Holiday } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
@@ -49,7 +50,7 @@ export default function CompanyCalendar({ weekdays, closures }: Props) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Calendario aziendale" />
+            <Head title={t('Calendario aziendale')} />
 
             <SettingsLayout>
                 <div className="space-y-10">
@@ -57,54 +58,58 @@ export default function CompanyCalendar({ weekdays, closures }: Props) {
 
                     <form onSubmit={save} className="space-y-4" noValidate>
                         <HeadingSmall
-                            title="Giorni lavorativi"
-                            description="I giorni della settimana in cui si lavora. Gli altri sono non lavorativi: niente quote, niente ore previste e non si possono chiedere assenze."
+                            title={t('Giorni lavorativi')}
+                            description={t(
+                                'I giorni della settimana in cui si lavora. Gli altri sono non lavorativi: niente quote, niente ore previste e non si possono chiedere assenze.',
+                            )}
                         />
                         <fieldset className="flex flex-wrap gap-3">
-                            <legend className="sr-only">Giorni lavorativi</legend>
+                            <legend className="sr-only">{t('Giorni lavorativi')}</legend>
                             {weekdayLabels.map((label, index) => (
                                 <label
                                     key={label}
                                     className="border-input flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm"
                                 >
                                     <input type="checkbox" checked={data.weekdays.includes(index + 1)} onChange={() => toggleDay(index + 1)} />
-                                    {label}
+                                    {t(label)}
                                 </label>
                             ))}
                         </fieldset>
                         <InputError message={errors.weekdays} />
-                        <p className="text-muted-foreground text-sm">Salvando si ricalcolano le quote giornaliere di tutte le attività aperte.</p>
+                        <p className="text-muted-foreground text-sm">
+                            {t('Salvando si ricalcolano le quote giornaliere di tutte le attività aperte.')}
+                        </p>
                         <Button type="submit" disabled={processing || data.weekdays.length === 0}>
-                            Salva i giorni lavorativi
+                            {t('Salva i giorni lavorativi')}
                         </Button>
                     </form>
 
                     <section className="space-y-4">
                         <HeadingSmall
-                            title="Festività e chiusure"
-                            description="Giorni in cui l'azienda è chiusa: festività del calendario e chiusure extra, come i ponti."
+                            title={t('Festività e chiusure')}
+                            description={t("Giorni in cui l'azienda è chiusa: festività del calendario e chiusure extra, come i ponti.")}
                         />
                         <div className="flex flex-wrap gap-2">
                             <Button variant="outline" size="sm" onClick={() => open(null, 'festivo')}>
-                                <Plus /> Nuova festività
+                                <Plus /> {t('Nuova festività')}
                             </Button>
                             <Button variant="outline" size="sm" onClick={() => open(null, 'chiusura')}>
-                                <Plus /> Nuova chiusura extra
+                                <Plus /> {t('Nuova chiusura extra')}
                             </Button>
                         </div>
 
                         {closures.length === 0 ? (
                             <p className="text-muted-foreground border-sidebar-border/70 rounded-md border border-dashed p-6 text-center text-sm">
-                                Nessuna festività o chiusura inserita
+                                {t('Nessuna festività o chiusura inserita')}
                             </p>
                         ) : (
                             <div className="border-sidebar-border/70 overflow-x-auto rounded-xl border">
                                 <table className="w-full text-sm">
                                     <thead className="bg-muted/50 text-left">
                                         <tr>
-                                            <th className="px-4 py-3 font-medium">Data</th>
-                                            <th className="px-4 py-3 font-medium">Nome</th>
-                                            <th className="px-4 py-3 font-medium">Tipo</th>
+                                            <th className="px-4 py-3 font-medium">{t('Data')}</th>
+                                            <th className="px-4 py-3 font-medium">{t('Nome')}</th>
+                                            <th className="px-4 py-3 font-medium">{t('Tipo')}</th>
                                             <th className="px-4 py-3" />
                                         </tr>
                                     </thead>
@@ -115,7 +120,7 @@ export default function CompanyCalendar({ weekdays, closures }: Props) {
                                                 <td className="px-4 py-3 font-medium">{closure.name}</td>
                                                 <td className="px-4 py-3">
                                                     <Badge variant={closure.kind === 'chiusura' ? 'secondary' : 'outline'}>
-                                                        {holidayKindLabels[closure.kind]}
+                                                        {t(holidayKindLabels[closure.kind])}
                                                     </Badge>
                                                 </td>
                                                 <td className="px-4 py-3 text-right whitespace-nowrap">
@@ -123,18 +128,18 @@ export default function CompanyCalendar({ weekdays, closures }: Props) {
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => open(closure)}
-                                                        aria-label={`Modifica ${closure.name}`}
+                                                        aria-label={t('Modifica :name', { name: closure.name })}
                                                     >
-                                                        <Pencil /> Modifica
+                                                        <Pencil /> {t('Modifica')}
                                                     </Button>
                                                     {confirmingDelete === closure.id ? (
                                                         <span className="inline-flex items-center gap-1">
-                                                            <span className="text-sm">Eliminare?</span>
+                                                            <span className="text-sm">{t('Eliminare?')}</span>
                                                             <Button variant="destructive" size="sm" onClick={() => remove(closure.id)}>
-                                                                Elimina
+                                                                {t('Elimina')}
                                                             </Button>
                                                             <Button variant="outline" size="sm" onClick={() => setConfirmingDelete(null)}>
-                                                                Annulla
+                                                                {t('Annulla')}
                                                             </Button>
                                                         </span>
                                                     ) : (
@@ -142,9 +147,9 @@ export default function CompanyCalendar({ weekdays, closures }: Props) {
                                                             variant="ghost"
                                                             size="sm"
                                                             onClick={() => setConfirmingDelete(closure.id)}
-                                                            aria-label={`Elimina ${closure.name}`}
+                                                            aria-label={t('Elimina :label', { label: closure.name })}
                                                         >
-                                                            <Trash2 /> Elimina
+                                                            <Trash2 /> {t('Elimina')}
                                                         </Button>
                                                     )}
                                                 </td>

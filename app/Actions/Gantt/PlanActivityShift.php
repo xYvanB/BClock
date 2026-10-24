@@ -71,7 +71,7 @@ final class PlanActivityShift
         $plan['shift'] = $shift;
 
         if ($newStart > $newDue) {
-            $plan['blockers'][] = 'La scadenza non può precedere l\'inizio.';
+            $plan['blockers'][] = __('La scadenza non può precedere l\'inizio.');
 
             return $plan;
         }
@@ -98,11 +98,11 @@ final class PlanActivityShift
         foreach ($moves as [$moved, $movedStart, $movedDue, $shiftManual]) {
             /** @var Activity $moved */
             if (in_array($moved->status, [WorkStatus::Done, WorkStatus::Archived], true)) {
-                $plan['blockers'][] = "«{$moved->name}» è {$this->statusLabel($moved->status)} e non si può spostare.";
+                $plan['blockers'][] = __('«:name» è :status e non si può spostare.', ['name' => $moved->name, 'status' => $this->statusLabel($moved->status)]);
             }
 
             if (! $user->can('update', $moved)) {
-                $plan['blockers'][] = "Non hai i permessi per spostare «{$moved->name}».";
+                $plan['blockers'][] = __('Non hai i permessi per spostare «:name».', ['name' => $moved->name]);
             }
 
             $project = $moved->project;
@@ -219,6 +219,6 @@ final class PlanActivityShift
 
     private function statusLabel(WorkStatus $status): string
     {
-        return $status === WorkStatus::Done ? 'completata' : 'archiviata';
+        return $status === WorkStatus::Done ? __('completata') : __('archiviata');
     }
 }

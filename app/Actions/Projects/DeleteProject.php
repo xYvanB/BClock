@@ -22,13 +22,13 @@ final class DeleteProject
         DB::transaction(function () use ($project): void {
             if ($project->timeEntries()->exists()) {
                 throw ValidationException::withMessages([
-                    'project' => 'Il progetto ha ore registrate: non si può eliminare, solo archiviare.',
+                    'project' => __('Il progetto ha ore registrate: non si può eliminare, solo archiviare.'),
                 ]);
             }
 
             if (Timer::whereIn('activity_id', $project->activities()->select('id'))->exists()) {
                 throw ValidationException::withMessages([
-                    'project' => 'Ci sono timer attivi su questo progetto: fermali prima di eliminarlo, oppure archivia il progetto.',
+                    'project' => __('Ci sono timer attivi su questo progetto: fermali prima di eliminarlo, oppure archivia il progetto.'),
                 ]);
             }
 

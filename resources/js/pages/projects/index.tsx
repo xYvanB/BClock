@@ -3,6 +3,7 @@ import { HoursProgress } from '@/components/hours-progress';
 import { ProjectFormSheet } from '@/components/project-form-sheet';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
+import { t } from '@/lib/i18n';
 import { statusLabel, statusOptions } from '@/lib/status';
 import { formatDay } from '@/lib/time';
 import {
@@ -60,26 +61,26 @@ export default function ProjectsIndex({ projects, filters, clients, users, areas
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Progetti" />
+            <Head title={t('Progetti')} />
 
             <div className="flex flex-col gap-4 p-4">
                 <FlashMessage />
 
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-semibold">Progetti</h1>
+                    <h1 className="text-2xl font-semibold">{t('Progetti')}</h1>
                     <Button onClick={() => setSheetOpen(true)}>
-                        <Plus /> Nuovo progetto
+                        <Plus /> {t('Nuovo progetto')}
                     </Button>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
                     <select
-                        aria-label="Filtra per cliente"
+                        aria-label={t('Filtra per cliente')}
                         className={fieldClass}
                         value={filters.client_id}
                         onChange={(event) => applyFilters({ client_id: event.target.value })}
                     >
-                        <option value="">Tutti i clienti</option>
+                        <option value="">{t('Tutti i clienti')}</option>
                         {clients.map((client) => (
                             <option key={client.id} value={client.id}>
                                 {client.company_name}
@@ -87,12 +88,12 @@ export default function ProjectsIndex({ projects, filters, clients, users, areas
                         ))}
                     </select>
                     <select
-                        aria-label="Filtra per area"
+                        aria-label={t('Filtra per area')}
                         className={fieldClass}
                         value={filters.area_id}
                         onChange={(event) => applyFilters({ area_id: event.target.value })}
                     >
-                        <option value="">Tutte le aree</option>
+                        <option value="">{t('Tutte le aree')}</option>
                         {areas.map((area) => (
                             <option key={area.id} value={area.id}>
                                 {area.name}
@@ -100,41 +101,44 @@ export default function ProjectsIndex({ projects, filters, clients, users, areas
                         ))}
                     </select>
                     <select
-                        aria-label="Filtra per stato"
+                        aria-label={t('Filtra per stato')}
                         className={fieldClass}
                         value={filters.status}
                         onChange={(event) => applyFilters({ status: event.target.value })}
                     >
-                        <option value="">Tutti gli stati</option>
+                        <option value="">{t('Tutti gli stati')}</option>
                         {statusOptions.map((option) => (
                             <option key={option.value} value={option.value}>
-                                {option.label}
+                                {t(option.label)}
                             </option>
                         ))}
                     </select>
                     <label className="flex items-center gap-2 text-sm">
                         <input type="checkbox" checked={filters.archived} onChange={(event) => applyFilters({ archived: event.target.checked })} />
-                        Mostra archiviati
+
+                        {t('Mostra archiviati')}
                     </label>
                 </div>
 
                 {projects.length === 0 ? (
                     <div className="border-sidebar-border/70 flex flex-col items-center gap-3 rounded-xl border border-dashed p-12 text-center">
                         <p className="text-muted-foreground">
-                            Nessun progetto{filters.client_id || filters.area_id || filters.status ? ' con questi filtri' : ' – crea il primo'}
+                            {filters.client_id || filters.area_id || filters.status
+                                ? t('Nessun progetto con questi filtri')
+                                : t('Nessun progetto – crea il primo')}
                         </p>
-                        <Button onClick={() => setSheetOpen(true)}>Crea progetto</Button>
+                        <Button onClick={() => setSheetOpen(true)}>{t('Crea progetto')}</Button>
                     </div>
                 ) : (
                     <div className="border-sidebar-border/70 overflow-x-auto rounded-xl border">
                         <table className="w-full text-sm">
                             <thead className="bg-muted/50 text-left">
                                 <tr>
-                                    <th className="px-4 py-3 font-medium">Nome</th>
-                                    <th className="px-4 py-3 font-medium">Cliente</th>
-                                    <th className="px-4 py-3 font-medium">Stato</th>
-                                    <th className="px-4 py-3 font-medium">Date</th>
-                                    <th className="px-4 py-3 font-medium">Ore (usate / previste)</th>
+                                    <th className="px-4 py-3 font-medium">{t('Nome')}</th>
+                                    <th className="px-4 py-3 font-medium">{t('Cliente')}</th>
+                                    <th className="px-4 py-3 font-medium">{t('Stato')}</th>
+                                    <th className="px-4 py-3 font-medium">{t('Date')}</th>
+                                    <th className="px-4 py-3 font-medium">{t('Ore (usate / previste)')}</th>
                                 </tr>
                             </thead>
                             <tbody>

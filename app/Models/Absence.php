@@ -137,7 +137,7 @@ class Absence extends Model
         $start = $this->starts_on->format('d/m/Y');
 
         if ($this->type === AbsenceType::Leave) {
-            return "{$start} dalle {$this->timeLabel($this->starts_time)} alle {$this->timeLabel($this->ends_time)}";
+            return "{$start} {$this->timeLabel($this->starts_time)}–{$this->timeLabel($this->ends_time)}";
         }
 
         return $this->starts_on->equalTo($this->ends_on) ? $start : "{$start} – {$this->ends_on->format('d/m/Y')}";

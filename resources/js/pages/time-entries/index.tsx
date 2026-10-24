@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
+import { t } from '@/lib/i18n';
 import { formatDay, formatMinutes, formatTime } from '@/lib/time';
 import { type ActivityOption, type BreadcrumbItem, type SharedData, type TimeEntryDay, type TimeEntryItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
@@ -48,41 +49,41 @@ export default function TimeEntriesIndex({ days, filters, activities }: Props) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Le mie ore" />
+            <Head title={t('Le mie ore')} />
 
             <div className="flex flex-col gap-4 p-4">
                 <FlashMessage />
 
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-semibold">Le mie ore</h1>
+                    <h1 className="text-2xl font-semibold">{t('Le mie ore')}</h1>
                     <div className="flex gap-2">
                         <Button variant="outline" onClick={() => setTimerOpen(true)}>
-                            <Play /> Avvia timer
+                            <Play /> {t('Avvia timer')}
                         </Button>
                         <Button onClick={openCreate}>
-                            <Plus /> Nuova registrazione
+                            <Plus /> {t('Nuova registrazione')}
                         </Button>
                     </div>
                 </div>
 
                 <div className="flex flex-wrap items-end gap-4">
                     <div className="grid gap-1">
-                        <Label htmlFor="filter-from">Dal</Label>
+                        <Label htmlFor="filter-from">{t('Dal')}</Label>
                         <Input id="filter-from" type="date" value={filters.from} onChange={(event) => applyFilters({ from: event.target.value })} />
                     </div>
                     <div className="grid gap-1">
-                        <Label htmlFor="filter-to">Al</Label>
+                        <Label htmlFor="filter-to">{t('Al')}</Label>
                         <Input id="filter-to" type="date" value={filters.to} onChange={(event) => applyFilters({ to: event.target.value })} />
                     </div>
                     <div className="grid gap-1">
-                        <Label htmlFor="filter-activity">Attività</Label>
+                        <Label htmlFor="filter-activity">{t('Attività')}</Label>
                         <select
                             id="filter-activity"
                             className="border-input bg-background h-9 rounded-md border px-3 text-sm"
                             value={filters.activity_id ?? ''}
                             onChange={(event) => applyFilters({ activity_id: event.target.value ? Number(event.target.value) : null })}
                         >
-                            <option value="">Tutte</option>
+                            <option value="">{t('Tutte')}</option>
                             {activities.map((activity) => (
                                 <option key={activity.id} value={activity.id}>
                                     {activity.project_name} › {activity.name}
@@ -94,8 +95,8 @@ export default function TimeEntriesIndex({ days, filters, activities }: Props) {
 
                 {days.length === 0 ? (
                     <div className="border-sidebar-border/70 flex flex-col items-center gap-3 rounded-xl border border-dashed p-12 text-center">
-                        <p className="text-muted-foreground">Nessuna registrazione nel periodo</p>
-                        <Button onClick={openCreate}>Registra ore</Button>
+                        <p className="text-muted-foreground">{t('Nessuna registrazione nel periodo')}</p>
+                        <Button onClick={openCreate}>{t('Registra ore')}</Button>
                     </div>
                 ) : (
                     <div className="border-sidebar-border/70 overflow-hidden rounded-xl border">
@@ -103,7 +104,7 @@ export default function TimeEntriesIndex({ days, filters, activities }: Props) {
                             <section key={day.date}>
                                 <header className="bg-muted/50 flex items-center justify-between px-4 py-2 text-sm font-semibold">
                                     <span className="capitalize">{formatDay(day.date)}</span>
-                                    <span>Totale giorno: {formatMinutes(day.total_minutes)}</span>
+                                    <span>{t('Totale giorno: :total', { total: formatMinutes(day.total_minutes) })}</span>
                                 </header>
                                 <ul>
                                     {day.entries.map((entry) => (
@@ -120,20 +121,20 @@ export default function TimeEntriesIndex({ days, filters, activities }: Props) {
                                                 <span className="min-w-48 flex-1 font-medium">
                                                     {entry.project_name} › {entry.activity_name}
                                                     {entry.activity_over_budget && (
-                                                        <span className="ml-2 font-normal" title="Ore previste dell'attività superate">
-                                                            ⚠️ attività oltre le ore previste
+                                                        <span className="ml-2 font-normal" title={t("Ore previste dell'attività superate")}>
+                                                            {t('⚠️ attività oltre le ore previste')}
                                                         </span>
                                                     )}
                                                     {entry.project_over_budget && (
-                                                        <span className="ml-2 font-normal" title="Ore previste del progetto superate">
-                                                            ⚠️ progetto oltre le ore previste
+                                                        <span className="ml-2 font-normal" title={t('Ore previste del progetto superate')}>
+                                                            {t('⚠️ progetto oltre le ore previste')}
                                                         </span>
                                                     )}
                                                 </span>
                                                 <span className="text-muted-foreground min-w-40 flex-1">{entry.description}</span>
                                                 <span className="w-16 text-right tabular-nums">{formatMinutes(entry.duration_minutes)}</span>
                                                 <span className="text-muted-foreground w-20 text-right">
-                                                    {entry.source === 'timer' ? '⏱ Timer' : '✎ Manuale'}
+                                                    {entry.source === 'timer' ? t('⏱ Timer') : t('✎ Manuale')}
                                                 </span>
                                             </button>
                                         </li>

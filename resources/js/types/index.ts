@@ -38,6 +38,8 @@ export interface SharedData {
     flash: { success: string | null };
     timers: ActiveTimer[];
     timer_warning_minutes: number;
+    /** Interface language of the person (`it` or `en`). */
+    locale: Locale;
     notifications: SharedNotifications | null;
     /** Server time (ISO 8601): corrects the browser clock in the elapsed time. */
     server_now: string;

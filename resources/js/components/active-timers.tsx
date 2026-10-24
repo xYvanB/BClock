@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { formatElapsed } from '@/lib/elapsed';
+import { t } from '@/lib/i18n';
 import { type SharedData } from '@/types';
 import { router, usePage } from '@inertiajs/react';
 import { AlertTriangle, Square, Timer } from 'lucide-react';
@@ -45,14 +46,14 @@ export function ActiveTimers() {
                             {timers.length}
                         </span>
                     )}
-                    {anyForgotten && <AlertTriangle className="text-destructive size-4" aria-label="Timer attivo da molte ore" />}
+                    {anyForgotten && <AlertTriangle className="text-destructive size-4" aria-label={t('Timer attivo da molte ore')} />}
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-96 max-w-[calc(100vw-2rem)] p-2">
-                <DropdownMenuLabel>Timer attivi</DropdownMenuLabel>
+                <DropdownMenuLabel>{t('Timer attivi')}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {timers.length === 0 ? (
-                    <p className="text-muted-foreground px-2 py-3 text-sm">Nessun timer attivo. Avviane uno dalla pagina Ore.</p>
+                    <p className="text-muted-foreground px-2 py-3 text-sm">{t('Nessun timer attivo. Avviane uno dalla pagina Ore.')}</p>
                 ) : (
                     <ul className="grid gap-2">
                         {timers.map((timer) => (
@@ -65,7 +66,7 @@ export function ActiveTimers() {
                                     </p>
                                     {isForgotten(timer.started_at) && (
                                         <p className="text-destructive mt-1 flex items-center gap-1 text-xs">
-                                            <AlertTriangle className="size-3" /> Attivo da molte ore: l'hai dimenticato?
+                                            <AlertTriangle className="size-3" /> {t("Attivo da molte ore: l'hai dimenticato?")}
                                         </p>
                                     )}
                                 </div>
@@ -75,9 +76,9 @@ export function ActiveTimers() {
                                         size="sm"
                                         variant="outline"
                                         onClick={() => stop(timer.id)}
-                                        aria-label={`Ferma il timer di ${timer.activity_name}`}
+                                        aria-label={t('Ferma il timer di :activity', { activity: timer.activity_name })}
                                     >
-                                        <Square /> Stop
+                                        <Square /> {t('Stop')}
                                     </Button>
                                 </div>
                             </li>

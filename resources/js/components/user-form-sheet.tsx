@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { t } from '@/lib/i18n';
 import { userSchema, type UserFormData } from '@/lib/schemas/user';
 import { flattenZodErrors } from '@/lib/zod-errors';
 import { type AreaOption, type ManagedUser, type Role } from '@/types';
@@ -86,47 +87,47 @@ export function UserFormSheet({ open, user, areas, assignableRoles, fixedAreaId,
             <SheetContent side="right" className="w-full sm:max-w-md">
                 <form onSubmit={submit} className="flex h-full flex-col gap-6" noValidate>
                     <SheetHeader>
-                        <SheetTitle>{user ? 'Modifica utente' : 'Nuovo utente'}</SheetTitle>
+                        <SheetTitle>{user ? t('Modifica utente') : t('Nuovo utente')}</SheetTitle>
                         <SheetDescription>
-                            {user ? 'Aggiorna i dati della persona.' : "Riceverà un'email con il link per scegliere la password."}
+                            {user ? t('Aggiorna i dati della persona.') : t("Riceverà un'email con il link per scegliere la password.")}
                         </SheetDescription>
                     </SheetHeader>
 
                     <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-4">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="user-name">Nome</Label>
+                                <Label htmlFor="user-name">{t('Nome')}</Label>
                                 <Input id="user-name" value={data.name} onChange={(event) => setData('name', event.target.value)} />
                                 <InputError message={errors.name} />
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="user-surname">Cognome</Label>
+                                <Label htmlFor="user-surname">{t('Cognome')}</Label>
                                 <Input id="user-surname" value={data.surname} onChange={(event) => setData('surname', event.target.value)} />
                                 <InputError message={errors.surname} />
                             </div>
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="user-email">Email</Label>
+                            <Label htmlFor="user-email">{t('Email')}</Label>
                             <Input id="user-email" type="email" value={data.email} onChange={(event) => setData('email', event.target.value)} />
                             <InputError message={errors.email} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="user-role">Ruolo</Label>
+                            <Label htmlFor="user-role">{t('Ruolo')}</Label>
                             <select id="user-role" className={fieldClass} value={data.role} onChange={(event) => setData('role', event.target.value)}>
                                 {(user?.is_self ? [user.role] : assignableRoles).map((role) => (
                                     <option key={role} value={role}>
-                                        {roleLabels[role]}
+                                        {t(roleLabels[role])}
                                     </option>
                                 ))}
                             </select>
-                            {user?.is_self && <p className="text-muted-foreground text-sm">Non puoi cambiare il tuo ruolo.</p>}
+                            {user?.is_self && <p className="text-muted-foreground text-sm">{t('Non puoi cambiare il tuo ruolo.')}</p>}
                             <InputError message={errors.role} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="user-area">Area</Label>
+                            <Label htmlFor="user-area">{t('Area')}</Label>
                             <select
                                 id="user-area"
                                 className={fieldClass}
@@ -134,19 +135,21 @@ export function UserFormSheet({ open, user, areas, assignableRoles, fixedAreaId,
                                 disabled={fixedAreaId !== null}
                                 onChange={(event) => setData('area_id', event.target.value)}
                             >
-                                <option value="">Nessuna</option>
+                                <option value="">{t('Nessuna')}</option>
                                 {areas.map((area) => (
                                     <option key={area.id} value={area.id}>
                                         {area.name}
                                     </option>
                                 ))}
                             </select>
-                            {fixedAreaId !== null && <p className="text-muted-foreground text-sm">L'area è quella del tuo team e non si può cambiare.</p>}
+                            {fixedAreaId !== null && (
+                                <p className="text-muted-foreground text-sm">{t("L'area è quella del tuo team e non si può cambiare.")}</p>
+                            )}
                             <InputError message={errors.area_id} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="user-capacity">Capacità giornaliera (ore)</Label>
+                            <Label htmlFor="user-capacity">{t('Capacità giornaliera (ore)')}</Label>
                             <Input
                                 id="user-capacity"
                                 type="number"
@@ -162,10 +165,10 @@ export function UserFormSheet({ open, user, areas, assignableRoles, fixedAreaId,
 
                     <SheetFooter className="flex-row justify-end gap-2">
                         <Button type="button" variant="outline" onClick={onClose}>
-                            Annulla
+                            {t('Annulla')}
                         </Button>
                         <Button type="submit" disabled={processing}>
-                            {user ? 'Salva' : 'Invia invito'}
+                            {user ? t('Salva') : t('Invia invito')}
                         </Button>
                     </SheetFooter>
                 </form>

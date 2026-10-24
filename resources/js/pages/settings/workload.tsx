@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import { t } from '@/lib/i18n';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
@@ -31,14 +32,16 @@ export default function WorkloadSettings({ tolerance_enabled, tolerance_hours }:
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Carico di lavoro" />
+            <Head title={t('Carico di lavoro')} />
 
             <SettingsLayout>
                 <div className="space-y-6">
                     <FlashMessage />
                     <HeadingSmall
-                        title="Carico di lavoro"
-                        description='Un giorno è "pieno" quando le ore assegnate coincidono con quelle disponibili. Con la tolleranza attiva basta esserci vicini.'
+                        title={t('Carico di lavoro')}
+                        description={t(
+                            'Un giorno è "pieno" quando le ore assegnate coincidono con quelle disponibili. Con la tolleranza attiva basta esserci vicini.',
+                        )}
                     />
 
                     <form onSubmit={submit} className="space-y-6" noValidate>
@@ -48,12 +51,12 @@ export default function WorkloadSettings({ tolerance_enabled, tolerance_hours }:
                                 checked={data.tolerance_enabled}
                                 onChange={(event) => setData('tolerance_enabled', event.target.checked)}
                             />
-                            <span className="font-medium">Attiva la tolleranza sul livello "pieno"</span>
+                            <span className="font-medium">{t('Attiva la tolleranza sul livello "pieno"')}</span>
                         </label>
                         <InputError message={errors.tolerance_enabled} />
 
                         <div className="grid max-w-xs gap-2">
-                            <Label htmlFor="tolerance-hours">Scarto massimo (ore)</Label>
+                            <Label htmlFor="tolerance-hours">{t('Scarto massimo (ore)')}</Label>
                             <Input
                                 id="tolerance-hours"
                                 type="number"
@@ -65,13 +68,13 @@ export default function WorkloadSettings({ tolerance_enabled, tolerance_hours }:
                                 onChange={(event) => setData('tolerance_hours', event.target.value)}
                             />
                             <p className="text-muted-foreground text-sm">
-                                Con 0,5 ore, su una giornata da 8 ore sono "piene" quelle da 7,5 a 8,5 ore assegnate.
+                                {t('Con 0,5 ore, su una giornata da 8 ore sono "piene" quelle da 7,5 a 8,5 ore assegnate.')}
                             </p>
                             <InputError message={errors.tolerance_hours} />
                         </div>
 
                         <Button type="submit" disabled={processing}>
-                            Salva
+                            {t('Salva')}
                         </Button>
                     </form>
                 </div>
