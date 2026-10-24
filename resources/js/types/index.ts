@@ -371,3 +371,55 @@ export interface GanttPreview {
     projects: { project_id: number; name: string; due_on: string; new_due_on: string }[];
     blockers: string[];
 }
+
+export interface DashboardFilters {
+    from: string;
+    to: string;
+    project_id: number | null;
+    day: string;
+    user_ids: number[];
+    user_id: number | null;
+    area_id: number | null;
+    granularity: 'day' | 'week' | 'month';
+}
+
+export interface ProjectHours {
+    total_hours: number;
+    projects: { id: number; name: string; client: string; planned_hours: number; period_hours: number; total_hours: number }[];
+    selected: {
+        project_id: number;
+        activities: { id: number; name: string; planned_hours: number; hours: number }[];
+        people: { id: number; name: string; hours: number }[];
+    } | null;
+    options: { id: number; name: string }[];
+}
+
+export interface DayHours {
+    day: string;
+    people: {
+        id: number;
+        name: string;
+        capacity_hours: number;
+        total_minutes: number;
+        entries: {
+            id: number;
+            activity: string;
+            project: string;
+            started_at: string;
+            ended_at: string;
+            minutes: number;
+            description: string | null;
+        }[];
+    }[];
+    options: { id: number; name: string }[];
+}
+
+export interface WorkedHours {
+    granularity: 'day' | 'week' | 'month';
+    buckets: { label: string; from: string; to: string }[];
+    rows: { id: number; name: string; minutes: number[]; total: number }[];
+    column_totals: number[];
+    grand_total: number;
+    people: { id: number; name: string }[];
+    areas: { id: number; name: string }[];
+}

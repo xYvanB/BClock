@@ -9,6 +9,7 @@ use App\Enum\Palette;
 use App\Enum\Role;
 use App\Enum\TimeFormat;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -95,6 +96,21 @@ class User extends Authenticatable
     public function timeEntries(): HasMany
     {
         return $this->hasMany(TimeEntry::class);
+    }
+
+    /**
+     * Persone di cui `$viewer` vede i dati nella dashboard: il Capo e l'HR tutte, il Capo area quelle della sua area
+     * (solo sé stesso se non ha un'area), il Dipendente solo sé stesso.
+     *
+     * @param  Builder<User>  $query
+     */
+    public function scopeVisibleTo(Builder $query, User $viewer): void
+    {
+        match (true) {
+            $viewer->hasRole(Role::Boss, Role::Hr) => null,
+            $viewer->hasRole(Role::AreaHead) && $viewer->area_id !== null => $query->where('users.area_id', $viewer->area_id),
+            default => $query->where('users.id', $viewer->id),
+        };
     }
 
     public function hasRole(Role ...$roles): bool

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enum\Role;
 use App\Enum\TimeEntrySource;
 use Database\Factories\TimeEntryFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -28,6 +30,21 @@ class TimeEntry extends Model
         'description',
         'source',
     ];
+
+    /**
+     * Registrazioni che `$viewer` vede nella dashboard: tutte per il Capo e l'HR, quelle delle persone della sua area
+     * per il Capo area (solo le proprie se non ha un'area), le proprie per il Dipendente.
+     *
+     * @param  Builder<TimeEntry>  $query
+     */
+    public function scopeVisibleTo(Builder $query, User $viewer): void
+    {
+        match (true) {
+            $viewer->hasRole(Role::Boss, Role::Hr) => null,
+            $viewer->hasRole(Role::AreaHead) && $viewer->area_id !== null => $query->whereIn('time_entries.user_id', User::query()->where('area_id', $viewer->area_id)->select('id')),
+            default => $query->where('time_entries.user_id', $viewer->id),
+        };
+    }
 
     /**
      * @return array<string, string>
