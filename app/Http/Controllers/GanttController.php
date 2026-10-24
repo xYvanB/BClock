@@ -89,7 +89,7 @@ class GanttController extends Controller
                     ->map(fn ($project): array => ['id' => $project->id, 'name' => $project->name]),
                 'areas' => $canFilterArea ? Area::orderBy('name')->get(['id', 'name']) : [],
                 'people' => $user->hasRole(Role::Employee) ? [] : User::query()
-                    ->when($user->hasRole(Role::AreaHead), fn ($query) => $query->where('area_id', $user->area_id))
+                    ->when($user->hasRole(Role::AreaHead), fn ($query) => $user->area_id !== null ? $query->where('area_id', $user->area_id) : $query->whereKey($user->id))
                     ->orderBy('surname')->orderBy('name')->get()
                     ->map(fn (User $person): array => ['id' => $person->id, 'name' => $person->fullName()]),
             ],
@@ -140,7 +140,14 @@ class GanttController extends Controller
             return null;
         }
 
-        return ['activity_id' => $activity->id] + $planner->handle(
+        return [
+            'activity_id' => $activity->id,
+            'requested' => [
+                'mode' => $request->string('preview_mode')->toString(),
+                'start' => $request->string('preview_start')->toString(),
+                'due' => $request->string('preview_due')->toString(),
+            ],
+        ] + $planner->handle(
             $request->user(),
             $activity,
             $request->string('preview_mode')->toString(),
@@ -156,7 +163,7 @@ class GanttController extends Controller
     {
         return Activity::query()->when(
             ! $user->hasRole(Role::Boss, Role::Hr),
-            fn ($query) => $query->whereHas('assignees', fn ($q) => $user->hasRole(Role::AreaHead)
+            fn ($query) => $query->whereHas('assignees', fn ($q) => $user->hasRole(Role::AreaHead) && $user->area_id !== null
                 ? $q->where('users.area_id', $user->area_id)
                 : $q->where('users.id', $user->id)),
         );

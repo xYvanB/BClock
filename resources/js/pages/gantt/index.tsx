@@ -197,7 +197,12 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
     );
 
     const selectedActivity = projects.flatMap((project) => project.activities).find((activity) => activity.id === selected);
-    const previewReady = request !== null && preview?.activity_id === request.activity.id;
+    const previewReady =
+        request !== null &&
+        preview?.activity_id === request.activity.id &&
+        preview.requested.mode === request.mode &&
+        preview.requested.start === request.startsOn &&
+        preview.requested.due === request.dueOn;
     const todayLeft = diffDays(from, today) * px + px / 2;
     const bodyHeight = rows.length * ROW_HEIGHT;
 
@@ -428,8 +433,6 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
                                                                             event.stopPropagation();
                                                                             onPointerDown(event, row.activity, 'resize_start');
                                                                         }}
-                                                                        onPointerMove={(event) => onPointerMove(event, row.activity)}
-                                                                        onPointerUp={() => onPointerUp(row.activity)}
                                                                     />
                                                                     <span
                                                                         aria-hidden
@@ -438,8 +441,6 @@ export default function GanttIndex({ zoom, filters, from, to, today, projects, f
                                                                             event.stopPropagation();
                                                                             onPointerDown(event, row.activity, 'resize_end');
                                                                         }}
-                                                                        onPointerMove={(event) => onPointerMove(event, row.activity)}
-                                                                        onPointerUp={() => onPointerUp(row.activity)}
                                                                     />
                                                                 </>
                                                             )}

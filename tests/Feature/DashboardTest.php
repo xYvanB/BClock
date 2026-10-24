@@ -278,3 +278,15 @@ it('requires a login for the dashboard and its export', function (): void {
     $this->get(route('dashboard'))->assertRedirect(route('login'));
     $this->get(route('dashboard.export'))->assertRedirect(route('login'));
 });
+
+it('neutralises spreadsheet formulas in the CSV cells', function (): void {
+    $user = User::factory()->employee()->create(['name' => '=cmd', 'surname' => 'Rossi']);
+    $entry = logHours($user, dashboardActivity(dashboardProject('+Progetto'), '@Attività'), '2026-11-10', 60);
+    $entry->update(['description' => '-1+1']);
+
+    $csv = $this->actingAs(User::factory()->boss()->create())
+        ->get(route('dashboard.export', ['from' => '2026-11-01', 'to' => '2026-11-30']))
+        ->streamedContent();
+
+    expect($csv)->toContain("'+Progetto")->toContain("'@Attività")->toContain("'=cmd Rossi")->toContain("'-1+1");
+});

@@ -357,6 +357,8 @@ export type GanttShiftMode = 'move' | 'resize_start' | 'resize_end';
 
 export interface GanttPreview {
     activity_id: number;
+    /** La richiesta a cui si riferisce l'anteprima: serve a scartare quelle rimaste dalla richiesta precedente. */
+    requested: { mode: GanttShiftMode; start: string; due: string };
     mode: GanttShiftMode;
     shift: number;
     changes: {

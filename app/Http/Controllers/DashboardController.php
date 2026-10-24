@@ -95,19 +95,21 @@ class DashboardController extends Controller
             fwrite($out, "\xEF\xBB\xBF");
             fputcsv($out, ['Data', 'Progetto', 'Cliente', 'Attività', 'Persona', 'Area', 'Inizio', 'Fine', 'Ore', 'Descrizione'], ';');
 
-            $entries->chunk(500, function ($chunk) use ($out): void {
+            $safe = fn (?string $text): ?string => $text !== null && preg_match('/^[=+\-@\t\r]/', $text) === 1 ? "'".$text : $text;
+
+            $entries->chunk(500, function ($chunk) use ($out, $safe): void {
                 foreach ($chunk as $entry) {
                     fputcsv($out, [
                         $entry->date->format('d/m/Y'),
-                        $entry->activity->project->name,
-                        $entry->activity->project->client->company_name,
-                        $entry->activity->name,
-                        $entry->user->fullName(),
-                        $entry->user->area?->name,
+                        $safe($entry->activity->project->name),
+                        $safe($entry->activity->project->client->company_name),
+                        $safe($entry->activity->name),
+                        $safe($entry->user->fullName()),
+                        $safe($entry->user->area?->name),
                         substr($entry->started_at, 0, 5),
                         substr($entry->ended_at, 0, 5),
                         number_format($entry->duration_minutes / 60, 2, ',', ''),
-                        $entry->description,
+                        $safe($entry->description),
                     ], ';');
                 }
             });

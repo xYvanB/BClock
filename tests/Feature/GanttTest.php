@@ -296,6 +296,7 @@ it('previews the shift on a partial reload: changes, extensions and blockers', f
 
     $this->actingAs(User::factory()->boss()->create())->get(route('gantt.index', $query))
         ->assertInertia(fn (Assert $page) => $page->reloadOnly('preview', fn (Assert $reload) => $reload
+            ->where('preview.requested', ['mode' => 'move', 'start' => '2026-11-11', 'due' => '2026-11-13'])
             ->where('preview.shift', 2)
             ->has('preview.changes', 3)
             ->where('preview.changes.0.new_starts_on', '2026-11-11')
