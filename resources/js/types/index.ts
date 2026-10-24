@@ -243,3 +243,34 @@ export interface AreaOption {
     id: number;
     name: string;
 }
+
+export type AbsenceType = 'ferie' | 'permesso';
+
+export type AbsenceStatus = 'in_attesa' | 'confermata' | 'rifiutata';
+
+export interface Absence {
+    id: number;
+    user_name: string;
+    type: AbsenceType;
+    starts_on: string;
+    ends_on: string;
+    note: string | null;
+    rejection_reason: string | null;
+    is_own: boolean;
+    status: AbsenceStatus;
+    can_update: boolean;
+    can_delete: boolean;
+    can_confirm: boolean;
+    can_reject: boolean;
+}
+
+export interface Holiday {
+    id: number;
+    date: string;
+    name: string;
+}
+
+export interface AppNotification {
+    id: string;
+    message: string;
+}

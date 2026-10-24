@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\AbsenceController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectTemplateController;
@@ -58,6 +60,18 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('timers', [TimerController::class, 'store'])->name('timers.store');
     Route::post('timers/{timer}/stop', [TimerController::class, 'stop'])->name('timers.stop');
+
+    Route::get('absences', [AbsenceController::class, 'index'])->name('absences.index');
+    Route::post('absences', [AbsenceController::class, 'store'])->name('absences.store');
+    Route::put('absences/{absence}', [AbsenceController::class, 'update'])->name('absences.update');
+    Route::delete('absences/{absence}', [AbsenceController::class, 'destroy'])->name('absences.destroy');
+    Route::post('absences/notifications/read', [AbsenceController::class, 'readNotifications'])->name('absences.notifications.read');
+    Route::post('absences/{absence}/reject', [AbsenceController::class, 'reject'])->name('absences.reject');
+    Route::post('absences/{absence}/confirm', [AbsenceController::class, 'confirm'])->name('absences.confirm');
+
+    Route::post('holidays', [HolidayController::class, 'store'])->name('holidays.store');
+    Route::put('holidays/{holiday}', [HolidayController::class, 'update'])->name('holidays.update');
+    Route::delete('holidays/{holiday}', [HolidayController::class, 'destroy'])->name('holidays.destroy');
 
     Route::resource('time-entries', TimeEntryController::class)
         ->only(['index', 'store', 'update', 'destroy']);
