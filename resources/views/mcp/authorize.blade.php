@@ -24,7 +24,16 @@
 <body class="font-sans antialiased bg-background text-foreground">
 <div class="min-h-screen flex items-center justify-center p-4">
     <main class="w-full max-w-lg rounded-lg border bg-card text-card-foreground shadow-sm p-7 space-y-4">
-        <p class="text-sm font-semibold">{{ config('app.name') }}</p>
+        <div class="flex items-center gap-2">
+            <svg class="h-7 w-auto text-primary" viewBox="-8 -8 110 164" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke-width="14" d="M0 0H44A34 34 0 0 1 44 68H0M0 68H54A40 40 0 0 1 54 148H0V0" />
+                    <path stroke-width="8" d="M35 18V40H53" />
+                </g>
+                <circle cx="35" cy="40" r="6" fill="currentColor" />
+            </svg>
+            <p class="text-sm font-semibold">{{ config('app.name') }}</p>
+        </div>
 
         <h1 class="text-xl font-semibold leading-tight">{{ __('Collegare «:app» a BClock?', ['app' => $client->name]) }}</h1>
 
