@@ -19,6 +19,19 @@ BClock is a web app for logging and planning a company's working hours: customer
 - **Personal preferences**: language, time format, workload and colour theme (including a custom palette).
 - **Connected AI apps**: an MCP server lets assistants such as Claude read projects and hours and log time on behalf of the person who authorized them.
 
+## Screenshots
+
+Taken with the demo data, using the Italian interface.
+
+| | |
+| --- | --- |
+| ![Dashboard](public/screenshots/dashboard.png) **Dashboard** | ![Calendar](public/screenshots/calendario.png) **Calendar** |
+| ![Gantt chart](public/screenshots/gantt.png) **Gantt chart** | ![Projects](public/screenshots/progetti.png) **Projects** |
+| ![Hours and timer](public/screenshots/ore-timer.png) **Hours and timer** | ![Absences](public/screenshots/assenze.png) **Absences** |
+| ![Customers](public/screenshots/clienti.png) **Customers** | ![Users](public/screenshots/utenti.png) **Users** |
+| ![Templates](public/screenshots/template.png) **Templates** | ![Company calendar](public/screenshots/calendario-aziendale.png) **Company calendar** |
+| ![Preferences and colour themes](public/screenshots/impostazioni-temi.png) **Preferences and colour themes** | ![Dark theme](public/screenshots/tema-scuro.png) **Dark theme** |
+
 ## Tech stack
 
 Laravel 13 (PHP 8.4), Inertia 2 with React 19 and TypeScript, Tailwind CSS 4, Laravel Reverb for real time, Laravel Passport and Laravel MCP for connected AI apps, and Pest for tests.
